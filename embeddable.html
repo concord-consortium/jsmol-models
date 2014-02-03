@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html style="height:100%">
+<head>
+<meta charset="utf-8">
+<title>JSmol -- Jmol/HTML5 Demo</title>
+<script type="text/javascript" src="jsmol/JSmol.min.js"></script>
+
+<script type="text/javascript">
+
+var jmolApplet0;
+
+// logic is set by indicating order of USE -- default is HTML5 for this page, though
+var use = "HTML5" // JAVA HTML5 WEBGL IMAGE  are all options
+var s = document.location.search;
+
+// Developers: The debugCode flag is checked in j2s/core/core.z.js, 
+// and, if TRUE, skips loading the core methods, forcing those
+// to be read from their individual directories. Set this
+// true if you want to do some code debugging by inserting
+// System.out.println, document.title, or alert commands
+// anywhere in the Java or Jmol code.
+
+Jmol.debugCode = (s.indexOf("debugcode") >= 0);
+
+jmol_isReady = function(applet) {
+	document.title = (applet._id + " - Jmol " + ___JmolVersion)
+}
+
+var Info = {
+	width: "100%",
+	height: "100%",
+	debug: false,
+	color: "0xFFFFFF",
+	addSelectionOptions: false,
+	serverURL: "http://chemapps.stolaf.edu/jmol/jsmol/php/jsmol.php",
+	use: "HTML5",
+	j2sPath: "jsmol/j2s",
+	readyFunction: jmol_isReady,
+	script: "set antialiasDisplay;load jsmol/data/caffeine.mol",
+	//jarPath: "java",
+	//jarFile: (useSignedApplet ? "JmolAppletSigned.jar" : "JmolApplet.jar"),
+	//isSigned: useSignedApplet,
+	disableJ2SLoadMonitor: true,
+	disableInitialConsole: true,
+	allowJavaScript: true
+	//defaultModel: "$dopamine",
+	//console: "none", // default will be jmolApplet0_infodiv
+};
+
+$(document).ready(function() {
+  $("#appdiv").html(Jmol.getAppletHtml("jmolApplet0", Info))
+});
+
+</script>
+</head>
+
+<body style="height:100%;margin:0;overflow:hidden">
+	<div id="appdiv" style="width:100%;height:100%"></div>
+</body>
+
+</html>
