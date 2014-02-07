@@ -80,8 +80,13 @@ phone.addListener('stop', function () {
 	// Notify iframe model that we received 'stop' message and reacted appropriately.
 	phone.post('stop.iframe-model');
 });
-phone.addListener('jmolScript', function (content) {
+phone.addListener('jsmolScript', function (content) {
 	Jmol.script(jmolApplet0, content);
+});
+phone.addListener('set', function (content) {
+	var propName = content.name;
+	var propVal = content.value;
+	Jmol.script(jmolApplet0, 'set ' + propName + ' ' + propVal);
 });
 // Initialize connection *after* listeners are added!
 phone.initialize();
@@ -89,9 +94,10 @@ phone.initialize();
 // Register Scripting API functions shortcuts. 
 phone.post('registerScriptingAPIFunc', 'play');
 phone.post('registerScriptingAPIFunc', 'stop');
-phone.post('registerScriptingAPIFunc', 'jmolScript');
+phone.post('registerScriptingAPIFunc', 'jsmolScript');
+phone.post('registerScriptingAPIFunc', 'set');
 
-</script>
+</script>	
 </head>
 <body>
 	<div id="appdiv"></div>
