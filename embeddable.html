@@ -86,6 +86,11 @@ phone.addListener('jmolScript', function (content) {
 // Initialize connection *after* listeners are added!
 phone.initialize();
 
+// Register Scripting API functions shortcuts. 
+phone.post('registerScriptingAPIFunc', 'play');
+phone.post('registerScriptingAPIFunc', 'stop');
+phone.post('registerScriptingAPIFunc', 'jmolScript');
+
 </script>
 </head>
 <body>
