@@ -80,6 +80,9 @@ phone.addListener('stop', function () {
 	// Notify iframe model that we received 'stop' message and reacted appropriately.
 	phone.post('stop.iframe-model');
 });
+phone.addListener('jmolScript', function (content) {
+	Jmol.script(jmolApplet0, content);
+});
 // Initialize connection *after* listeners are added!
 phone.initialize();
 
