@@ -14,13 +14,14 @@
 		margin: 0;
 	}
 	#appdiv {
-		width:100%;
-		height:100%;
+		width: 100%;
+		height: 100%;
 	}
 </style>
 
 <script type="text/javascript" src="jsmol/JSmol.min.js"></script>
 <script type="text/javascript" src="iframe-phone/dist/iframe-phone.js"></script>
+<script type="text/javascript" src="http://shutterbug.herokuapp.com/shutterbug/shutterbug.js"></script>
 <script type="text/javascript">
 
 var jmolApplet0;
@@ -64,7 +65,9 @@ var Info = {
 };
 
 $(document).ready(function() {
-  $("#appdiv").html(Jmol.getAppletHtml("jmolApplet0", Info))
+  $("#appdiv").html(Jmol.getAppletHtml("jmolApplet0", Info));
+  // Snapshot support.
+  new Shutterbug('#appdiv');
 });
 
 /********************* integration with Lab *********************/
@@ -101,5 +104,6 @@ phone.post('registerScriptingAPIFunc', 'set');
 </head>
 <body>
 	<div id="appdiv"></div>
+	<div id="dest"></div>
 </body>
 </html>
