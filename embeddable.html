@@ -39,10 +39,6 @@ var s = document.location.search;
 
 Jmol.debugCode = (s.indexOf("debugcode") >= 0);
 
-jmol_isReady = function(applet) {
-	document.title = (applet._id + " - Jmol " + ___JmolVersion)
-}
-
 var Info = {
 	width: "100%",
 	height: "100%",
@@ -52,7 +48,6 @@ var Info = {
 	serverURL: "http://chemapps.stolaf.edu/jmol/jsmol/php/jsmol.php",
 	use: "HTML5",
 	j2sPath: "jsmol/j2s",
-	readyFunction: jmol_isReady,
 	script: "set antialiasDisplay;load jsmol/data/caffeine.mol",
 	//jarPath: "java",
 	//jarFile: (useSignedApplet ? "JmolAppletSigned.jar" : "JmolApplet.jar"),
@@ -66,11 +61,31 @@ var Info = {
 
 $(document).ready(function() {
   $("#appdiv").html(Jmol.getAppletHtml("jmolApplet0", Info));
+  setHashProperties();
   // Snapshot support.
   new Shutterbug('#appdiv');
 });
 
 /********************* integration with Lab *********************/
+
+function setHashProperties() {
+	var hash = document.location.hash.substring(1); // rm #
+	if (hash === "") return;
+	hash.split("&").forEach(function (prop) {
+		var nameValue = prop.split("=");
+		setProperty(nameValue[0], nameValue[1]);
+	});
+}
+
+function setProperty(name, value) {
+	if (name === 'molecule') {
+		// It's special property, not supported natively by JSmol, but it can be used
+		// by Lab to load a molecule model.
+		Jmol.script(jmolApplet0, 'load ' + value);
+		return;
+	}
+	Jmol.script(jmolApplet0, 'set ' + name + ' ' + value);
+}
 
 var phone = iframePhone.getIFrameEndpoint();
 phone.addListener('play', function () {
@@ -87,9 +102,7 @@ phone.addListener('jsmolScript', function (content) {
 	Jmol.script(jmolApplet0, content);
 });
 phone.addListener('set', function (content) {
-	var propName = content.name;
-	var propVal = content.value;
-	Jmol.script(jmolApplet0, 'set ' + propName + ' ' + propVal);
+	setProperty(content.name, content.value);
 });
 // Initialize connection *after* listeners are added!
 phone.initialize();
