@@ -26,10 +26,6 @@
 
 var jmolApplet0;
 
-// logic is set by indicating order of USE -- default is HTML5 for this page, though
-var use = "HTML5" // JAVA HTML5 WEBGL IMAGE  are all options
-var s = document.location.search;
-
 // Developers: The debugCode flag is checked in j2s/core/core.z.js, 
 // and, if TRUE, skips loading the core methods, forcing those
 // to be read from their individual directories. Set this
@@ -37,7 +33,7 @@ var s = document.location.search;
 // System.out.println, document.title, or alert commands
 // anywhere in the Java or Jmol code.
 
-Jmol.debugCode = (s.indexOf("debugcode") >= 0);
+Jmol.debugCode = (document.location.search.indexOf("debugcode") >= 0);
 
 var Info = {
 	width: "100%",
@@ -48,14 +44,13 @@ var Info = {
 	serverURL: "http://chemapps.stolaf.edu/jmol/jsmol/php/jsmol.php",
 	use: "HTML5",
 	j2sPath: "jsmol/j2s",
-	script: "set antialiasDisplay;load jsmol/data/caffeine.mol",
 	//jarPath: "java",
 	//jarFile: (useSignedApplet ? "JmolAppletSigned.jar" : "JmolApplet.jar"),
 	//isSigned: useSignedApplet,
 	disableJ2SLoadMonitor: true,
 	disableInitialConsole: true,
 	allowJavaScript: true
-	//defaultModel: "$dopamine",
+	// defaultModel: "$dopamine",
 	//console: "none", // default will be jmolApplet0_infodiv
 };
 
@@ -66,7 +61,6 @@ $(document).ready(function() {
   new Shutterbug('#appdiv');
 });
 
-/********************* integration with Lab *********************/
 
 function setHashProperties() {
 	var hash = document.location.hash.substring(1); // rm #
@@ -86,6 +80,8 @@ function setProperty(name, value) {
 	}
 	Jmol.script(jmolApplet0, 'set ' + name + ' ' + value);
 }
+
+/********************* integration with Lab *********************/
 
 var phone = iframePhone.getIFrameEndpoint();
 phone.addListener('play', function () {
