@@ -1,0 +1,5 @@
+deploy
+bin
+.bundle
+*.sublime-project
+*.sublime-workspace
