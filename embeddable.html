@@ -17,6 +17,11 @@
 		width: 100%;
 		height: 100%;
 	}
+	.jsmol-cont {
+		width: 100%;
+		height: 100%;	
+		display: inline-block;
+	}
 </style>
 
 <script type="text/javascript" src="jsmol/JSmol.min.js"></script>
@@ -24,7 +29,16 @@
 <script type="text/javascript" src="http://shutterbug.herokuapp.com/shutterbug/shutterbug.js"></script>
 <script type="text/javascript">
 
-var jmolApplet0;
+
+var jsmolAppletsCount = (function () {
+	var result = 1;
+	forEachHashProp(function (name, value) {
+		if (name === 'moleculesCount') result = Number(value);
+	})
+	return result;
+}());
+
+var jsmolApplets = {};
 
 // Developers: The debugCode flag is checked in j2s/core/core.z.js, 
 // and, if TRUE, skips loading the core methods, forcing those
@@ -35,7 +49,7 @@ var jmolApplet0;
 
 Jmol.debugCode = (document.location.search.indexOf("debugcode") >= 0);
 
-var Info = {
+var defaultInfo = {
 	width: "100%",
 	height: "100%",
 	debug: false,
@@ -44,46 +58,95 @@ var Info = {
 	serverURL: "http://chemapps.stolaf.edu/jmol/jsmol/php/jsmol.php",
 	use: "HTML5",
 	j2sPath: "jsmol/j2s",
-	readyFunction: jsmolReady,
 	//jarPath: "java",
 	//jarFile: (useSignedApplet ? "JmolAppletSigned.jar" : "JmolApplet.jar"),
 	//isSigned: useSignedApplet,
 	disableJ2SLoadMonitor: true,
 	disableInitialConsole: true,
 	allowJavaScript: true
-	// defaultModel: "$dopamine",
+	// defaultModel: "$dopamine"
 	//console: "none", // default will be jmolApplet0_infodiv
 };
 
 $(document).ready(function() {
-  $("#appdiv").html(Jmol.getAppletHtml("jmolApplet0", Info));
-  setHashProperties();
-  // Snapshot support.
-  new Shutterbug('#appdiv');
+	var $appdiv = $('#appdiv');
+	var appletLoadedDef = [];
+	// Make sure that .getApplet() calls won't insert automatically applet in the page.
+	Jmol.setDocument(0);
+ 	for (var i = 0; i < jsmolAppletsCount; i++) {
+ 		(function (i) {
+	 		// Create applet.
+ 			var id = "m" + i;
+ 			var deffered = new $.Deferred();
+	 		var info = $.extend({}, defaultInfo);
+	 		info.readyFunction = function () {
+ 				deffered.resolve();
+ 			};
+ 			jsmolApplets[id] = Jmol.getApplet(id, info);
+ 			appletLoadedDef.push(deffered);
+
+ 			// Insert applet in the page.
+ 			var $container = $('<div class="jsmol-cont">').appendTo($appdiv);
+	 		$container.html(Jmol.getAppletHtml(jsmolApplets[id]));
+	 		$container.css("width", (100 / jsmolAppletsCount) + "%");	 	
+ 		}(i));
+ 	}
+
+ 	$.when.apply($, appletLoadedDef).done(function() {
+ 		// Set properties from hash.
+ 		forEachHashProp(setProperty);
+ 		// Initialize connection *after* listeners are added and all jsmol applets are ready!
+		phone.initialize();
+ 	});
+
+  	// Snapshot support.
+  	new Shutterbug('#appdiv');
 });
 
-function jsmolReady (applet) {
-	// Initialize connection *after* listeners are added and jsmol is ready!
-	phone.initialize();
-}
-
-function setHashProperties() {
+function forEachHashProp(callback) {
 	var hash = document.location.hash.substring(1); // rm #
 	if (hash === "") return;
 	hash.split("&").forEach(function (prop) {
 		var nameValue = prop.split("=");
-		setProperty(nameValue[0], nameValue[1]);
+		callback(nameValue[0], nameValue[1]);
 	});
 }
 
-function setProperty(name, value) {
-	if (name === 'molecule') {
-		// It's special property, not supported natively by JSmol, but it can be used
-		// by Lab to load a molecule model.
-		Jmol.script(jmolApplet0, 'load ' + value);
+function execJsmolScript(appletId, content) {
+	if (appletId === "all") {
+		Object.keys(jsmolApplets).forEach(function (id) {
+			Jmol.script(jsmolApplets[id], content);
+		});
 		return;
 	}
-	Jmol.script(jmolApplet0, 'set ' + name + ' ' + value);
+	Jmol.script(jsmolApplets[appletId], content);
+}
+
+function setProperty(name, value) {
+	name = name.split(':');
+	var appletId = null;
+	var propName = null;
+	if (name.length === 1) {
+		appletId = "all";
+		propName = name[0];
+	} else {
+		appletId = name[0];
+		propName = name[1];
+	}
+	switch (propName) {
+		case 'moleculesCount': 
+			// Special property, not supported natively by JSmol, but it can be used
+			// by Lab to set number of jsmol applets. However it can be set ONLY using
+			// hash, can't be changed dynamically later.
+			return;
+		case 'molecule':
+			// Special property, not supported natively by JSmol, but it can be used
+			// by Lab to load a molecule model.
+			execJsmolScript(appletId, 'load ' + value);
+			return;
+		default:
+			execJsmolScript(appletId, 'set ' + propName + ' ' + value);
+	}
 }
 
 /********************* integration with Lab *********************/
@@ -100,7 +163,17 @@ phone.addListener('stop', function () {
 	phone.post('stop.iframe-model');
 });
 phone.addListener('jsmolScript', function (content) {
-	Jmol.script(jmolApplet0, content);
+	content = content.split(':');
+	var appletId;
+	var script;
+	if (content.length === 1) {
+		appletId = "all";
+		script = content[0];
+	} else {
+		appletId = content[0];
+		script = content[1];
+	}
+	execJsmolScript(appletId, script);
 });
 phone.addListener('set', function (content) {
 	setProperty(content.name, content.value);
@@ -116,6 +189,5 @@ phone.post('registerScriptingAPIFunc', 'set');
 </head>
 <body>
 	<div id="appdiv"></div>
-	<div id="dest"></div>
 </body>
 </html>
