@@ -24,6 +24,7 @@
 	}
 </style>
 
+
 <script type="text/javascript" src="jsmol/JSmol.min.js"></script>
 <script type="text/javascript" src="iframe-phone/dist/iframe-phone.js"></script>
 <script type="text/javascript" src="http://shutterbug.herokuapp.com/shutterbug/shutterbug.js"></script>
@@ -39,6 +40,9 @@ var jsmolAppletsCount = (function () {
 }());
 
 var jsmolApplets = {};
+
+// It matches m1:, m2:, ... (+ whitespace characters). Subgroup contains only id (m1, m2, ...).
+var appIdRegExp = /^(m\d+):\s*/;
 
 // Developers: The debugCode flag is checked in j2s/core/core.z.js, 
 // and, if TRUE, skips loading the core methods, forcing those
@@ -123,15 +127,15 @@ function execJsmolScript(appletId, content) {
 }
 
 function setProperty(name, value) {
-	name = name.split(':');
-	var appletId = null;
-	var propName = null;
-	if (name.length === 1) {
-		appletId = "all";
-		propName = name[0];
+	var appletId;
+	var propName;
+	var r = name.match(appIdRegExp);
+	if (r !== null && r.length === 2) {
+		appletId = r[1];
+		propName = name.substr(r[0].length);
 	} else {
-		appletId = name[0];
-		propName = name[1];
+		appletId = "all";
+		propName = name;
 	}
 	switch (propName) {
 		case 'moleculesCount': 
@@ -163,15 +167,15 @@ phone.addListener('stop', function () {
 	phone.post('stop.iframe-model');
 });
 phone.addListener('jsmolScript', function (content) {
-	content = content.split(':');
 	var appletId;
 	var script;
-	if (content.length === 1) {
-		appletId = "all";
-		script = content[0];
+	var r = content.match(appIdRegExp);
+	if (r !== null && r.length === 2) {
+		appletId = r[1];
+		script = content.substr(r[0].length);
 	} else {
-		appletId = content[0];
-		script = content[1];
+		appletId = "all";
+		script = content;
 	}
 	execJsmolScript(appletId, script);
 });
