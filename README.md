@@ -1,7 +1,7 @@
 jsmol-models
 ============
 
-This repostiory contains an embeddable webpage that can be used by the [Lab](https://github.com/concord-consortium/lab) iframe model type. Post message API is used for communication between the embeddable page and parent (Lab interactive). It also contains JSmol models created by the [Concord Consortium](http://www.concord.org).
+This repository contains an embeddable webpage that can be used by the [Lab](https://github.com/concord-consortium/lab) iframe model type. Post message API is used for communication between the embeddable page and parent (Lab interactive). It also contains JSmol models created by the [Concord Consortium](http://www.concord.org).
 
 ## Checking out the project
 
@@ -41,15 +41,15 @@ The embeddable page doesn't load any model by default. However you provide a spe
     
 e.g.:
 
-  http://localhost:9191/embeddable.html#molecule=models/dna/dna1.pdb
+    http://localhost:9191/embeddable.html#molecule=models/dna/dna1.pdb
     
 ## Production server
 
 When you update ```production``` branch and push it, Travis CI will automatically deploy changes to
-[http://resources.models.concord.org/jsmol/embeddable.html](http://resources.models.concord.org/jsmol/embeddable.html)
+[http://resources.models.concord.org/jsmol/embeddable.html](http://resources.models.concord.org/jsmol/embeddable.html).
 
 ## GitHub pages
 
-The live version of this site can be also found at [http://concord-consortium.github.io/jsmol-models/embeddable.html](http://concord-consortium.github.io/jsmol-models/embeddable.html)
+The live version of this site can be also found at [http://concord-consortium.github.io/jsmol-models/embeddable.html](http://concord-consortium.github.io/jsmol-models/embeddable.html).
 
 To update this site, merge your changes into the ```gh-pages``` branch and push.
