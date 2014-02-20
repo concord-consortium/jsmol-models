@@ -42,7 +42,17 @@ The embeddable page doesn't load any model by default. However you provide a spe
 e.g.:
 
     http://localhost:9191/embeddable.html#molecule=models/dna/dna1.pdb
-    
+
+## Working on Lab interactive
+
+When you work on a new Lab interactive, you should test integration with new JSmol model locally (before pushing it to repository and production server). You can start the local server (see above, use a different port from 9292, e.g. 9191) and use local URL in the Lab interactive you are working on:
+
+    http://localhost:9191/embeddable.html
+
+When everything works as expected, you can push changes to jsmol-models repostiory, merge ```master``` into the ```production``` branch, push it and finally use production URL in the Lab interactive:
+
+    http://resources.models.concord.org/jsmol/embeddable.html
+
 ## Production server
 
 When you update ```production``` branch and push it, Travis CI will automatically deploy changes to
