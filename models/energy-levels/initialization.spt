@@ -1,0 +1,35 @@
+set background [xffffc0]
+
+# Initialization scripts (system-set and custom) exported from Classic MW
+
+selectionHalos off;
+moveto 0 465.0 -803.0 373.0 162.9 210.0 0.0 0.0;
+backbone off;
+spacefill 20%;
+wireframe 0.15;
+cartoon off;
+ribbon off;
+rocket off;
+trace off;
+strands off;
+meshribbon off;
+dots off;
+set axes 0;
+set boundbox 0;
+
+restrict (atomno=2); 
+select atomno=2; 
+spacefill 8%;
+color atoms darkred;
+moveto 0 { 828 -192 -527 73.8} 210.2 0.0 0.0 {0.0 0.0 0.0} 5.2;
+isosurface delete sign orange violet phase atomicOrbital 1 0 0;
+set echo bottom center; 
+color echo black;
+font echo 12 arial;
+echo drag mouse over orbital to rotate;
+set echo top center;
+color echo darkblue;
+font echo 18 arial bold;
+echo "1s orbital";
+set frank off;
+spin;
