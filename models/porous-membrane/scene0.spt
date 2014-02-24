@@ -1,0 +1,20 @@
+# Scene 1 arrival script
+select all;
+center selected;
+select ~lipidHead;
+color atoms [xeb4000];
+select ~lipidTail;
+color atoms [xffbf00];
+model 1;
+isosurface off;
+display none;
+model none;
+set echo top center;
+color echo [xdcecda];
+font echo 18 SANSSERIF plain;
+echo "||Use the animation controls below|to go on a guided tour of an aquapore.||At each stop on the tour|you can explore the model by|dragging the mouse to rotate the model|and shift-dragging to zoom the model.||Check out the questions below|to find out what kind of snapshots|you should take along the way."
+set echo bottom center;
+font echo 12 sansserif;
+color echo pink;
+echo "*Note: With large biological molecules the hydrogen|atoms are commonly not shown.";
+refresh;

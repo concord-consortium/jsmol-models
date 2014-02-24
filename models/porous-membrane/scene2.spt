@@ -1,0 +1,42 @@
+# Classic MW transition (geoData)
+moveto 3.0 { 6.0 -1000.0 2.0 179.8} 126.0 0.79999924 6.5999985;
+
+# Scene 3 arrival script
+echo "Most molecules need a pore to allow them|to pass through the cell membrane."
+model all;
+select protein;
+color atoms lightblue;
+select all;
+spacefill off;
+display model=5;
+spacefill 80%;
+delay 4.0;
+echo "";
+select ~poreLipids;
+spacefill 70%; delay 0.1;
+spacefill 60%; delay 0.1;
+spacefill 50%; delay 0.1;
+spacefill 40%; delay 0.1;
+spacefill 30%; delay 0.1;
+spacefill 20%; delay 0.1;
+spacefill 10%; delay 0.1;
+spacefill off;
+delay 0.5;
+model all;
+display not ~poreLipids and not water;
+select not model=5;
+spacefill 10%; delay 0.1;
+spacefill 20%; delay 0.1;
+spacefill 30%; delay 0.1;
+spacefill 40%; delay 0.1;
+spacefill 50%; delay 0.1;
+spacefill 60%; delay 0.1;
+spacefill 70%; delay 0.1;
+spacefill 80%;
+echo "This is an aquapore that allows|water to pass through the membrane."
+select protein;
+color atoms lightblue;
+delay 3.0;
+moveto 1.5 { -43 996 79 2.9} 126.6 0.8 6.6 {2.2192564 2.027696 -0.02942003} 73.7;
+delay 0.5;
+moveto 1.5 { -6 1000 30 178.7} 126.6 0.8 6.6 {2.2192564 2.027696 -0.02942003} 73.7;

@@ -1,0 +1,27 @@
+# Classic MW transition (geoData)
+moveto 0 {32.0 -999.0 -41.0 89.7} 118.0 0 0;
+
+# Scene 2 arrival script
+model all;
+select all;
+spacefill off;
+wireframe off;
+display model=5;
+set echo off;
+refresh;
+color echo [xdcecda];
+font echo 18 SANSSERIF plain;
+set echo top center;
+echo "A cross-section of a cell membrane."
+delay 1.0;
+spacefill 10%; delay 0.1;
+spacefill 20%; delay 0.1;
+spacefill 30%; delay 0.1;
+spacefill 40%; delay 0.1;
+spacefill 50%; delay 0.1;
+spacefill 60%; delay 0.1;
+spacefill 70%; delay 0.1;
+spacefill 80%;
+delay 1.0;
+moveto 1.5 { -291 930 -223 3.4} 118.0 0.0 0.0 {2.2192564 2.027696 -0.02942003} 73.7;
+moveto 1.5 { 1 1000 27 90.9} 113.3 0.0 0.0 {2.2192564 2.027696 -0.02942003} 73.7;

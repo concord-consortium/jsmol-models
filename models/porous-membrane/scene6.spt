@@ -1,0 +1,17 @@
+# Scene 6 departure script
+select water;
+spacefill 20%;
+color atoms blue;
+
+# Classic MW transition (geoData)
+moveto 3.0 { -59.0 -995.0 -84.0 175.4} 26290.0 0.0 0.0;
+
+# Scene 7 arrival script
+set echo top center;
+echo "Here the channel is shown|with water (blue balls)."
+select water;
+color atoms blue;
+spacefill 20%;
+center selected;
+display not ~poreLipids;
+model all;

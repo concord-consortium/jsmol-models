@@ -1,0 +1,28 @@
+set background [x000000];
+define ~poreLipids within(34.0,atomno=34999 and model=5) or within(34.0,atomno=38891 and model=5) or atomno=36076 or atomno=36077 or atomno=36079 or atomno=25870 or atomno=25734 or atomno=25065 or atomno=940 or atomno=25066 or atomno=24948 or atomno=24931 or atomno=24930 or atomno=25064 or atomno=25062 or atomno=36075 or atomno=29926 or atomno=29772 or within(4.0, atomno=3507) or atomno=24215 or atomno=3489 or atomno=2835 or atomno=24126 or atomno=24127 or atomno=24128 or atomno=3512 or atomno=3520 or atomno=3525 or atomno=3524 or atomno=3523 or within(3.0,atomno=2683) or atomno=3526 or atomno=3514 or atomno=3579 or atomno=3576 or atomno=3582 or atomno=2772 or atomno=29755 or atomno=30828 or atomno=12778 or atomno=12777 or atomno=12775 or atomno=12776 or atomno=13868 or atomno=13867 or atomno=13869 or atomno=13831;
+define ~singlePore model=1;
+define ~halfPoreSmall (80-107 or 125-167 or 173-249) and model=1;
+define ~halfPoreLarge model=1 and not ~halfPoreSmall and not water;
+define ~lipidHead model=5 and (oxygen or phosphorus or nitrogen or *.C1 or *.C2 or *.C3 or *.C11 or *.C12 or *.C13 or *.C14 or *.C15);
+define ~lipidTail model=5 and not ~lipidHead;
+select not model=5;
+translateSelected {-43 -46 -27};
+select all;
+center selected;
+select ~lipidHead;
+color atoms [xeb4000];
+select ~lipidTail;
+color atoms [xffbf00];
+display none;
+set echo all;
+color echo [xdcecda];
+select protein;
+color atoms lightblue;
+select water;
+color atoms blue;
+font echo 18 SANSSERIF plain;
+echo "||Use the animation controls below|to go on a guided tour of an aquapore.||At each stop on the tour|you can explore the model by|dragging the mouse to rotate the model|and shift-dragging to zoom the model.||Check out the questions below|to find out what kind of snapshots|you should take along the way."
+set echo bottom center;
+font echo 12 sansserif;
+color echo pink;
+echo "*Note: With large biological molecules the hydrogen|atoms are commonly not shown."

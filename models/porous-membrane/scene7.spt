@@ -1,0 +1,13 @@
+# Classic MW transition (geoData)
+moveto 8.0 { 6.0 -1000.0 -7.0 179.3} 128.0 0.0 0.0;
+
+# Scene 8 arrival script 
+select all;
+center selected;
+select water;
+color atoms blue;
+spacefill 20%;
+display not ~poreLipids;
+model all;
+set echo top center;
+echo "An aquapore."

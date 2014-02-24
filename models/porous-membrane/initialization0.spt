@@ -1,0 +1,14 @@
+selectionHalos off;
+moveto 0 32.0 -999.0 -41.0 89.7 118.0 0.0 0.0;
+backbone off;
+spacefill 20%;
+wireframe 0.15;
+cartoon off;
+ribbon off;
+rocket off;
+trace off;
+strands off;
+meshribbon off;
+dots off;
+set axes 0;
+set boundbox 0;

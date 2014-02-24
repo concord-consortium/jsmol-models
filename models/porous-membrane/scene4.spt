@@ -1,0 +1,44 @@
+# Classic MW transition (geoData)
+moveto 0.0 { -357.0 850.0 -388.0 5.2} 222.0 0.0 3.6000009;
+
+# Scene 5 arrival script
+display protein;
+select model=4;
+spacefill 70%; delay 0.1;
+spacefill 60%; delay 0.1;
+spacefill 50%; delay 0.1;
+spacefill 40%; delay 0.1;
+spacefill 30%; delay 0.1;
+spacefill 20%; delay 0.1;
+spacefill 10%; delay 0.1;
+display protein and (model=1 or model=2 or model=3);
+spacefill 80%;
+select model=2;
+spacefill 70%; delay 0.1;
+spacefill 60%; delay 0.1;
+spacefill 50%; delay 0.1;
+spacefill 40%; delay 0.1;
+spacefill 30%; delay 0.1;
+spacefill 20%; delay 0.1;
+spacefill 10%; delay 0.1;
+display protein and (model=1 or model=3);
+spacefill 80%;
+select model=3;
+spacefill 70%; delay 0.1;
+spacefill 60%; delay 0.1;
+spacefill 50%; delay 0.1;
+spacefill 40%; delay 0.1;
+spacefill 30%; delay 0.1;
+spacefill 20%; delay 0.1;
+spacefill 10%; delay 0.1;
+display protein and model=1;
+spacefill 80%;
+moveto 2.0 { -125 992 -24 172.2} 411.5 0.0 0.0 {-7.42025 -13.1085 0.20650053} 87.4;
+select water;
+center selected;
+set echo top center;
+echo "The structure of the channel can best be|seen if we look at the surface of the protein."
+refresh;
+model 1;
+select protein and model=1;
+isosurface delete ignore(not selected) color lightblue sasurface 0;
