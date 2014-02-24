@@ -1,0 +1,45 @@
+
+# create hbonds for the tetrahedorn so they can have a 
+# different appearance from the measurement lines:
+connect (atomno=5) (atomno=2) hbond
+connect (atomno=5) (atomno=3) hbond
+connect (atomno=5) (atomno=4) hbond
+connect (atomno=3) (atomno=2) hbond
+connect (atomno=4) (atomno=2) hbond
+connect (atomno=3) (atomno=4) hbond
+select all
+color hbonds [x00ff00]
+hbonds 0.01
+hbonds off
+
+measure 1 2
+measure 1 3
+measure 1 4
+measure 1 5
+color measures [x00ff00]
+set measurements 0  # renders line thickness (0 turns off lines)
+set measurement off  #turns off numbers
+
+isosurface scale 0.9 lcaoCartoon "lp" (atomno=1)
+isosurface scale 0.8 lcaoCartoon "sp3a" (atomno=1)
+isosurface scale 0.8 lcaoCartoon "sp3b" (atomno=1)
+isosurface scale 0.8 lcaoCartoon "sp3c" (atomno=1)
+color $lcao1_lp translucent lightblue
+color $lcao2_sp3a translucent lightblue
+color $lcao3_sp3b translucent lightblue
+color $lcao4_sp3c translucent lightblue
+
+
+select (atomno=2, atomno=3)
+label %e
+color labels blue
+font label 14 sans bold
+set labeloffset 0 0
+#set labelgroup
+
+select atomno=1
+label O
+color labels white
+font label 14 sans bold
+set labeloffset 0 1
+

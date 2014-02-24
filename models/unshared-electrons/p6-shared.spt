@@ -1,0 +1,5 @@
+isosurface off
+isosurface scale 0.8 lcaoCartoon "sp3b" (atomno=1)
+color isosurface translucent lightblue
+isosurface scale 0.8 lcaoCartoon "sp3c" (atomno=1)
+color isosurface translucent lightblue

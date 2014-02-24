@@ -1,0 +1,22 @@
+set background [x000000]
+
+# Initialization scripts (system-set and custom) exported from Classic MW
+
+selectionHalos off;
+moveto 0 -975.0 -220.0 -18.0 66.0 100.0 0.0 0.0;
+backbone off;
+spacefill 20%;
+wireframe 0.15;
+cartoon off;
+ribbon off;
+rocket off;
+trace off;
+strands off;
+meshribbon off;
+dots off;
+set axes 0;
+set boundbox 0;
+
+restrict none
+script models/unshared-electrons/p6-waterDefault.spt
+script models/unshared-electrons/p6-waterShape.spt

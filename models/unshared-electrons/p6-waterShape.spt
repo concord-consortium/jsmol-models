@@ -1,0 +1,43 @@
+#restrict none
+select all
+set frank off
+
+moveto 0.0 { 9 846 533 169.6} 100.0 0.0 10.0 {19.0716 -11.9839 -0.5734} 2.2
+spin on
+translate y -2
+
+
+
+isosurface off
+
+select not (atomno=5, atomno=4)
+wireframe 0.1; 
+cpk 20%; 
+color bonds [xffffff]
+
+select (atomno=5, atomno=4)
+cpk off
+select not atomno=1
+wireframe off
+select atomno=1 or atomno=4
+wireframe off
+
+set echo bottom left; 
+echo shape: bent;
+font echo 16 sans bold; 
+color echo [x00ff00];
+
+set echo top right
+echo water
+font echo 12 sans bold
+color echo [xf0e9cf]
+
+center atomno=1
+select atomno=1
+color red
+
+#select all
+#hbonds off
+#color measures none
+#color measures [x00ff00]
+#set measurements 0.05
