@@ -4,7 +4,7 @@ spacefill 20%;
 color atoms blue;
 
 # Classic MW transition (geoData)
-moveto 3.0 { -59.0 -995.0 -84.0 175.4} 26290.0 0.0 0.0;
+moveto 3.0 { -59.0 -995.0 -84.0 175.4} 4000.0 0.0 0.0;
 
 # Scene 7 arrival script
 set echo top center;

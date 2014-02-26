@@ -1,5 +1,5 @@
 # Classic MW transition (geoData)
-moveto 8.0 { 6.0 -1000.0 -7.0 179.3} 128.0 0.0 0.0;
+moveto 5.0 { 6 -1000 -7 179.3} 128.0 0.0 4.0;
 
 # Scene 8 arrival script 
 select all;
