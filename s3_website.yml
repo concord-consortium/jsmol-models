@@ -7,3 +7,27 @@ cloudfront_distribution_id: E1QHTGVGYD1DWZ
 max_age: 300
 concurrency_level: 4
 ignore_on_server: ^(?!jsmol)
+
+gzip:
+  - .html
+  - .css
+  - .js
+  - .txt
+  - .md
+  # specific for JSmol:
+  - .spt
+  - .pdb
+  - .mol
+  - .mdl
+  - .smol
+  - .sd
+  - .sdf
+  - .xyz
+  - .jxyz
+  - .jvxl
+  - .pse
+  - .map
+  - .magres
+  - .jdx
+  - .molden
+  - .xodydata
