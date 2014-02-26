@@ -56,7 +56,7 @@ function _setFileState() {
   set percentVdwAtom 23;
   set smallMoleculeMaxAtoms 40000;
   set smartAromatic true;
-  load /*file*/"http://localhost:9191/models/porous-membrane/aquaporeMem.pdb";
+  load /*file*/"http://resources.models.concord.org/jsmol/models/porous-membrane/aquaporeMem.pdb";
 
 }
 
