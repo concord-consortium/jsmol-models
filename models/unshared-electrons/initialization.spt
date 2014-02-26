@@ -20,3 +20,6 @@ set boundbox 0;
 restrict none
 script models/unshared-electrons/p6-waterDefault.spt
 script models/unshared-electrons/p6-waterShape.spt
+
+set echo TOP LEFT;
+set echo IMAGE "models/unshared-electrons/lewis_H2O.gif";
