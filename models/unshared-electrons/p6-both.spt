@@ -1,0 +1,2 @@
+select (atomno=1)
+lcaocartoon delete scale 0.9 color translucent pink create "sp3a" create "sp3b" create "sp3c" create "sp3d"
