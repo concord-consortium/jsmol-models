@@ -3,8 +3,10 @@ moveto 0.0 { -125.0 992.0 -24.0 172.2} 270.0 0.0 5.0;
 
 # Scene 6 arrival script
 set echo top center;
+select protein and model=1;
+spacefill 0%;
 model 1;
-moveto 3.0 { -125 992 -24 172.2} 136608.8 0.0 0.0 {-7.42025 -13.1085 0.20650053} 87.4;
+moveto 3.0 { -125 992 -24 172.2} 10000 0.0 0.0 {-7.42025 -13.1085 0.20650053} 87.4;
 echo "The channel may be narrow, but water|molecules can fit through easily."
 delay 1.5;
 moveto 3.0 { -125 992 -24 172.2} 270.0 0.0 5.0 {-7.42025 -13.1085 0.20650053} 87.4;

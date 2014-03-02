@@ -42,3 +42,4 @@ refresh;
 model 1;
 select protein and model=1;
 isosurface delete ignore(not selected) color lightblue sasurface 0;
+spacefill 0%

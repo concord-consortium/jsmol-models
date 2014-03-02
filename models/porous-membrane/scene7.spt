@@ -1,4 +1,6 @@
 # Classic MW transition (geoData)
+select protein and model=1;
+spacefill 0%;
 moveto 5.0 { 6 -1000 -7 179.3} 128.0 0.0 4.0;
 
 # Scene 8 arrival script 
