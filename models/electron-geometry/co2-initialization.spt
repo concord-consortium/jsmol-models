@@ -23,6 +23,6 @@ wireframe off
 monitor 3 1
 monitor 2 3
 set echo top left
-echo Geometry: Linear
+echo Geometry: linear
 font echo 12 sans bold
 color echo [xba78fc]

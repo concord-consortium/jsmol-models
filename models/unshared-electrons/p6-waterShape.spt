@@ -23,7 +23,7 @@ select atomno=1 or atomno=4
 wireframe off
 
 set echo bottom left; 
-echo shape: bent;
+echo Shape: bent;
 font echo 16 sans bold; 
 color echo [x00ff00];
 

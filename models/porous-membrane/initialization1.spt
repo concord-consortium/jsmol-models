@@ -21,7 +21,7 @@ color atoms lightblue;
 select water;
 color atoms blue;
 font echo 18 SANSSERIF plain;
-echo "||Use the animation controls below|to go on a guided tour of an aquapore.||At each stop on the tour|you can explore the model by|dragging the mouse to rotate the model|and shift-dragging to zoom the model.||Check out the questions below|to find out what kind of snapshots|you should take along the way."
+echo "||Use the animation controls|to go on a guided tour of an aquapore.||At each stop on the tour|you can explore the model by|dragging the mouse to rotate the model|and shift-dragging to zoom the model."
 set echo bottom center;
 font echo 12 sansserif;
 color echo pink;
