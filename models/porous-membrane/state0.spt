@@ -7670,7 +7670,7 @@ function _setModelState() {
   set echo off;
   set echo bottom center; echo "*Note: With large biological molecules the hydrogen|atoms are commonly not shown.";
   font echo 12 SansSerif Plain; color echo [xffc0cb];
-  set echo top center; echo "||Use the animation controls below|to go on a guided tour of an aquapore.||At each stop on the tour|you can explore the model by|dragging the mouse to rotate the model|and shift-dragging to zoom the model.||Check out the questions below|to find out what kind of snapshots|you should take along the way.";
+  set echo top center; echo "||Use the animation controls|to go on a guided tour of an aquapore.||At each stop on the tour|you can explore the model by|dragging the mouse to rotate the model|and shift-dragging to zoom the model.";
   font echo 18 SansSerif Plain; color echo [xdcecda];
 
   frank on;
