@@ -7,7 +7,6 @@ select all;
 spacefill off;
 wireframe off;
 display model=5;
-set echo off;
 refresh;
 color echo [xdcecda];
 font echo 18 SANSSERIF plain;
