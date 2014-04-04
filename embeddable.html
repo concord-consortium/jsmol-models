@@ -157,12 +157,12 @@ function setProperty(name, value) {
 
 var phone = iframePhone.getIFrameEndpoint();
 phone.addListener('play', function () {
-	Jmol.script(jmolApplet0, 'spin on');
+	execJsmolScript('all', 'spin on');
 	// Notify iframe model that we received 'play' message and reacted appropriately.
 	phone.post('play.iframe-model');
 });
 phone.addListener('stop', function () {
-	Jmol.script(jmolApplet0, 'spin off');
+	execJsmolScript('all', 'spin off');
 	// Notify iframe model that we received 'stop' message and reacted appropriately.
 	phone.post('stop.iframe-model');
 });
@@ -174,7 +174,7 @@ phone.addListener('jsmolScript', function (content) {
 		appletId = r[1];
 		script = content.substr(r[0].length);
 	} else {
-		appletId = "all";
+		appletId = 'all';
 		script = content;
 	}
 	execJsmolScript(appletId, script);
