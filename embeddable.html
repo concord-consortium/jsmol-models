@@ -27,7 +27,7 @@
 
 <script type="text/javascript" src="jsmol/JSmol.min.js"></script>
 <script type="text/javascript" src="iframe-phone/dist/iframe-phone.js"></script>
-<script type="text/javascript" src="http://shutterbug.herokuapp.com/shutterbug/shutterbug.js"></script>
+<script type="text/javascript" src="shutterbug.js/dist/shutterbug.js"></script>
 <script type="text/javascript">
 
 
@@ -104,7 +104,7 @@ $(document).ready(function() {
  	});
 
   	// Snapshot support.
-  	new Shutterbug('#appdiv');
+  	Shutterbug.enable('#appdiv');
 });
 
 function forEachHashProp(callback) {
