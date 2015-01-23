@@ -1,0 +1,33 @@
+set background [x000000]
+
+# Initialization scripts (system-set and custom) exported from Classic MW
+
+selectionHalos off;
+moveto 0 580.0 452.0 -677.0 44.8 100.0 0.0 0.0;
+backbone off;
+spacefill 20%;
+wireframe 0.15;
+cartoon off;
+ribbon off;
+rocket off;
+trace off;
+strands off;
+meshribbon off;
+dots off;
+set axes 0;
+set boundbox 0;
+
+#translate y -15
+set measures off
+spacefill 0.06
+wireframe off
+monitor 3 2
+monitor 3 4
+monitor 2 4
+monitor 2 5
+monitor 4 5
+monitor 3 5
+set echo top left
+echo Geometry: tetrahedral
+font echo 12 sans bold
+color echo [xba78fc]
