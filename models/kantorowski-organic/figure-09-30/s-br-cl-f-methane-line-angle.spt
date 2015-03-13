@@ -1,0 +1,57 @@
+# load methane.pdb
+center atomno=1
+set antialiasdisplay on
+background white
+color cpk
+
+# Set the structure head on and then rotate 15 degrees, 
+# to starting position with Cl forward/left.
+reset;center {3.8754003 0.67740005 -8.4172}; rotate z 102.69; rotate y 100.9; rotate z 118.14; zoom 42.43; set rotationRadius 2.27;
+rotate y -15
+
+set ambientpercent 100;
+
+#turn wirefram off so that 'on' sets it to one pixel.
+wireframe off
+wireframe on 
+cpk 0.3;  
+select all; 
+color atoms white; 
+color bonds black; 
+
+# if make one atom Br to increase bondlength, then delete all the spurious bonds with Br, while leaving the bonds with carbon.
+select all and not atomno=1
+connect (selected) (selected) delete
+
+select atomno=1
+define C selected
+cpk 0.01
+
+select atomno=2
+label Cl
+define Cl selected
+
+select atomno=3
+label Br
+define Br selected
+
+select atomno=4
+label F
+define F selected
+
+select atomno=5
+label H
+define H selected
+
+select all
+font label 30 sans bold;
+set labeloffset 0 0; 
+
+# make Cl-C bond a little thicker (wedge)  
+ select atomno=1 or atomno=2
+ wireframe 0.03
+
+# make F-C bond dotted (hash)
+ connect (atomno=1) (atomno=4) hbond
+
+select all
