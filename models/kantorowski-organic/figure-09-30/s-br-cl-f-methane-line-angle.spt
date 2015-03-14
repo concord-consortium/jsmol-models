@@ -1,5 +1,5 @@
 # load methane.pdb
-#restrict none
+restrict none
 set frank off
 center atomno=1
 set antialiasdisplay on
@@ -23,8 +23,8 @@ color atoms white
 color bonds black 
 
 # currently using ordinary methane pdb file, but if editing it to name each atom so it is substututed, to support label %e, then delete all the spurious bonds that will be shown, while leaving the bonds with carbon.
-#select all and not atomno=1
-#connect (selected) (selected) delete
+select all and not atomno=1
+connect (selected) (selected) delete
 
 # do not show carbon in cpk, nor label, as per line-angle conventions
 # small (invisible) cpk required for bonds to be shown
