@@ -1,4 +1,6 @@
 # load methane.pdb
+restrict none
+set frank off
 center atomno=1
 set antialiasdisplay on
 background white
@@ -9,24 +11,28 @@ color cpk
 reset;center {3.8754003 0.67740005 -8.4172}; rotate z 102.69; rotate y 100.9; rotate z 118.14; zoom 80; set rotationRadius 2.27;
 rotate y -15
 
+# make lighting perfectly flat
 set ambientpercent 100;
 
-#turn wirefram off so that 'on' sets it to one pixel.
+# turn wirefram off so that 'on' sets it to one pixel bond width.
+select all; 
 wireframe off
 wireframe on 
-cpk 0.3;  
-select all; 
-color atoms white; 
-color bonds black; 
+cpk 0.3  
+color atoms white 
+color bonds black 
 
-# if make one atom Br to increase bondlength, then delete all the spurious bonds with Br, while leaving the bonds with carbon.
-select all and not atomno=1
-connect (selected) (selected) delete
+# currently using ordinary methane pdb file, but if editing it to name each atom so it is substututed, to support label %e, then delete all the spurious bonds that will be shown, while leaving the bonds with carbon.
+#select all and not atomno=1
+#connect (selected) (selected) delete
 
+# do not show carbon in cpk, nor label, as per line-angle conventions
+# small (invisible) cpk required for bonds to be shown
 select atomno=1
 define C selected
 cpk 0.01
 
+# define each atom to make calling them easy
 select atomno=2
 label Cl
 define Cl selected
@@ -42,16 +48,3 @@ define F selected
 select atomno=5
 label H
 define H selected
-
-select all
-font label 25 sans bold;
-set labeloffset 0 0; 
-
-# make Cl-C bond a little thicker (wedge)  
- select atomno=1 or atomno=2
- wireframe 0.03
-
-# make F-C bond dotted (hash)
- connect (atomno=1) (atomno=4) hbond
-
-select all
