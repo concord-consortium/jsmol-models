@@ -1,5 +1,5 @@
 # load methane.pdb
-restrict none
+#restrict none
 set frank off
 center atomno=1
 set antialiasdisplay on
@@ -14,7 +14,7 @@ rotate y -15
 # make lighting perfectly flat
 set ambientpercent 100;
 
-# turn wirefram off so that 'on' sets it to one pixel bond width.
+# turn wireframe off so that 'on' sets it to one pixel bond width.
 select all; 
 wireframe off
 wireframe on 
