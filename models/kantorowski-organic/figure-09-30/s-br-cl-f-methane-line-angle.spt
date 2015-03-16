@@ -51,7 +51,7 @@ label H
 define H selected
 
 select all
-font label 22 sans bold;
+font label 25 sans bold;
 set labeloffset 0 0; 
 
 # make Cl-C bond a little thicker (wedge)  
