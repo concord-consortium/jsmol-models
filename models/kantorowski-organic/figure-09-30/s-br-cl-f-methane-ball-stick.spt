@@ -19,3 +19,14 @@ color cpk
 color bonds [xcccccc]
 wireframe 0.1
 
+select atomno = 2 # F, yellow-green
+color [xaacc43]
+
+select atomno = 3  # Br, red
+color [xba1441]
+
+select atomno = 4  # Cl, green
+color [x1ba1441]
+
+select all
+
