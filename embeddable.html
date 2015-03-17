@@ -22,6 +22,16 @@
 		height: 100%;	
 		display: inline-block;
 	}
+	#overlay {
+    	background-color: rgba(1, 1, 1, 0);
+    	bottom: 0;
+    	left: 0;
+    	position: fixed;
+    	right: 0;
+    	top: 0;
+    	display: none;
+    	z-index: 10000;
+	}
 </style>
 
 
@@ -148,6 +158,13 @@ function setProperty(name, value) {
 			// by Lab to load a molecule model.
 			execJsmolScript(appletId, 'load ' + value);
 			return;
+		case 'controllable':
+		    if(value){
+		    	$('#overlay').hide();
+		    } else {
+		    	$('#overlay').show();
+		    }
+		    return;
 		default:
 			execJsmolScript(appletId, 'set ' + propName + ' ' + value);
 	}
@@ -193,5 +210,6 @@ phone.post('registerScriptingAPIFunc', 'set');
 </head>
 <body>
 	<div id="appdiv"></div>
+	<div id="overlay"></div>
 </body>
 </html>
