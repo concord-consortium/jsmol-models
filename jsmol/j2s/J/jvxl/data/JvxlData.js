@@ -1,6 +1,7 @@
 Clazz.declarePackage ("J.jvxl.data");
 Clazz.load (null, "J.jvxl.data.JvxlData", ["java.lang.Float", "JU.SB", "J.jvxl.data.JvxlCoder"], function () {
 c$ = Clazz.decorateAsClass (function () {
+this.msg = "";
 this.wasJvxl = false;
 this.wasCubic = false;
 this.jvxlFileTitle = null;
@@ -48,6 +49,7 @@ this.contourColixes = null;
 this.contourColors = null;
 this.contourValues = null;
 this.contourValuesUsed = null;
+this.thisContour = -1;
 this.scale3d = 0;
 this.minColorIndex = -1;
 this.maxColorIndex = 0;
@@ -77,6 +79,7 @@ this.slabInfo = null;
 this.allowVolumeRender = false;
 this.voxelVolume = 0;
 this.mapLattice = null;
+this.fixedLattice = null;
 this.baseColor = null;
 Clazz.instantialize (this, arguments);
 }, J.jvxl.data, "JvxlData");
@@ -86,7 +89,7 @@ this.jvxlExcluded =  new Array (4);
 Clazz.makeConstructor (c$, 
 function () {
 });
-$_M(c$, "clear", 
+Clazz.defineMethod (c$, "clear", 
 function () {
 this.allowVolumeRender = true;
 this.jvxlSurfaceData = "";
@@ -104,19 +107,22 @@ this.contourColors = null;
 this.isSlabbable = false;
 this.mapLattice = null;
 this.meshColor = null;
+this.msg = "";
 this.nPointsX = 0;
 this.nVertexColors = 0;
+this.fixedLattice = null;
 this.slabInfo = null;
 this.slabValue = -2147483648;
 this.thisSet = -2147483648;
 this.rendering = null;
+this.thisContour = -1;
 this.translucency = 0;
 this.vContours = null;
 this.vertexColorMap = null;
 this.vertexColors = null;
 this.voxelVolume = 0;
 });
-$_M(c$, "setSurfaceInfo", 
+Clazz.defineMethod (c$, "setSurfaceInfo", 
 function (thePlane, mapLattice, nSurfaceInts, surfaceData) {
 this.jvxlSurfaceData = surfaceData;
 if (this.jvxlSurfaceData.indexOf ("--") == 0) this.jvxlSurfaceData = this.jvxlSurfaceData.substring (2);
@@ -124,22 +130,22 @@ this.jvxlPlane = thePlane;
 this.mapLattice = mapLattice;
 this.nSurfaceInts = nSurfaceInts;
 }, "JU.P4,JU.P3,~N,~S");
-$_M(c$, "setSurfaceInfoFromBitSet", 
+Clazz.defineMethod (c$, "setSurfaceInfoFromBitSet", 
 function (bs, thePlane) {
 this.setSurfaceInfoFromBitSetPts (bs, thePlane, null);
 }, "JU.BS,JU.P4");
-$_M(c$, "setSurfaceInfoFromBitSetPts", 
+Clazz.defineMethod (c$, "setSurfaceInfoFromBitSetPts", 
 function (bs, thePlane, mapLattice) {
 var sb =  new JU.SB ();
 var nSurfaceInts = (thePlane != null ? 0 : J.jvxl.data.JvxlCoder.jvxlEncodeBitSetBuffer (bs, this.nPointsX * this.nPointsY * this.nPointsZ, sb));
 this.setSurfaceInfo (thePlane, mapLattice, nSurfaceInts, sb.toString ());
 }, "JU.BS,JU.P4,JU.P3");
-$_M(c$, "jvxlUpdateInfo", 
+Clazz.defineMethod (c$, "jvxlUpdateInfo", 
 function (title, nBytes) {
 this.title = title;
 this.nBytes = nBytes;
 }, "~A,~N");
-c$.updateSurfaceData = $_M(c$, "updateSurfaceData", 
+c$.updateSurfaceData = Clazz.defineMethod (c$, "updateSurfaceData", 
 function (edgeData, vertexValues, vertexCount, vertexIncrement, isNaN) {
 if (edgeData.length == 0) return "";
 var chars = edgeData.toCharArray ();

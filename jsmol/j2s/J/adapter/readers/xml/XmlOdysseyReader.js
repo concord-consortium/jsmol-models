@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.adapter.readers.xml");
-Clazz.load (["J.adapter.readers.xml.XmlReader"], "J.adapter.readers.xml.XmlOdysseyReader", ["java.lang.Float", "JU.P3", "J.adapter.smarter.Atom"], function () {
+Clazz.load (["J.adapter.readers.xml.XmlReader"], "J.adapter.readers.xml.XmlOdysseyReader", ["java.lang.Float", "JU.P3", "$.PT", "J.adapter.smarter.Atom"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.modelName = null;
 this.formula = null;
@@ -8,20 +8,20 @@ this.myAttributes = null;
 Clazz.instantialize (this, arguments);
 }, J.adapter.readers.xml, "XmlOdysseyReader", J.adapter.readers.xml.XmlReader);
 Clazz.prepareFields (c$, function () {
-this.myAttributes = ["id", "label", "xyz", "element", "hybrid", "a", "b", "order", "box"];
+this.myAttributes =  Clazz.newArray (-1, ["id", "label", "xyz", "element", "hybrid", "a", "b", "order", "box"]);
 });
 Clazz.makeConstructor (c$, 
 function () {
 Clazz.superConstructor (this, J.adapter.readers.xml.XmlOdysseyReader, []);
 });
-$_V(c$, "getDOMAttributes", 
+Clazz.overrideMethod (c$, "getDOMAttributes", 
 function () {
 return this.myAttributes;
 });
-$_V(c$, "processStartElement", 
+Clazz.overrideMethod (c$, "processStartElement", 
 function (localName) {
 if ("structure".equals (localName)) {
-this.atomSetCollection.newAtomSet ();
+this.asc.newAtomSet ();
 return;
 }if ("atom".equals (localName)) {
 this.atom =  new J.adapter.smarter.Atom ();
@@ -29,7 +29,7 @@ if (this.atts.containsKey ("label")) this.atom.atomName = this.atts.get ("label"
  else this.atom.atomName = this.atts.get ("id");
 if (this.atts.containsKey ("xyz")) {
 var xyz = this.atts.get ("xyz");
-var tokens = J.adapter.smarter.AtomSetCollectionReader.getTokensStr (xyz);
+var tokens = JU.PT.getTokens (xyz);
 this.atom.set (this.parseFloatStr (tokens[0]), this.parseFloatStr (tokens[1]), this.parseFloatStr (tokens[2]));
 }if (this.atts.containsKey ("element")) {
 this.atom.elementSymbol = this.atts.get ("element");
@@ -39,10 +39,10 @@ var atom1 = this.atts.get ("a");
 var atom2 = this.atts.get ("b");
 var order = 1;
 if (this.atts.containsKey ("order")) order = this.parseBondToken (this.atts.get ("order"));
-this.atomSetCollection.addNewBondFromNames (atom1, atom2, order);
+this.asc.addNewBondFromNames (atom1, atom2, order);
 return;
 }if ("boundary".equals (localName)) {
-var boxDim = J.adapter.smarter.AtomSetCollectionReader.getTokensStr (this.atts.get ("box"));
+var boxDim = JU.PT.getTokens (this.atts.get ("box"));
 var x = this.parseFloatStr (boxDim[0]);
 var y = this.parseFloatStr (boxDim[1]);
 var z = this.parseFloatStr (boxDim[2]);
@@ -53,9 +53,9 @@ this.parent.setUnitCellItem (3, 90);
 this.parent.setUnitCellItem (4, 90);
 this.parent.setUnitCellItem (5, 90);
 var pt = JU.P3.new3 (-x / 2, -y / 2, -z / 2);
-this.atomSetCollection.setAtomSetAuxiliaryInfo ("periodicOriginXyz", pt);
-var atoms = this.atomSetCollection.getAtoms ();
-for (var i = this.atomSetCollection.getAtomCount (); --i >= 0; ) {
+this.asc.setCurrentModelInfo ("periodicOriginXyz", pt);
+var atoms = this.asc.atoms;
+for (var i = this.asc.ac; --i >= 0; ) {
 atoms[i].sub (pt);
 this.parent.setAtomCoord (atoms[i]);
 }
@@ -66,12 +66,12 @@ this.parent.applySymmetryAndSetTrajectory ();
 return;
 }if ("odyssey_simulation".equals (localName)) {
 if (this.modelName != null && this.phase != null) this.modelName += " - " + this.phase;
-if (this.modelName != null) this.atomSetCollection.setAtomSetName (this.modelName);
-if (this.formula != null) this.atomSetCollection.setAtomSetAuxiliaryInfo ("formula", this.formula);
+if (this.modelName != null) this.asc.setAtomSetName (this.modelName);
+if (this.formula != null) this.asc.setCurrentModelInfo ("formula", this.formula);
 }if ("title".equals (localName) || "formula".equals (localName) || "phase".equals (localName)) this.keepChars = true;
 }, "~S");
-$_M(c$, "parseBondToken", 
-($fz = function (str) {
+Clazz.defineMethod (c$, "parseBondToken", 
+ function (str) {
 if (str.length >= 1) {
 switch (str.charAt (0)) {
 case 's':
@@ -85,12 +85,12 @@ return 515;
 }
 return this.parseIntStr (str);
 }return 1;
-}, $fz.isPrivate = true, $fz), "~S");
-$_V(c$, "processEndElement", 
+}, "~S");
+Clazz.overrideMethod (c$, "processEndElement", 
 function (localName) {
 if ("atom".equals (localName)) {
 if (this.atom.elementSymbol != null && !Float.isNaN (this.atom.z)) {
-this.atomSetCollection.addAtomWithMappedName (this.atom);
+this.asc.addAtomWithMappedName (this.atom);
 }this.atom = null;
 return;
 }if ("title".equals (localName)) {

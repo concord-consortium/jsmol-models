@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.jvxl.readers");
-Clazz.load (["J.jvxl.readers.VolumeFileReader", "JU.P3"], "J.jvxl.readers.MapFileReader", ["J.util.Logger", "$.SimpleUnitCell"], function () {
+Clazz.load (["J.jvxl.readers.VolumeFileReader", "JU.P3"], "J.jvxl.readers.MapFileReader", ["JU.Logger", "$.SimpleUnitCell"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.dmin = 3.4028235E38;
 this.dmax = 0;
@@ -23,50 +23,46 @@ this.alpha = 0;
 this.beta = 0;
 this.gamma = 0;
 this.origin = null;
-this.adjustment = null;
 this.vectors = null;
 Clazz.instantialize (this, arguments);
 }, J.jvxl.readers, "MapFileReader", J.jvxl.readers.VolumeFileReader);
 Clazz.prepareFields (c$, function () {
 this.nxyzStart =  Clazz.newIntArray (3, 0);
 this.origin =  new JU.P3 ();
-this.adjustment =  new JU.P3 ();
 this.vectors =  new Array (3);
 });
 Clazz.makeConstructor (c$, 
 function () {
 Clazz.superConstructor (this, J.jvxl.readers.MapFileReader, []);
 });
-$_V(c$, "init2", 
+Clazz.overrideMethod (c$, "init2", 
 function (sg, br) {
 this.init2MFR (sg, br);
 }, "J.jvxl.readers.SurfaceGenerator,java.io.BufferedReader");
-$_M(c$, "init2MFR", 
+Clazz.defineMethod (c$, "init2MFR", 
 function (sg, br) {
 this.init2VFR (sg, br);
 this.isAngstroms = true;
-this.adjustment = sg.getParams ().center;
-if (this.adjustment == null || this.adjustment.x == 3.4028235E38) this.adjustment =  new JU.P3 ();
 }, "J.jvxl.readers.SurfaceGenerator,java.io.BufferedReader");
-$_M(c$, "getVectorsAndOrigin", 
+Clazz.defineMethod (c$, "getVectorsAndOrigin", 
 function () {
-J.util.Logger.info ("grid parameters: nx,ny,nz: " + this.nx + "," + this.ny + "," + this.nz);
-J.util.Logger.info ("grid parameters: nxStart,nyStart,nzStart: " + this.nxyzStart[0] + "," + this.nxyzStart[1] + "," + this.nxyzStart[2]);
-J.util.Logger.info ("grid parameters: mx,my,mz: " + this.na + "," + this.nb + "," + this.nc);
-J.util.Logger.info ("grid parameters: a,b,c,alpha,beta,gamma: " + this.a + "," + this.b + "," + this.c + "," + this.alpha + "," + this.beta + "," + this.gamma);
-J.util.Logger.info ("grid parameters: mapc,mapr,maps: " + this.mapc + "," + this.mapr + "," + this.maps);
-J.util.Logger.info ("grid parameters: originX,Y,Z: " + this.origin);
-var unitCell = J.util.SimpleUnitCell.newA ([this.a / this.na, this.b / this.nb, this.c / this.nc, this.alpha, this.beta, this.gamma]);
+JU.Logger.info ("grid parameters: nx,ny,nz: " + this.nx + "," + this.ny + "," + this.nz);
+JU.Logger.info ("grid parameters: nxStart,nyStart,nzStart: " + this.nxyzStart[0] + "," + this.nxyzStart[1] + "," + this.nxyzStart[2]);
+JU.Logger.info ("grid parameters: mx,my,mz: " + this.na + "," + this.nb + "," + this.nc);
+JU.Logger.info ("grid parameters: a,b,c,alpha,beta,gamma: " + this.a + "," + this.b + "," + this.c + "," + this.alpha + "," + this.beta + "," + this.gamma);
+JU.Logger.info ("grid parameters: mapc,mapr,maps: " + this.mapc + "," + this.mapr + "," + this.maps);
+JU.Logger.info ("grid parameters: originX,Y,Z: " + this.origin);
+var unitCell = JU.SimpleUnitCell.newA ( Clazz.newFloatArray (-1, [this.a / this.na, this.b / this.nb, this.c / this.nc, this.alpha, this.beta, this.gamma]));
 this.vectors[0] = JU.P3.new3 (1, 0, 0);
 this.vectors[1] = JU.P3.new3 (0, 1, 0);
 this.vectors[2] = JU.P3.new3 (0, 0, 1);
 unitCell.toCartesian (this.vectors[0], false);
 unitCell.toCartesian (this.vectors[1], false);
 unitCell.toCartesian (this.vectors[2], false);
-J.util.Logger.info ("Jmol unit cell vectors:");
-J.util.Logger.info ("    a: " + this.vectors[0]);
-J.util.Logger.info ("    b: " + this.vectors[1]);
-J.util.Logger.info ("    c: " + this.vectors[2]);
+JU.Logger.info ("Jmol unit cell vectors:");
+JU.Logger.info ("    a: " + this.vectors[0]);
+JU.Logger.info ("    b: " + this.vectors[1]);
+JU.Logger.info ("    c: " + this.vectors[2]);
 this.voxelCounts[0] = this.nz;
 this.voxelCounts[1] = this.ny;
 this.voxelCounts[2] = this.nx;
@@ -81,17 +77,17 @@ xyz2crs[this.maps - 1] = 2;
 var xIndex = xyz2crs[0];
 var yIndex = xyz2crs[1];
 var zIndex = xyz2crs[2];
-this.origin.scaleAdd2 (this.nxyzStart[xIndex] + this.adjustment.x, this.vectors[0], this.origin);
-this.origin.scaleAdd2 (this.nxyzStart[yIndex] + this.adjustment.y, this.vectors[1], this.origin);
-this.origin.scaleAdd2 (this.nxyzStart[zIndex] + this.adjustment.z, this.vectors[2], this.origin);
+this.origin.scaleAdd2 (this.nxyzStart[xIndex], this.vectors[0], this.origin);
+this.origin.scaleAdd2 (this.nxyzStart[yIndex], this.vectors[1], this.origin);
+this.origin.scaleAdd2 (this.nxyzStart[zIndex], this.vectors[2], this.origin);
 }this.volumetricOrigin.setT (this.origin);
-J.util.Logger.info ("Jmol grid origin in Cartesian coordinates: " + this.origin);
-J.util.Logger.info ("Use  isosurface OFFSET {x y z}  if you want to shift it.\n");
+JU.Logger.info ("Jmol grid origin in Cartesian coordinates: " + this.origin);
+JU.Logger.info ("Use  isosurface OFFSET {x y z}  if you want to shift it.\n");
 });
-$_M(c$, "setCutoffAutomatic", 
+Clazz.defineMethod (c$, "setCutoffAutomatic", 
 function () {
 if (this.params.thePlane == null && this.params.cutoffAutomatic) {
 this.params.cutoff = -1.0;
-J.util.Logger.info ("MapReader: setting cutoff to default value of " + this.params.cutoff + (this.boundingBox == null ? " (no BOUNDBOX parameter)\n" : "\n"));
+JU.Logger.info ("MapReader: setting cutoff to default value of " + this.params.cutoff + (this.boundingBox == null ? " (no BOUNDBOX parameter)\n" : "\n"));
 }});
 });
