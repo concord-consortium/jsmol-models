@@ -19,7 +19,7 @@ set ambientpercent 100;
 select all; 
 wireframe off
 wireframe on 
-cpk 0.3  
+cpk 0.2
 color atoms white 
 color bonds black 
 
@@ -51,7 +51,10 @@ label H
 define H selected
 
 select all
-font label 25 sans bold;
+
+# use fontscaling so the font changes size with the window
+set fontscaling TRUE;
+font label 6 sans bold 0.06;
 set labeloffset 0 0; 
 
 # make Cl-C bond a little thicker (wedge)  
