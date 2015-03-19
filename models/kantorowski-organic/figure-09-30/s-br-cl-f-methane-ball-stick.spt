@@ -11,7 +11,7 @@ color [xaaaaaa]
 
 # Set the structure head on and then rotate 15 degrees, 
 # to starting position with Cl forward/left.
-	reset;center {-0.21400002 0.367 0.023}; rotate z -109.87; rotate y 77.47; rotate z 137.54; set rotationRadius 4.06;
+	reset;center {-0.21400002 0.367 0.023}; rotate z -109.87; rotate y 77.47; rotate z 137.54; set rotationRadius 4.06; zoom 150;
 	rotate y -15
 
 select all

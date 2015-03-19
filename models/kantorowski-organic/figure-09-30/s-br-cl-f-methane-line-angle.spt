@@ -9,7 +9,7 @@ color cpk
 
 # Set the structure head on and then rotate 15 degrees, 
 # to starting position with Cl forward/left.
-reset;center {3.8754003 0.67740005 -8.4172}; rotate z 102.69; rotate y 100.9; rotate z 118.14; zoom 80; set rotationRadius 2.27;
+reset;center {3.8754003 0.67740005 -8.4172}; rotate z 102.69; rotate y 100.9; rotate z 118.14; zoom 150; set rotationRadius 2.27;
 rotate y -15
 
 # make lighting perfectly flat
