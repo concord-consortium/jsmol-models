@@ -1,0 +1,17 @@
+COMPND    Title                                                       
+REMARK   1 PDB to MMOD atom-numbering translation table; the mmod numbers
+REMARK   1 pertain to the .dat file from which this file was created,
+REMARK   1 not to one created from this file:
+REMARK   1  PDB:     1     2     3     4     5  
+REMARK   1 MMOD:     1     2     3     5     4 /
+HETATM    1  C01 UNK     0       -.214    .367    .023   .00   .00   0
+HETATM    2  F02 UNK     0        .055   1.678    .401   .00   .00   0
+HETATM    3 Br 3 UNK     0      -2.079   -.059    .429   .00   .00   0
+HETATM    4 Cl 5 UNK     0        .864   -.750    .924   .00   .00   0
+HETATM    5  H04 UNK     0       -.036    .252  -1.076   .00   .00   0
+CONECT    1    2    3    5    4
+CONECT    2    1
+CONECT    3    1
+CONECT    4    1
+CONECT    5    1
+END

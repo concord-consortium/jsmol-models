@@ -6,41 +6,41 @@ this.minY = 0;
 this.maxY = 0;
 Clazz.instantialize (this, arguments);
 }, JSV.common, "PeakData", JSV.common.MeasurementData);
-$_M(c$, "getThresh", 
+Clazz.defineMethod (c$, "getThresh", 
 function () {
 return this.thresh;
 });
-$_V(c$, "getDataHeader", 
+Clazz.overrideMethod (c$, "getDataHeader", 
 function () {
-return (this.spec.isHNMR () ? JSV.common.PeakData.HNMR_HEADER : ["peak", this.spec.getXUnits (), this.spec.getYUnits ()]);
+return (this.spec.isHNMR () ? JSV.common.PeakData.HNMR_HEADER :  Clazz.newArray (-1, ["peak", this.spec.getXUnits (), this.spec.getYUnits ()]));
 });
-$_V(c$, "getMeasurementListArray", 
+Clazz.overrideMethod (c$, "getMeasurementListArray", 
 function (units) {
 var data =  new Array (this.size ());
-var last = [-1.0E100, 1e100, 1e100];
+var last =  Clazz.newDoubleArray (-1, [-1.0E100, 1e100, 1e100]);
 var ddata;
 for (var pt = 0, i = this.size (); --i >= 0; pt++) {
 ddata = this.spec.getPeakListArray (this.get (i), last, this.maxY);
-if (ddata.length == 2) data[pt] = ["" + (pt + 1), JU.DF.formatDecimalDbl (ddata[0], 2), JU.DF.formatDecimalDbl (ddata[1], 4)];
- else data[pt] = ["" + (pt + 1), JU.DF.formatDecimalDbl (ddata[0], 4), JU.DF.formatDecimalDbl (ddata[1], 4), JU.DF.formatDecimalDbl (ddata[2], 2), (ddata[3] == 0 ? "" : JU.DF.formatDecimalDbl (ddata[3], 2)), (ddata[4] == 0 ? "" : JU.DF.formatDecimalDbl (ddata[4], 2)), (ddata[5] == 0 ? "" : JU.DF.formatDecimalDbl (ddata[5], 2))];
+if (ddata.length == 2) data[pt] =  Clazz.newArray (-1, ["" + (pt + 1), JU.DF.formatDecimalDbl (ddata[0], 2), JU.DF.formatDecimalDbl (ddata[1], 4)]);
+ else data[pt] =  Clazz.newArray (-1, ["" + (pt + 1), JU.DF.formatDecimalDbl (ddata[0], 4), JU.DF.formatDecimalDbl (ddata[1], 4), JU.DF.formatDecimalDbl (ddata[2], 2), (ddata[3] == 0 ? "" : JU.DF.formatDecimalDbl (ddata[3], 2)), (ddata[4] == 0 ? "" : JU.DF.formatDecimalDbl (ddata[4], 2)), (ddata[5] == 0 ? "" : JU.DF.formatDecimalDbl (ddata[5], 2))]);
 }
 return data;
 }, "~S");
-$_V(c$, "getMeasurementListArrayReal", 
+Clazz.overrideMethod (c$, "getMeasurementListArrayReal", 
 function (units) {
 var data =  Clazz.newDoubleArray (this.size (), 0);
-var last = [-1.0E100, 1e100, 1e100];
+var last =  Clazz.newDoubleArray (-1, [-1.0E100, 1e100, 1e100]);
 for (var pt = 0, i = this.size (); --i >= 0; pt++) data[pt] = this.spec.getPeakListArray (this.get (i), last, this.maxY);
 
 return data;
 }, "~S");
-$_M(c$, "getInfo", 
+Clazz.defineMethod (c$, "getInfo", 
 function (info) {
 info.put ("interpolation", this.myParams.peakListInterpolation);
 info.put ("threshold", Double.$valueOf (this.myParams.peakListThreshold));
 Clazz.superCall (this, JSV.common.PeakData, "getInfo", [info]);
 }, "java.util.Map");
-$_M(c$, "setPeakList", 
+Clazz.defineMethod (c$, "setPeakList", 
 function (p, precision, view) {
 this.precision = (precision == -2147483648 ? this.spec.getDefaultUnitPrecision () : precision);
 var xyCoords = this.spec.getXYCoords ();
@@ -58,7 +58,7 @@ var maxX = view.maxXOnScale;
 this.thresh = this.myParams.peakListThreshold;
 if (Double.isNaN (this.thresh)) this.thresh = this.myParams.peakListThreshold = (this.minY + this.maxY) / 2;
 var yLast = 0;
-var y3 = [xyCoords[0].getYVal (), yLast = xyCoords[1].getYVal (), 0];
+var y3 =  Clazz.newDoubleArray (-1, [xyCoords[0].getYVal (), yLast = xyCoords[1].getYVal (), 0]);
 var n = 0;
 if (isInverted) for (var i = 2; i < xyCoords.length; i++) {
 var y = y3[i % 3] = xyCoords[i].getYVal ();
@@ -81,5 +81,5 @@ if (++n == 100) break;
 }}yLast = y;
 }
 }, "JSV.common.Parameters,~N,JSV.common.ScaleData");
-c$.HNMR_HEADER = c$.prototype.HNMR_HEADER = ["peak", "shift/ppm", "intens", "shift/hz", "diff/hz", "2-diff", "3-diff"];
+c$.HNMR_HEADER = c$.prototype.HNMR_HEADER =  Clazz.newArray (-1, ["peak", "shift/ppm", "intens", "shift/hz", "diff/hz", "2-diff", "3-diff"]);
 });

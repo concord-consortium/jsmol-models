@@ -52,24 +52,24 @@ Clazz.makeConstructor (c$,
 function (target, id, arg) {
 this.construct (target, 0, id, 0, 0, 0, 0, arg);
 }, "~O,~N,~O");
-$_M(c$, "translate", 
+Clazz.defineMethod (c$, "translate", 
 function (dx, dy) {
 this.x += dx;
 this.y += dy;
 }, "~N,~N");
-$_M(c$, "shiftDown", 
+Clazz.defineMethod (c$, "shiftDown", 
 function () {
 return (this.modifiers & 1) != 0;
 });
-$_M(c$, "controlDown", 
+Clazz.defineMethod (c$, "controlDown", 
 function () {
 return (this.modifiers & 2) != 0;
 });
-$_M(c$, "metaDown", 
+Clazz.defineMethod (c$, "metaDown", 
 function () {
 return (this.modifiers & 4) != 0;
 });
-$_M(c$, "consume", 
+Clazz.defineMethod (c$, "consume", 
 function () {
 switch (this.id) {
 case 401:
@@ -81,11 +81,11 @@ break;
 default:
 }
 });
-$_M(c$, "isConsumed", 
+Clazz.defineMethod (c$, "isConsumed", 
 function () {
 return this.consumed;
 });
-c$.getOldEventKey = $_M(c$, "getOldEventKey", 
+c$.getOldEventKey = Clazz.defineMethod (c$, "getOldEventKey", 
 function (e) {
 var keyCode = e.getKeyCode ();
 for (var i = 0; i < java.awt.Event.actionKeyCodes.length; i++) {
@@ -94,7 +94,7 @@ return java.awt.Event.actionKeyCodes[i][1];
 }}
 return e.getKeyChar ();
 }, "java.awt.event.KeyEvent");
-$_M(c$, "getKeyEventChar", 
+Clazz.defineMethod (c$, "getKeyEventChar", 
 function () {
 for (var i = 0; i < java.awt.Event.actionKeyCodes.length; i++) {
 if (java.awt.Event.actionKeyCodes[i][1] == this.key) {
@@ -102,7 +102,7 @@ return '\uffff';
 }}
 return String.fromCharCode (this.key);
 });
-$_M(c$, "paramString", 
+Clazz.defineMethod (c$, "paramString", 
 function () {
 var str = "id=" + this.id + ",x=" + this.x + ",y=" + this.y;
 if (this.key != 0) {
@@ -119,7 +119,7 @@ str += ",target=" + this.target;
 str += ",arg=" + this.arg;
 }return str;
 });
-$_V(c$, "toString", 
+Clazz.overrideMethod (c$, "toString", 
 function () {
 return this.getClass ().getName () + "[" + this.paramString () + "]";
 });
@@ -194,4 +194,4 @@ Clazz.defineStatics (c$,
 "SAVE_FILE", 1003,
 "GOT_FOCUS", 1004,
 "LOST_FOCUS", 1005,
-"actionKeyCodes", [[36, 1000], [35, 1001], [33, 1002], [34, 1003], [38, 1004], [40, 1005], [37, 1006], [39, 1007], [112, 1008], [113, 1009], [114, 1010], [115, 1011], [116, 1012], [117, 1013], [118, 1014], [119, 1015], [120, 1016], [121, 1017], [122, 1018], [123, 1019], [154, 1020], [145, 1021], [20, 1022], [144, 1023], [19, 1024], [155, 1025]]);
+"actionKeyCodes",  Clazz.newArray (-1, [ Clazz.newIntArray (-1, [36, 1000]),  Clazz.newIntArray (-1, [35, 1001]),  Clazz.newIntArray (-1, [33, 1002]),  Clazz.newIntArray (-1, [34, 1003]),  Clazz.newIntArray (-1, [38, 1004]),  Clazz.newIntArray (-1, [40, 1005]),  Clazz.newIntArray (-1, [37, 1006]),  Clazz.newIntArray (-1, [39, 1007]),  Clazz.newIntArray (-1, [112, 1008]),  Clazz.newIntArray (-1, [113, 1009]),  Clazz.newIntArray (-1, [114, 1010]),  Clazz.newIntArray (-1, [115, 1011]),  Clazz.newIntArray (-1, [116, 1012]),  Clazz.newIntArray (-1, [117, 1013]),  Clazz.newIntArray (-1, [118, 1014]),  Clazz.newIntArray (-1, [119, 1015]),  Clazz.newIntArray (-1, [120, 1016]),  Clazz.newIntArray (-1, [121, 1017]),  Clazz.newIntArray (-1, [122, 1018]),  Clazz.newIntArray (-1, [123, 1019]),  Clazz.newIntArray (-1, [154, 1020]),  Clazz.newIntArray (-1, [145, 1021]),  Clazz.newIntArray (-1, [20, 1022]),  Clazz.newIntArray (-1, [144, 1023]),  Clazz.newIntArray (-1, [19, 1024]),  Clazz.newIntArray (-1, [155, 1025])]));

@@ -49,17 +49,26 @@ When you work on a new Lab interactive, you should test integration with new JSm
 
     http://localhost:9191/embeddable.html
 
-When everything works as expected, you can push changes to jsmol-models repostiory, merge ```master``` into the ```production``` branch, push it and finally use production URL in the Lab interactive:
+When everything works as expected, you can push changes to the ``gh-pages`` branch of the jsmol-models repository.
+Then use the GH Pages URL in the Lab interactive:
 
-    http://resources.models.concord.org/jsmol/embeddable.html
+    http://concord-consortium.github.io/jsmol-models/embeddable.html
+
+If that is working fine, then merge ``gh-pages`` into the ```production``` branch, push it,
+and then use the production URL in the Lab interactive:
+
+    https://resources.models.concord.org/jsmol/embeddable.html
 
 ## Production server
 
 When you update ```production``` branch and push it, Travis CI will automatically deploy changes to
 [http://resources.models.concord.org/jsmol/embeddable.html](http://resources.models.concord.org/jsmol/embeddable.html).
 
+You can monitor this proces at the [JSMol Models Travis CI Build page](https://travis-ci.org/concord-consortium/jsmol-models/builds).
+
 ## GitHub pages
 
-The live version of this site can be also found at [http://concord-consortium.github.io/jsmol-models/embeddable.html](http://concord-consortium.github.io/jsmol-models/embeddable.html).
+There is no ``master`` branch in this repository. The ``gh-pages`` branch is the default branch, so all of your work should be done there.
+As soon as you push a change it will be available here:
 
-To update this site, merge your changes into the ```gh-pages``` branch and push.
+[http://concord-consortium.github.io/jsmol-models/embeddable.html](http://concord-consortium.github.io/jsmol-models/embeddable.html)

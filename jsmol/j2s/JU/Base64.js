@@ -1,11 +1,11 @@
 Clazz.declarePackage ("JU");
 Clazz.load (null, "JU.Base64", ["JU.SB"], function () {
 c$ = Clazz.declareType (JU, "Base64");
-c$.getBytes64 = $_M(c$, "getBytes64", 
+c$.getBytes64 = Clazz.defineMethod (c$, "getBytes64", 
 function (bytes) {
 return JU.Base64.getBase64 (bytes).toBytes (0, -1);
 }, "~A");
-c$.getBase64 = $_M(c$, "getBase64", 
+c$.getBase64 = Clazz.defineMethod (c$, "getBase64", 
 function (bytes) {
 var nBytes = bytes.length;
 var sout =  new JU.SB ();
@@ -21,7 +21,7 @@ sout.appendC (nPad >= 1 ? '=' : JU.Base64.base64.charAt (outbytes & 0x3F));
 }
 return sout;
 }, "~A");
-c$.decodeBase64 = $_M(c$, "decodeBase64", 
+c$.decodeBase64 = Clazz.defineMethod (c$, "decodeBase64", 
 function (strBase64) {
 var nBytes = 0;
 var ch;
@@ -50,5 +50,5 @@ return bytes;
 }, "~S");
 Clazz.defineStatics (c$,
 "base64", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
-"decode64", [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 62, 0, 62, 0, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 0, 0, 0, 0, 63, 0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 0, 0, 0, 0, 0]);
+"decode64",  Clazz.newIntArray (-1, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 62, 0, 62, 0, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 0, 0, 0, 0, 63, 0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 0, 0, 0, 0, 0]));
 });
