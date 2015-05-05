@@ -62,6 +62,7 @@ and then use the production URL in the Lab interactive:
 ## Production server
 
 When you update ```production``` branch and push it, Travis CI will automatically deploy changes to
+
 [https://models-resources.concord.org/jsmol/embeddable.html](https://models-resources.concord.org/jsmol/embeddable.html).
 
 You can monitor this proces at the [JSMol Models Travis CI Build page](https://travis-ci.org/concord-consortium/jsmol-models/builds).
