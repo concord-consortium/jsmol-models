@@ -57,12 +57,13 @@ Then use the GH Pages URL in the Lab interactive:
 If that is working fine, then merge ``gh-pages`` into the ```production``` branch, push it,
 and then use the production URL in the Lab interactive:
 
-    https://resources.models.concord.org/jsmol/embeddable.html
+    https://models-resources.concord.org/jsmol/embeddable.html
 
 ## Production server
 
-When you update ```production``` branch and push it, Travis CI will automatically deploy changes to
-[http://resources.models.concord.org/jsmol/embeddable.html](http://resources.models.concord.org/jsmol/embeddable.html).
+When you update ```production``` branch and push it, Travis CI will automatically deploy changes to:
+
+[https://models-resources.concord.org/jsmol/embeddable.html](https://models-resources.concord.org/jsmol/embeddable.html).
 
 You can monitor this proces at the [JSMol Models Travis CI Build page](https://travis-ci.org/concord-consortium/jsmol-models/builds).
 
