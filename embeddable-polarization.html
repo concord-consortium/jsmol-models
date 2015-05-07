@@ -173,7 +173,7 @@ function setProperty(name, value) {
 function structureModified(a,b){
 	var bb = '' + b;
 	if (bb == -1) {
-		var updateView = 'isosurface delete; calculate partialcharge; label %P;'+
+		var updateView = 'isosurface delete; calculate partialcharge; label %P; color labels yellow;'+
 						 'if (surf) {'+
 						 '	script models/polarization/create-isosurface.spt;'+
 						 '	if (transl) {'+
