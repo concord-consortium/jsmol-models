@@ -1,0 +1,7 @@
+set echo bottom left
+font echo 12
+color echo lightgreen
+echo "generating surface..."
+refresh
+isosurface colorscheme “rwb” resolution 6 solvent map mep
+echo ""

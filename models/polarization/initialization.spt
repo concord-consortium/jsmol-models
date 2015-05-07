@@ -1,0 +1,12 @@
+moveto /* time, axisAngle */ 0.0 { -204 85 -975 177.11} /* zoom, translation */  100.0 0.0 0.0  /* center, rotationRadius */ {16.83675 -9.16875 -0.98134995} 4.0057898 /* navigation center, translation, depth */ {0 0 0} 0 0 0 /* cameraDepth, cameraX, cameraY */  3.0 0.0 0.0
+
+assign atom ({13}) "O"
+calculate partialcharge
+assign atom ({13}) "H"
+calculate partialcharge
+label %P
+color labels yellow
+set background black
+set echo top left; font echo 14 italic; color echo yellow
+echo "yellow numbers show charge"
+set structureModifiedCallback "structureModified"
