@@ -24,5 +24,6 @@ select all
  
 
 # set fontscaling true - nope, only works with 3D echos
-set echo ~newmanl IMAGE "newman-c-L.jpg"
-set echo ~newmanl 30% 95%
+set echo ~newman2 IMAGE "newman-c-L.jpg"
+set echo ~newman2 30% 95%
+set echo ~newman2 SCALE 0.6
