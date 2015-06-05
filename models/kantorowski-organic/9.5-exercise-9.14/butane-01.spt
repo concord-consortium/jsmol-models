@@ -26,7 +26,6 @@ set echo ~newman1 IMAGE "newman-c-R.jpg"
 set echo ~newman1 30% 95%
 set echo ~newman1 SCALE 0.6
 
-set echo off
 set echo ~mirror1 IMAGE "mirror.png" 
 set echo ~mirror1 87% 99% 
 #set echo ~mirror1 SCALE 1.2
