@@ -22,15 +22,19 @@ display all
 select all 
  
 # set fontscaling true - nope, only works with 3D echos
-set echo ~newmanl IMAGE "models/kantorowski-organic/9.5-exercise-9.14/newman-c-R.jpg"
+set echo ~newmanl IMAGE "newman-c-R.jpg"
 set echo ~newmanl 30% 95%
+set echo ~mirror1 SCALE 0.6
 
-set echo ~mirror1 IMAGE "models/kantorowski-organic/9.5-exercise-9.14/mirror.png" 
+set echo off
+set echo ~mirror1 IMAGE "mirror.png" 
 set echo ~mirror1 87% 99% 
-set echo ~mirror1 SCALE 1.2
+#set echo ~mirror1 SCALE 1.2
 
-set echo ~mirror2 IMAGE "models/kantorowski-organic/9.5-exercise-9.14/mirror.png" 
+set echo ~mirror2 IMAGE "mirror.png" 
 set echo ~mirror2 87% 55% 
-set echo ~mirror2 SCALE 1.2
+#set echo ~mirror2 SCALE 1.2
+
+
 
 
