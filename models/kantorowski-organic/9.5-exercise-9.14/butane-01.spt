@@ -1,1 +1,37 @@
+load pdb "butane-1.pdb"
+display none
+antialiasdisplay = true
+background [xffffff]
+reset;center {1.904 -0.644 1.6065}; rotate z -105.22; rotate y 96.39; rotate z 163.64; zoom 81.4; translate y 20.0;
+
+# move it down to make room for the newman projection
+translate y 20
+
+select all
+ 	spacefill 0.25
+ 	color [xdddddd]
+select carbon
+	spacefill 0.4
+	color [x666666]
+select BONDS ({0:25});
+	color bonds opaque [xbbbbbb];
+	wireframe 0.07;
+
+display all
+
+select all 
+ 
+# set fontscaling true - nope, only works with 3D echos
+set echo ~newmanl IMAGE "newman-c-R.jpg"
+set echo ~newmanl 30% 95%
+
+set echo off
+set echo ~mirror1 IMAGE "mirror.png" 
+set echo ~mirror1 87% 99% 
+set echo ~mirror1 SCALE 1.2
+
+set echo ~mirror2 IMAGE "mirror.png" 
+set echo ~mirror2 87% 55% 
+set echo ~mirror2 SCALE 1.2
+
 
