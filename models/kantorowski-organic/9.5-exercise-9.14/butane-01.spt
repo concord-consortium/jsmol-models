@@ -1,4 +1,4 @@
-load pdb "butane-1.pdb"
+#load pdb "butane-1.pdb"
 display none
 antialiasdisplay = true
 background [xffffff]
