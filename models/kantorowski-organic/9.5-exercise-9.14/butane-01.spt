@@ -25,12 +25,12 @@ select all
 set echo ~newmanl IMAGE "models/kantorowski-organic/9.5-exercise-9.14/newman-c-R.jpg"
 set echo ~newmanl 30% 95%
 
-set echo ~mirror1 IMAGE "models/kantorowski-organic/9.5-exercise-9.14/mirror2.png" 
-set echo ~mirror1 87% 99% 
-set echo ~mirror1 SCALE 1.2
+#set echo ~mirror1 IMAGE "models/kantorowski-organic/9.5-exercise-9.14/mirror2.png" 
+#set echo ~mirror1 87% 99% 
+#set echo ~mirror1 SCALE 1.2
 
-set echo ~mirror2 IMAGE "models/kantorowski-organic/9.5-exercise-9.14/mirror2.png" 
-set echo ~mirror2 87% 55% 
-set echo ~mirror2 SCALE 1.2
+#set echo ~mirror2 IMAGE "models/kantorowski-organic/9.5-exercise-9.14/mirror2.png" 
+#set echo ~mirror2 87% 55% 
+#set echo ~mirror2 SCALE 1.2
 
 
