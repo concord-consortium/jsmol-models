@@ -24,7 +24,7 @@ select all
 # set fontscaling true - nope, only works with 3D echos
 set echo ~newmanl IMAGE "newman-c-R.jpg"
 set echo ~newmanl 30% 95%
-set echo ~mirror1 SCALE 0.6
+set echo ~newman1 SCALE 0.6
 
 set echo off
 set echo ~mirror1 IMAGE "mirror.png" 
