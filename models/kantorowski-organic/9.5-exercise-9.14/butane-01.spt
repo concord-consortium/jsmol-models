@@ -25,7 +25,6 @@ select all
 set echo ~newmanl IMAGE "newman-c-R.jpg"
 set echo ~newmanl 30% 95%
 
-set echo off
 set echo ~mirror1 IMAGE "mirror.png" 
 set echo ~mirror1 87% 99% 
 set echo ~mirror1 SCALE 1.2
