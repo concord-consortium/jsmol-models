@@ -34,7 +34,7 @@ set echo ~mirrorupper IMAGE "models/kantorowski-organic/9.5-exercise-9.14/mirror
 set echo ~mirrorupper 87% 99% 
 
 set echo ~mirrorlower IMAGE "models/kantorowski-organic/9.5-exercise-9.14/mirror.png" 
-set echo ~mirrorlower 87% 55% 
+set echo ~mirrorlower 87% 65% 
 
 
 
