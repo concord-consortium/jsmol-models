@@ -59,9 +59,13 @@ set labeloffset 0 0;
 
 # make Cl-C bond a little thicker (wedge)  
  select atomno=1 or atomno=2
- wireframe 0.03
+ wireframe off
 
 # make F-C bond dotted (hash)
  connect (atomno=1) (atomno=4) hbond
+
+draw myplane PLANE {3.875 0.678 -8.417} {3.875 0.678 -8.417} {3.7450380335922895 1.3870370758849795 -8.237200001887336} {3.9193476247410084 1.2971603426886933 -8.115023889311413};
+
+color $myplane black
 
 select all
