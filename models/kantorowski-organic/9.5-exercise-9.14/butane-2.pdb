@@ -1,0 +1,16 @@
+# a gauche conformer of butane  
+# the initial non-moveable butane in discovery exercise 9.5.14.
+ATOM      1  C1  BUT     1       2.658   0.905  -2.076  1.00  0.00           C  
+ATOM      2  C2  BUT     1       2.631   0.416  -3.537  1.00  0.00           C  
+ATOM      3  C3  BUT     1       3.203  -1.012  -3.612  1.00  0.00           C  
+ATOM      4  C4  BUT     1       4.691  -0.991  -3.218  1.00  0.00           C  
+ATOM      5 1H1  BUT     1       3.666   0.906  -1.719  1.00  0.00           H  
+ATOM      6 2H1  BUT     1       2.259   1.897  -2.025  1.00  0.00           H  
+ATOM      7 3H1  BUT     1       2.065   0.252  -1.471  1.00  0.00           H  
+ATOM      8 1H2  BUT     1       1.622   0.415  -3.894  1.00  0.00           H  
+ATOM      9 2H2  BUT     1       3.223   1.069  -4.144  1.00  0.00           H  
+ATOM     10 1H3  BUT     1       2.665  -1.647  -2.940  1.00  0.00           H  
+ATOM     11 2H3  BUT     1       3.104  -1.384  -4.611  1.00  0.00           H  
+ATOM     12 1H4  BUT     1       5.088  -1.983  -3.270  1.00  0.00           H  
+ATOM     13 2H4  BUT     1       4.791  -0.619  -2.220  1.00  0.00           H  
+ATOM     14 3H4  BUT     1       5.230  -0.356  -3.890  1.00  0.00           H  
