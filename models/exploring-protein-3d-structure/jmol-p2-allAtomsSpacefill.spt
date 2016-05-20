@@ -1,0 +1,6 @@
+isosurface off
+select all
+labels off
+restrict none
+select all
+cpk 100%

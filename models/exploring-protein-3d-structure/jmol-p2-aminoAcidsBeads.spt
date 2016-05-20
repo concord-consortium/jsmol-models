@@ -1,0 +1,13 @@
+isosurface off
+select all
+labels off
+restrict none
+select protein
+trace 0.3
+
+select *.ca
+cpk 50%
+#label %m
+#color label black
+#font label 10 sans bold
+#set labeloffset 0 0

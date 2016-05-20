@@ -1,0 +1,22 @@
+#set echo line1 100% 95%
+#color echo [xede1d8]
+#font echo 14 sans bold
+#echo Click the button to play a movie ---->
+
+select protein; cpk; color [x9ab9a4]; 
+
+set echo line1 50% 90%
+set echo line1 center
+color echo [x9ab9a4]
+echo Parvalbumin
+font echo 16 sans bold
+
+translate y 8; 
+
+#set showHydrogens off; 
+
+hover Amino acid: %n |Number: %r 
+
+isosurface parvsurface sasurface
+color isosurface [x9ab9a4]
+isosurface off

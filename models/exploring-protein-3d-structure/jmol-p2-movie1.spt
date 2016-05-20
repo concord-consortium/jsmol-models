@@ -1,0 +1,224 @@
+restrict none
+moveto 0.0 { 66 975 -210 137.7} 108.0 0.0 8.0 {0.10849953 -0.3850007 0.49249935} 24.1;
+
+select all
+color [x9ab9a4]
+cpk
+set echo off
+
+set echo line1 50% 90%
+set echo line1 center
+echo "Parvalbumin is a long chain of amino acids|(as are all proteins)."
+color echo [xc89cff]
+font echo 14 sans bold
+
+delay 0.5
+
+moveto 3.0 { -91 190 978 128.0} 100.0 0.0 8.0 {0.10849953 -0.3850007 0.49249935} 24.1;
+
+# ------- color by amino acid ---------------------
+
+select all
+color [x9ab9a4]
+cpk
+
+delay 1
+echo "To see the amino acids...|we can color each kind of amino acid differently."
+
+delay 1
+select  1; color shapely; delay 0.1
+select  2; color shapely; delay 0.1
+select  3; color shapely; delay 0.1
+select  4; color shapely; delay 0.1
+select  5-37; color shapely; delay 0.1
+select  38; color shapely; delay 0.1
+select  39; color shapely; delay 0.1
+select  40; color shapely; delay 0.1
+select  41; color shapely; delay 0.1
+select  42; color shapely; delay 0.1
+select  43; color shapely; delay 0.1
+select  44; color shapely; delay 0.1
+select  45; color shapely; delay 0.1
+select  46; color shapely; delay 0.1
+select  47; color shapely; delay 0.1
+select  48; color shapely; delay 0.1
+select  49; color shapely; delay 0.1
+select  50; color shapely; delay 0.1
+select  51; color shapely; delay 0.1
+select  52; color shapely; delay 0.1
+select  53; color shapely; delay 0.1
+select  54; color shapely; delay 0.1
+select  55; color shapely; delay 0.1
+select  56; color shapely; delay 0.1
+select  57; color shapely; delay 0.1
+select  58; color shapely; delay 0.1
+select  59; color shapely; delay 0.1
+select  60; color shapely; delay 0.1
+select  61; color shapely; delay 0.1
+select  62; color shapely; delay 0.1
+select  63; color shapely; delay 0.1
+select  64; color shapely; delay 0.1
+select  65; color shapely; delay 0.1
+select  66; color shapely; delay 0.1
+select  67; color shapely; delay 0.1
+select  68; color shapely; delay 0.1
+select  69; color shapely; delay 0.1
+select  70; color shapely; delay 0.1
+select  71; color shapely; delay 0.1
+select  72; color shapely; delay 0.1
+select  73; color shapely; delay 0.1
+select  74; color shapely; delay 0.1
+select  75; color shapely; delay 0.1
+select  76; color shapely; delay 0.1
+select  77; color shapely; delay 0.1
+select  78; color shapely; delay 0.1
+select  79; color shapely; delay 0.1
+select  80; color shapely; delay 0.1
+select  81; color shapely; delay 0.1
+select  82; color shapely; delay 0.1
+select  83; color shapely; delay 0.1
+select  84; color shapely; delay 0.1
+select  85; color shapely; delay 0.1
+select  86; color shapely; delay 0.1
+select  87; color shapely; delay 0.1
+select  88; color shapely; delay 0.1
+select  89; color shapely; delay 0.1
+select  90; color shapely; delay 0.1
+select  91; color shapely; delay 0.1
+select  92; color shapely; delay 0.1
+select  93; color shapely; delay 0.1
+select  94; color shapely; delay 0.1
+select  95; color shapely; delay 0.1
+select  96; color shapely; delay 0.1
+select  97; color shapely; delay 0.1
+select  98; color shapely; delay 0.1
+select  99; color shapely; delay 0.1
+select  100; color shapely; delay 0.1
+select  101; color shapely; delay 0.1
+select  102; color shapely; delay 0.1
+select  103; color shapely; delay 0.1
+select  104; color shapely; delay 0.1
+select  105; color shapely; delay 0.1
+select  106; color shapely; delay 0.1
+select  107; color shapely; delay 0.1
+select  108; color shapely; delay 0.1
+select  109; color shapely; delay 0.1
+select  110; color shapely; delay 0.1
+
+
+# ------------ turn on bbone representation underneath
+select all
+trace 0.3
+
+
+delay 2
+echo "Now we'll shrink every amino acid|down to a single bead."
+
+
+# -------------- shrink spacefill except .ca
+
+
+select sidechain
+
+spacefill 95%
+delay 0.05
+spacefill 90%
+delay 0.05
+spacefill 85%
+delay 0.05
+spacefill 80%
+delay 0.05
+spacefill 75%
+delay 0.05
+spacefill 70%
+delay 0.05
+spacefill 65%
+delay 0.05
+spacefill 60%
+delay 0.05
+spacefill 55%
+delay 0.05
+spacefill 50%
+delay 0.05
+spacefill 45%
+delay 0.05
+spacefill 40%
+delay 0.05
+spacefill 35%
+delay 0.05
+spacefill 30%
+delay 0.05
+spacefill 25%
+delay 0.05
+spacefill 20%
+delay 0.05
+spacefill 15%
+delay 0.05
+spacefill 10%
+delay 0.05
+spacefill 5%
+delay 0.05
+spacefill 0
+
+delay 1
+select backbone
+
+spacefill 95%
+delay 0.05
+spacefill 90%
+delay 0.05
+spacefill 85%
+delay 0.05
+spacefill 80%
+delay 0.05
+spacefill 75%
+delay 0.05
+spacefill 70%
+delay 0.05
+spacefill 65%
+delay 0.05
+spacefill 60%
+delay 0.05
+spacefill 55%
+delay 0.05
+
+
+select backbone and not *.ca
+spacefill 50%
+delay 0.05
+spacefill 45%
+delay 0.05
+spacefill 40%
+delay 0.05
+spacefill 35%
+delay 0.05
+spacefill 30%
+delay 0.05
+spacefill 25%
+delay 0.05
+spacefill 20%
+delay 0.05
+spacefill 15%
+delay 0.05
+spacefill 10%
+delay 0.05
+spacefill 5%
+delay 0.05
+spacefill 0
+
+
+
+delay 2
+moveto 4.0 { 333 -530 780 158.9} 141.0 0.0 8.0 {0.10849953 -0.3850007 0.49249935} 24.1
+
+#delay 1
+#echo "Click and drag on the protein to see if you can|follow the fold from one end to the other."
+#
+#delay 1
+#select all
+#color monomer
+#
+#delay 1
+#
+#moveto 4.0 { 66 975 -210 137.7} 108.0 0.0 8.0 {0.10849953 -0.3850007 0.49249935} 24.1;
+
