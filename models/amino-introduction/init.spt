@@ -1,0 +1,18 @@
+restrict none
+background black
+set antialiasdisplay on
+set frank off
+zoom 75
+select protein
+cpk
+color monomer
+script models/amino-introduction/initFunctions.spt
+
+set echo top center
+color echo yellow
+font echo 15 sans bold
+
+echo "Press 'Play' to take closer look at how amino acids|link together, forming a chain that we call a protein."
+
+set echo bottom center
+echo "This protein is porin which lets molecules pass in and out of cells."

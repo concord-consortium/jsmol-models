@@ -1,0 +1,46 @@
+# Grow spacefill --------
+
+function off2cpk
+  for ( var i=0; i<101; i = i + 10 )
+	x = script("cpk " + i + "%; delay 0.1;")
+  refresh	
+  end for
+end function
+
+# Shrink spacefill ------
+
+function cpk2off
+  for ( var i=100; i>-1; i = i - 10 )
+	x = script("cpk " + i + "%; delay 0.1;")
+  refresh	
+  end for
+end function
+
+# Grow wireframe --------
+
+function off2wf
+  for ( var i=0.06; i<0.2; i = i + 0.02 )
+	x = script("wireframe " + i + "; delay 0.1;")	
+  refresh
+  end for
+end function
+
+
+# Spacefill to ball and stick
+
+function cpk2bs
+  for ( var i=100; i > 29; i = i - 5 )
+	x = script("cpk " + i + "%; delay 0.2;")
+  refresh	
+  end for
+end function
+
+
+# turn backbone off
+function backbone2off
+  for ( var i=0.375; i > 0.025; i = i - 0.025 )
+  x = script("backbone " + i+ "; delay 0.005;") 
+  refresh 
+  end for
+  backbone off
+end function
