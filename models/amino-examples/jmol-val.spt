@@ -1,0 +1,10 @@
+define ~backB (atomno=13,atomno=12,atomno=11,atomno=9,atomno=5,atomno=1,atomno=6,atomno=7,atomno=8)
+select not ~backB 
+define ~mySidechain selected 
+select all 
+
+set echo bottom center
+echo "Valine"
+
+moveto /* time, axisAngle */ 0.0 { 127 -395 -910 106.08} /* zoom, translation */  120.0 0.15 0.09  /* center, rotationRadius */ {0.0 0.0 -0.0020000339} 4.6127696 /* navigation center, translation, depth */ {0.0 0.0 0.0} -0.018095182 -0.007286144 50.0;
+

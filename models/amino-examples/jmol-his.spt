@@ -1,0 +1,9 @@
+define ~backB (atomno=1,atomno=2,atomno=7,atomno=8,atomno=9,atomno=10,atomno=16,atomno=19,atomno=20)
+select not ~backB 
+define ~mySidechain selected 
+select all 
+
+set echo bottom center
+echo "Histidine"
+
+moveto /* time, axisAngle */ 0.0 { 327 -891 -314 164.04} /* zoom, translation */  120.0 0.0 0.08  /* center, rotationRadius */ {-0.38008574 -0.14767621 -0.035490476} 5.4654703 /* navigation center, translation, depth */ {0.0 0.0 0.0} -3.8925505 0.9294264 50.0;

@@ -1,0 +1,12 @@
+background black
+translate y 5
+zoom 100
+
+set echo bottom center
+font echo 16 sans bold
+color echo [xf4f5ef]
+
+x = script("isosurface select {~mySidechain} colorscheme rwb sasurface 0.2 color range @low @high map mep")
+isosurface off
+
+
