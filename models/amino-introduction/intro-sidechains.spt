@@ -82,7 +82,7 @@ delay 1
 echo "The part that branches out|is called the side chain."
 color echo yellow
 
-delay 2
+delay 4
 echo "Here you can see the specfic elements|making up each of these amino acid sidechains."
 color echo red
 select visible and sidechain
