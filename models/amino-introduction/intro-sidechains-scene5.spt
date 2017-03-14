@@ -1,0 +1,9 @@
+echo "Each amino acid’s side chain is made up of specific elements|that give each amino acid different properties."
+color echo red
+select visible and sidechain
+color atoms cpk
+delay 1
+select visible and not (atomno=371 or atomno=421)
+wireframe 0.25
+backbone off
+cpk2bs

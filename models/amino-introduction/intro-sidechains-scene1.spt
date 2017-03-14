@@ -1,0 +1,25 @@
+moveto /* time, axisAngle */ 0 {0 0 1 0} /* zoom, translation */  75.0 0.0 0.0  /* center, rotationRadius */ {2.4839993 37.6445 36.004} 39.037724 /* navigation center, translation, depth */ {0.0 0.0 0.0} -2.1667414 49.25476 50.0;
+
+select protein
+color group
+cpk
+
+set echo top HIDDEN
+set echo bottom center
+
+moveto /* time, axisAngle */ 2.0 { 994 76 -75 85.42} /* zoom, translation */  87.29 0.0 0.0  /* center, rotationRadius */ {2.4839993 37.6445 36.004} 39.037724 /* navigation center, translation, depth */ {0.0 0.0 0.0} -8.091443 -48.54884 50.0;
+
+select sidechain and not (50-56)
+cpk2off
+
+delay 1
+
+select all
+backbone 0.4
+select backbone and not (50-55)
+cpk2off
+
+
+echo "We'll look at a small piece of the chain."
+font echo 15 sans bold
+color echo red

@@ -1,0 +1,12 @@
+select 1-49 or 55-289
+cpk off
+backbone2off
+delay 2.0
+
+
+moveto /* time, axisAngle */ 1.0 { -717 -695 -57 41.09} /* zoom, translation */  200.24 -5.0 -0.1  /* center, rotationRadius */ {0.3222499 51.195305 35.675953} 42.085636 /* navigation center, translation, depth */ {0.0 0.0 0.0} 12.298503 215.28168 50.0;
+
+delay 2
+
+echo "This piece of the chain is made of five links.|Each link is a molecule called an amino acid."
+color echo yellow

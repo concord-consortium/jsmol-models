@@ -1,0 +1,19 @@
+select 54 
+color shapely
+delay 1
+select 53 
+color shapely
+delay 1
+select 52 
+color [xcc0000]
+delay 1
+select 51 
+color shapely
+delay 1
+select 50 
+color shapely
+delay 1
+
+delay 0.5
+echo "Part of each amino acid|forms the linked chain of the protein.|The linked parts are called the backbone."
+color echo red

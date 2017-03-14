@@ -1,0 +1,20 @@
+moveto /* time, axisAngle */ 0.5 { -401 -866 -299 26.62} /* zoom, translation */  200.24 -5.0 -0.1  /* center, rotationRadius */ {0.3222499 51.195305 35.675953} 42.085636 /* navigation center, translation, depth */ {0.0 0.0 0.0} 3.8520846 174.4267 50.0;
+
+select 54 and backbone
+color [x00bbf9]
+delay 1
+select 53 and backbone
+color [x00bbf9]
+delay 1
+select 52 and backbone
+color [x00bbf9]
+delay 1
+select 51 and backbone
+color [x00bbf9]
+delay 1
+select 50 and backbone
+color [x00bbf9]
+
+delay 1
+echo "The part that branches out|is called the side chain."
+color echo yellow
