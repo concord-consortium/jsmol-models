@@ -12,7 +12,7 @@ set echo top center
 color echo yellow
 font echo 15 sans bold
 
-echo "Press 'Play' to take closer look at how amino acids|link together, forming a chain that we call a protein."
+echo "Click on each scene number below in order to take a closer look|at how amino acids link together, forming a chain that we call a protein."
 
 set echo bottom center
 echo "This protein is porin which lets molecules pass in and out of cells."
