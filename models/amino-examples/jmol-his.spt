@@ -6,4 +6,4 @@ select all
 set echo bottom center
 echo "Histidine"
 
-moveto /* time, axisAngle */ 0.0 { 327 -891 -314 164.04} /* zoom, translation */  120.0 0.0 0.08  /* center, rotationRadius */ {-0.38008574 -0.14767621 -0.035490476} 5.4654703 /* navigation center, translation, depth */ {0.0 0.0 0.0} -3.8925505 0.9294264 50.0;
+moveto 0.0 { 644 -291 708 14.42} 100.0 0.0 0.0 {-0.38008574 -0.14767621 -0.035490476} 5.4654703 {0 0 0} 0 0 0 3.0 0.0 0.0;
