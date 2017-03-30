@@ -1,4 +1,4 @@
-deploy
+dist
 bin
 .bundle
 *.sublime-project

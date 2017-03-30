@@ -1,9 +1,10 @@
+sudo: false
 language: ruby
 rvm:
-- 1.9.3
-script: mkdir -p deploy/jsmol && cp -r !(deploy) deploy/jsmol/
-install: bundle install --without dev
-after_success: if [ "$TRAVIS_BRANCH" == "production" ]; then bundle exec s3_website push --site deploy --headless; fi
+  - 2.2
+install: travis_retry gem install s3_website -v 3.1.0
+before_script: ./build.sh
+script: ./deploy/s3_deploy.sh
 env:
   global:
   - secure: DPn3RiEKNHqYQ7HLYSzBFOuEpnoXRl1gTI32mJbspQ79vr6Fz5BZZL4Gk2pi6Xv4Obl+lrYzVi9n429BgmXkJNB6O2oN4EzmKE+Shrg0V5hv6FsEaOdzmRu3TgVxvhelhYZkbaNTvpCH0fubWf3AIBB/S5FxEeEUKR/Xw4BpSto=
