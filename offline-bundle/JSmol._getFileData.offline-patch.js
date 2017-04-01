@@ -11,7 +11,6 @@ Jmol._getFileData = function(fileName, fSuccess, doProcess) {
     path = path.substr(0, path.lastIndexOf('/') + 1);
     fileName = fileName.replace('file:' + path, '');
   }
-  console.log('loading...', fileName);
   var isBinary = Jmol._isBinaryUrl(fileName);
   if (isBinary) {
     console.warning('trying to load binary file:', fileName);
@@ -19,8 +18,10 @@ Jmol._getFileData = function(fileName, fSuccess, doProcess) {
   var data = null;
   var localElement = document.getElementById(fileName);
   if (localElement) {
-    console.log('loaded local!', fileName);
     data = localElement.innerText;
+    if (data.startsWith('//<![CDATA[')) {
+      data = data.slice('//<![CDATA['.length, -'//]]>'.length);
+    }
   } else {
     console.error('missing data:', fileName);
   }
