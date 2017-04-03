@@ -5,8 +5,8 @@ const path = require('path');
 const klawSync = require('klaw-sync');
 const config = require('./config');
 
-const outputDir = path.resolve('.', 'jsmol-offline');
-const absolutePathPrefix = path.resolve('.');
+const mainDir = path.join(__dirname, '..');
+const outputDir = path.join(mainDir, 'jsmol-offline');
 
 function isJSFile(file) {
   return file.path.match(/\.js$/);
@@ -22,9 +22,11 @@ function flatten(arr) {
 
 function getAllPathsIn(paths, ignore = null, filterFunc = null) {
   if (filterFunc === null) filterFunc = function () { return true; };
-  return flatten(paths.map(path => fs.statSync(path).isFile() ?
-                                    [path] :
-                                    klawSync(path, {nodir: true, ignore}).filter(filterFunc).map(file => file.path)
+  return flatten(paths
+    .map(p => path.join(mainDir, p))
+    .map(p => fs.statSync(p).isFile() ? [p] : klawSync(p, {nodir: true, ignore})
+                                                .filter(filterFunc)
+                                                .map(file => file.path)
   ));
 }
 
@@ -35,13 +37,13 @@ fs.emptyDirSync(outputDir);
 // Copy necessary JS libs.
 // JSmol injects some scripts using <script> tag, so we need to copy a few files (core.z.js and package.js)
 // and keep the original dir structure / paths.
-fs.copySync('jsmol/j2s/core/core.z.js', path.join(outputDir, 'jsmol/j2s/core/core.z.js'));
-fs.copySync('jsmol/j2s/core/package.js', path.join(outputDir, 'jsmol/j2s/core/package.js'));
+fs.copySync(path.join(mainDir, 'jsmol/j2s/core/core.z.js'), path.join(outputDir, 'jsmol/j2s/core/core.z.js'));
+fs.copySync(path.join(mainDir, 'jsmol/j2s/core/package.js'), path.join(outputDir, 'jsmol/j2s/core/package.js'));
 // Copy libs used by embeddable.html.
-fs.copySync('jsmol/JSmol.min.js', path.join(outputDir, 'jsmol/JSmol.min.js'));
-fs.copySync('iframe-phone/dist/iframe-phone.js', path.join(outputDir, 'iframe-phone/dist/iframe-phone.js'));
-fs.copySync('shutterbug.js/dist/shutterbug.js', path.join(outputDir, 'shutterbug.js/dist/shutterbug.js'));
-fs.copySync('offline-bundle/JSmol._getFileData.offline-patch.js', path.join(outputDir, 'JSmol._getFileData.offline-patch.js'));
+fs.copySync(path.join(mainDir, 'jsmol/JSmol.min.js'), path.join(outputDir, 'jsmol/JSmol.min.js'));
+fs.copySync(path.join(mainDir, 'iframe-phone/dist/iframe-phone.js'), path.join(outputDir, 'iframe-phone/dist/iframe-phone.js'));
+fs.copySync(path.join(mainDir, 'shutterbug.js/dist/shutterbug.js'), path.join(outputDir, 'shutterbug.js/dist/shutterbug.js'));
+fs.copySync(path.join(mainDir, 'offline-bundle/JSmol._getFileData.offline-patch.js'), path.join(outputDir, 'JSmol._getFileData.offline-patch.js'));
 
 // Start building new content that will be injected into embeddable.html.
 // 1. _getFileData overwrite that replaces all the Ajax calls with local HTML lookup.
@@ -59,7 +61,7 @@ const modelPaths = getAllPathsIn(config.modelPaths, ignoredModelFiles);
 
 // 4. Generate script tags for j2sPaths and modelPaths.
 j2sPaths.concat(modelPaths).forEach(function (file) {
-  const id = file.replace(`${absolutePathPrefix}/`, '');
+  const id = file.replace(`${mainDir}/`, '');
   const fileContent = fs.readFileSync(file, 'utf-8');
   newContent += `<script type="text/template" id="${id}">//<![CDATA[\n${fileContent}\n//]]></script>\n`;
 });
@@ -67,11 +69,11 @@ j2sPaths.concat(modelPaths).forEach(function (file) {
 // 5. Copy images from models dir.
 const imagePaths = getAllPathsIn(config.modelPaths, null, isImgFile);
 imagePaths.forEach(function (file) {
-  fs.copySync(file, path.join(outputDir, file.replace(`${absolutePathPrefix}/`, '')));
+  fs.copySync(file, path.join(outputDir, file.replace(`${mainDir}/`, '')));
 });
 
 // Read embeddable.html content, insert new content it and save in output dir.
-const embeddable = fs.readFileSync('embeddable.html', 'utf-8');
+const embeddable = fs.readFileSync(path.join(mainDir, 'embeddable.html'), 'utf-8');
 const pos = embeddable.indexOf('<!-- OFFLINE BUNDLE CONTENT -->');
 const newEmbeddable = embeddable.substr(0, pos) + newContent + embeddable.substr(pos);
 fs.writeFileSync(path.join(outputDir, 'embeddable.html'), newEmbeddable);
