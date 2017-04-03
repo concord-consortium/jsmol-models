@@ -1,3 +1,6 @@
+// Store all files loaded, so this variable can be inspected and a smaller bundle created (based on this list).
+Jmol._filesLoaded = [];
+
 Jmol._getFileData = function(fileName, fSuccess, doProcess) {
   if (fileName.startsWith('file:/')) {
     // Sometimes JSmol resolves paths to:
@@ -11,6 +14,7 @@ Jmol._getFileData = function(fileName, fSuccess, doProcess) {
     path = path.substr(0, path.lastIndexOf('/') + 1);
     fileName = fileName.replace('file:' + path, '');
   }
+  Jmol._filesLoaded.push(fileName);
   var isBinary = Jmol._isBinaryUrl(fileName);
   if (isBinary) {
     console.warning('trying to load binary file:', fileName);
