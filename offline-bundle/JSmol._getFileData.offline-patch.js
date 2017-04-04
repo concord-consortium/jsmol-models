@@ -28,6 +28,7 @@ Jmol._getFileData = function(fileName, fSuccess, doProcess) {
     }
   } else {
     console.error('missing data:', fileName);
+    alert('Missing file: ', fileName, '\nJSmol offline bundle needs to be updated.');
   }
   if (!doProcess)
     return data;
