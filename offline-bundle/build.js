@@ -9,6 +9,8 @@ const mainDir = path.join(__dirname, '..');
 const outputDir = path.join(mainDir, 'jsmol-offline');
 
 function isJSFile(file) {
+  // java/util/Random.js for some reason is breaking the whole page. It seems we can skip it and JSmol works anyway.
+  if (file.path.indexOf('java/util/Random.js') !== -1) return;
   return file.path.match(/\.js$/);
 }
 

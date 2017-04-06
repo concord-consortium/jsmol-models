@@ -23,12 +23,12 @@ Jmol._getFileData = function(fileName, fSuccess, doProcess) {
   var localElement = document.getElementById(fileName);
   if (localElement) {
     data = localElement.innerText;
-    if (data.startsWith('//<![CDATA[')) {
-      data = data.slice('//<![CDATA['.length, -'//]]>'.length);
+    if (data.startsWith('//<![CDATA[\n')) {
+      data = data.slice('//<![CDATA[\n'.length, -'\n//]]>'.length);
     }
   } else {
     console.error('missing data:', fileName);
-    alert('Missing file: ', fileName, '\nJSmol offline bundle needs to be updated.');
+    alert('Missing file: ' + fileName + '\nJSmol offline bundle needs to be updated.');
   }
   if (!doProcess)
     return data;
