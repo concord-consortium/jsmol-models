@@ -1,0 +1,15 @@
+{
+  "name": "jsmol-offline-bundle-gen",
+  "version": "0.1.0",
+  "description": "Generates offline version of Jsmol embeddable page",
+  "main": "build.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Piotr Janik <janikpiotrek@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^2.1.2",
+    "klaw-sync": "^1.1.2"
+  }
+}

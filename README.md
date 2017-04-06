@@ -67,6 +67,16 @@ When you update ```production``` branch and push it, Travis CI will automaticall
 
 You can monitor this proces at the [JSMol Models Travis CI Build page](https://travis-ci.org/concord-consortium/jsmol-models/builds).
 
+## Offline bundle
+
+Prepackaged version of JSmol that includes all the models, necessary JSmol JavaScript files, and does not require internet connection
+can be found at [https://models-resources.concord.org/jsmol/jsmol-offline.html](https://models-resources.concord.org/jsmol/jsmol-offline.html).
+
+It can be used to create a standalone Lab interactive:
+[http://lab.concord.org/standalone/create.html](http://lab.concord.org/standalone/create.html)
+
+Take a look at [offline-bundle/README](offline-bundle/README.md) if you want to generate it locally.
+
 ## GitHub pages
 
 There is no ``master`` branch in this repository. The ``gh-pages`` branch is the default branch, so all of your work should be done there.

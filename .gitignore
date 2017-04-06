@@ -1,5 +1,7 @@
 dist
+jsmol-offline
 bin
 .bundle
+offline-bundle/node_modules
 *.sublime-project
 *.sublime-workspace
