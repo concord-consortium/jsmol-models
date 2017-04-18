@@ -13,6 +13,11 @@ Jmol._getFileData = function(fileName, fSuccess, doProcess) {
     var path = window.location.pathname;
     path = path.substr(0, path.lastIndexOf('/') + 1);
     fileName = fileName.replace('file:' + path, '');
+  } else if (fileName.startsWith('http')) {
+    // When http server is used, we need to remove http(s)://<full-path-of-the-jsmol-dir>/ part.
+    var href = window.location.href;
+    href = href.substr(0, href.lastIndexOf('/') + 1);
+    fileName = fileName.replace(href, '');
   }
   Jmol._filesLoaded.push(fileName);
   var isBinary = Jmol._isBinaryUrl(fileName);
