@@ -31,9 +31,6 @@ rockets off
 trace off
 backbone off
 
-# Text
-labels off
-set echo off
 # Monitors
 monitors off
 

@@ -5,3 +5,4 @@ bin
 offline-bundle/node_modules
 *.sublime-project
 *.sublime-workspace
+.idea

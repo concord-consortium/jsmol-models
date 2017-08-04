@@ -2,6 +2,7 @@ module.exports = {
   jsPaths: [
     // This seems to cover all the models:
     'jsmol/j2s',
+    'jsmol/idioma/en_GB.po',
     // If size of the bundle is important, you can list only files necessary for given interactive,
     // e.g. this is enough for DNA model:
     // "jsmol/j2s/core/corescript.z.js",
