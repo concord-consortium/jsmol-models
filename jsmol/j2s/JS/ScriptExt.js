@@ -1,4 +1,5 @@
 Clazz.declarePackage ("JS");
+Clazz.load (null, "JS.ScriptExt", ["JU.AU"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.vwr = null;
 this.e = null;
@@ -43,7 +44,7 @@ return this.e.paramAsStr (i);
 }, "~N");
 Clazz.defineMethod (c$, "centerParameter", 
 function (i) {
-return this.e.centerParameter (i);
+return this.e.centerParameter (i, null);
 }, "~N");
 Clazz.defineMethod (c$, "floatParameter", 
 function (i) {
@@ -96,7 +97,7 @@ return name;
 Clazz.defineMethod (c$, "getColorTrans", 
 function (eval, i, allowNone, ret) {
 var translucentLevel = 3.4028235E38;
-if (eval.theTok != 1766856708) --i;
+if (eval.theTok != 1765808134) --i;
 switch (this.tokAt (i + 1)) {
 case 603979967:
 i++;
@@ -109,7 +110,7 @@ break;
 }
 if (eval.isColorParam (i + 1)) {
 ret[0] = eval.getArgbParam (++i);
-} else if (this.tokAt (i + 1) == 1048587) {
+} else if (this.tokAt (i + 1) == 1073742333) {
 ret[0] = 0;
 eval.iToken = i + 1;
 } else if (translucentLevel == 3.4028235E38) {
@@ -130,3 +131,46 @@ this.setShapeProperty (shapeID, "scale", Integer.$valueOf (intScale));
 }if (iptDisplayProperty > 0) {
 if (!this.e.setMeshDisplayProperty (shapeID, iptDisplayProperty, 0)) this.invArg ();
 }}, "~N,~N,~N,~N,~B,~O,~N,JU.BS");
+Clazz.defineMethod (c$, "getIntArray2", 
+function (i) {
+var list = (this.e.getToken (i)).getList ();
+var faces = JU.AU.newInt2 (list.size ());
+for (var vi = faces.length; --vi >= 0; ) {
+var face = list.get (vi).getList ();
+if (face == null) this.invArg ();
+faces[vi] =  Clazz.newIntArray (face.size (), 0);
+for (var vii = faces[vi].length; --vii >= 0; ) faces[vi][vii] = face.get (vii).intValue;
+
+}
+return faces;
+}, "~N");
+Clazz.defineMethod (c$, "getAllPoints", 
+function (index) {
+var points = null;
+var bs = null;
+try {
+switch (this.e.tokAt (index)) {
+case 7:
+points = this.e.getPointArray (index, -1, false);
+break;
+case 12290:
+case 10:
+case 1073742325:
+bs = this.atomExpressionAt (index);
+break;
+}
+if (points == null) {
+if (bs == null) bs = this.vwr.getAllAtoms ();
+points =  new Array (bs.cardinality ());
+for (var i = bs.nextSetBit (0), pt = 0; i >= 0; i = bs.nextSetBit (i + 1)) points[pt++] = this.vwr.ms.at[i];
+
+}} catch (e) {
+if (Clazz.exceptionOf (e, Exception)) {
+} else {
+throw e;
+}
+}
+if (points.length < 3) this.invArg ();
+return points;
+}, "~N");
+});

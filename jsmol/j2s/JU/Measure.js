@@ -91,15 +91,21 @@ plane.set4 (normal.x, normal.y, normal.z, -normal.dot (pt));
 }, "JU.T3,JU.V3,JU.P4");
 c$.distanceToPlane = Clazz.defineMethod (c$, "distanceToPlane", 
 function (plane, pt) {
-return (plane == null ? NaN : (plane.x * pt.x + plane.y * pt.y + plane.z * pt.z + plane.w) / Math.sqrt (plane.x * plane.x + plane.y * plane.y + plane.z * plane.z));
+return (plane == null ? NaN : (plane.dot (pt) + plane.w) / Math.sqrt (plane.dot (plane)));
 }, "JU.P4,JU.T3");
+c$.directedDistanceToPlane = Clazz.defineMethod (c$, "directedDistanceToPlane", 
+function (pt, plane, ptref) {
+var f = plane.dot (pt) + plane.w;
+var f1 = plane.dot (ptref) + plane.w;
+return Math.signum (f1) * f / Math.sqrt (plane.dot (plane));
+}, "JU.P3,JU.P4,JU.P3");
 c$.distanceToPlaneD = Clazz.defineMethod (c$, "distanceToPlaneD", 
 function (plane, d, pt) {
-return (plane == null ? NaN : (plane.x * pt.x + plane.y * pt.y + plane.z * pt.z + plane.w) / d);
+return (plane == null ? NaN : (plane.dot (pt) + plane.w) / d);
 }, "JU.P4,~N,JU.P3");
 c$.distanceToPlaneV = Clazz.defineMethod (c$, "distanceToPlaneV", 
 function (norm, w, pt) {
-return (norm == null ? NaN : (norm.x * pt.x + norm.y * pt.y + norm.z * pt.z + w) / Math.sqrt (norm.x * norm.x + norm.y * norm.y + norm.z * norm.z));
+return (norm == null ? NaN : (norm.dot (pt) + w) / Math.sqrt (norm.dot (norm)));
 }, "JU.V3,~N,JU.P3");
 c$.calcNormalizedNormal = Clazz.defineMethod (c$, "calcNormalizedNormal", 
 function (pointA, pointB, pointC, vNormNorm, vAB) {
@@ -107,7 +113,7 @@ vAB.sub2 (pointB, pointA);
 vNormNorm.sub2 (pointC, pointA);
 vNormNorm.cross (vAB, vNormNorm);
 vNormNorm.normalize ();
-}, "JU.T3,JU.T3,JU.T3,JU.V3,JU.V3");
+}, "JU.T3,JU.T3,JU.T3,JU.T3,JU.T3");
 c$.getDirectedNormalThroughPoints = Clazz.defineMethod (c$, "getDirectedNormalThroughPoints", 
 function (pointA, pointB, pointC, ptRef, vNorm, vAB) {
 var nd = JU.Measure.getNormalThroughPoints (pointA, pointB, pointC, vNorm, vAB);
@@ -126,7 +132,7 @@ function (pointA, pointB, pointC, vNorm, vTemp) {
 JU.Measure.calcNormalizedNormal (pointA, pointB, pointC, vNorm, vTemp);
 vTemp.setT (pointA);
 return -vTemp.dot (vNorm);
-}, "JU.T3,JU.T3,JU.T3,JU.V3,JU.V3");
+}, "JU.T3,JU.T3,JU.T3,JU.T3,JU.T3");
 c$.getPlaneProjection = Clazz.defineMethod (c$, "getPlaneProjection", 
 function (pt, plane, ptProj, vNorm) {
 var dist = JU.Measure.distanceToPlane (plane, pt);
@@ -136,13 +142,12 @@ vNorm.scale (-dist);
 ptProj.add2 (pt, vNorm);
 }, "JU.P3,JU.P4,JU.P3,JU.V3");
 c$.getNormalFromCenter = Clazz.defineMethod (c$, "getNormalFromCenter", 
-function (ptCenter, ptA, ptB, ptC, isOutward, normal) {
-var vAB =  new JU.V3 ();
-var d = JU.Measure.getNormalThroughPoints (ptA, ptB, ptC, normal, vAB);
+function (ptCenter, ptA, ptB, ptC, isOutward, normal, vTemp) {
+var d = JU.Measure.getNormalThroughPoints (ptA, ptB, ptC, normal, vTemp);
 var isReversed = (JU.Measure.distanceToPlaneV (normal, d, ptCenter) > 0);
 if (isReversed == isOutward) normal.scale (-1.0);
 return !isReversed;
-}, "JU.P3,JU.P3,JU.P3,JU.P3,~B,JU.V3");
+}, "JU.P3,JU.P3,JU.P3,JU.P3,~B,JU.V3,JU.V3");
 c$.getNormalToLine = Clazz.defineMethod (c$, "getNormalToLine", 
 function (pointA, pointB, vNormNorm) {
 vNormNorm.sub2 (pointA, pointB);
@@ -303,9 +308,10 @@ c$.calculateQuaternionRotation = Clazz.defineMethod (c$, "calculateQuaternionRot
 function (centerAndPoints, retStddev) {
 retStddev[1] = NaN;
 var q =  new JU.Quat ();
-if (centerAndPoints[0].length == 1 || centerAndPoints[0].length != centerAndPoints[1].length) return q;
-var n = centerAndPoints[0].length - 1;
-if (n < 2) return q;
+var ptsA = centerAndPoints[0];
+var ptsB = centerAndPoints[1];
+var nPts = ptsA.length - 1;
+if (nPts < 2 || ptsA.length != ptsB.length) return q;
 var Sxx = 0;
 var Sxy = 0;
 var Sxz = 0;
@@ -317,11 +323,11 @@ var Szy = 0;
 var Szz = 0;
 var ptA =  new JU.P3 ();
 var ptB =  new JU.P3 ();
-for (var i = n + 1; --i >= 1; ) {
-var aij = centerAndPoints[0][i];
-var bij = centerAndPoints[1][i];
-ptA.sub2 (aij, centerAndPoints[0][0]);
-ptB.sub2 (bij, centerAndPoints[0][1]);
+var ptA0 = ptsA[0];
+var ptB0 = ptsB[0];
+for (var i = nPts + 1; --i >= 1; ) {
+ptA.sub2 (ptsA[i], ptA0);
+ptB.sub2 (ptsB[i], ptB0);
 Sxx += ptA.x * ptB.x;
 Sxy += ptA.x * ptB.y;
 Sxz += ptA.x * ptB.z;

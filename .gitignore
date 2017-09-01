@@ -6,3 +6,4 @@ offline-bundle/node_modules
 *.sublime-project
 *.sublime-workspace
 .idea
+.DS_Store

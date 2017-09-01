@@ -104,7 +104,7 @@ Clazz.overrideMethod (c$, "outputTextPixel",
 function (pt, argb) {
 }, "JU.P3,~N");
 Clazz.overrideMethod (c$, "outputSurface", 
-function (vertices, normals, colixes, indices, polygonColixes, nVertices, nPolygons, nFaces, bsPolygons, faceVertexMax, colix, colorList, htColixes, offset) {
+function (vertices, normals, colixes, indices, polygonColixes, nVertices, nPolygons, nTriangles, bsPolygons, faceVertexMax, colix, colorList, htColixes, offset) {
 }, "~A,~A,~A,~A,~A,~N,~N,~N,JU.BS,~N,~N,JU.Lst,java.util.Map,JU.P3");
 Clazz.overrideMethod (c$, "outputTriangle", 
 function (pt1, pt2, pt3, colix) {

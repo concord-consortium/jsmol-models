@@ -9,6 +9,8 @@
 * 
 */
 
+// BH 1/14/2017 7:12:47 PM adds proto._showTooltip
+// BH 4/24/2016 4:42:06 PM working around Resolver 2D issues
 // BH 2/2/2014 11:39:44 AM Jmol/JSME/JSV working triad
 // BH 1/30/2014 1:04:09 PM adds Info.viewSet 
 // BH 10/10/2013 1:25:28 PM JSV HTML5 option
@@ -94,6 +96,9 @@
 				break;
 			case "WEBGL":
 			case "HTML5":
+      	Info._isLayered = true;
+  			Info._isJSV = true;
+			  Info._platform = "JSV.awtjs2d.Platform";
 				Jmol._Canvas2D.prototype = Jmol._jsSetPrototype(new Applet(id,Info, true));
 			 	applet = new Jmol._Canvas2D(id, Info, "JSV", checkOnly);
 				break;
@@ -123,6 +128,16 @@
 				: new JSV.appletjs.JSVApplet(viewerOptions));
 	}
 
+	proto._addCoreFiles = function() {
+		Jmol._addCoreFile("jsv", this._j2sPath, this.__Info.preloadCore);
+		if (Jmol._debugCode) {
+		// no min package for that
+			Jmol._addExec([this, null, "JSV.appletjs.JSVApplet", "load JSV"]);
+			if (this._isPro)
+				Jmol._addExec([this, null, "JSV.appletjs.JSVAppletPro", "load JSV(signed)"]);
+		}
+  }
+
 	proto._create = function(id, Info){
 
 		Jmol._setObject(this, id, Info);
@@ -146,11 +161,10 @@
 		this._init();
 	};
 
-	proto._readyCallback = function(id, fullid, isReady, applet) {
+	proto._readyCallback = function(id, fullid, isReady) {
 	 if (!isReady)
 			return; // ignore -- page is closing
 		this._ready = true;
-		this._applet = applet;
 		this._readyScript && setTimeout(id + "._script(" + id + "._readyScript)",50);
 		this._showInfo(true);
 		this._showInfo(false);
@@ -191,7 +205,7 @@
 	}
 
 	proto._searchDatabase = function(query, database) {
-		return this._applet.runScript("load ID \"" + query + "\" " + database + query)
+		return this._applet.runScript("load ID \"" + query + "\" \"" + database + query + "\"")
 	}
 
 	proto._script = function(script) {
@@ -235,6 +249,26 @@
 		Jmol._loadFileData(this, fileName, function(data){me._loadInline(data)}, function(data){me._loadInline(null)});
 	}
 
+  proto._showTooltip = function(text) {
+    var s = "<span id='" + this._id + "_tooltip' style='position:absolute;z-index:10000000;left:0px;top:0px;background-color:yellow'></span>";
+    var t = this._tooltip;
+    if (!t) {    
+      Jmol.$after("body",s);
+      t = this._tooltip = Jmol.$(this, "tooltip");
+    }
+    t.hide();
+    this._tooltipTimer && clearTimeout(this._tooltipTimer);
+    this._tooltipTimer1 && clearTimeout(this._tooltipTimer1); 
+    var me = this;
+    this._tooltipTimer1 = setTimeout(function(){
+      t[0].style.left = (Jmol._mousePageX+10) + "px";
+      t[0].style.top = (Jmol._mousePageY+20) + "px";
+      t[0].innerHTML = text;
+      t.show();
+      me._tooltipTimer = setTimeout(function(){t.hide()},4000);
+    },50);
+  }
+  
 	proto._loadInline = function(data) {
 		// called when loading JDX data
 		this._currentView = null;
@@ -277,12 +311,15 @@
 			this._applet.runScriptNow("SELECT ID \"" + view.info.viewID + "\"");
 			return;
 		}
-		
 		// get the simulation into JSpecView
 		var script = this.__Info.preloadScript;
-		if (script == null) 
+		if (this._addC13)
+			script = "CLOSE ALL";
+		else if (script == null)
 			script = "CLOSE VIEWS;CLOSE SIMULATIONS > 1";
 		script += "; LOAD ID \"" + view.info.viewID + "\" APPEND \"http://SIMULATION/MOL=" + molData.replace(/\n/g,"\\n") + "\"";
+  	if (this._addC13)
+      script += "; LOAD ID \"" + view.info.viewID + "C13\" APPEND \"http://SIMULATION/C13/MOL=" + molData.replace(/\n/g,"\\n") + "\"";
 		this._applet.runScriptNow(script);
 		// update Jmol and/or JME to correspond with the model returned.
 		molData = this._getAppletInfo("DATA_mol");
@@ -292,7 +329,7 @@
 		this._propagateView(view, molData);
 	}
 
-	proto._propagateView = function(view, molData) {
+	proto._propagateView = function(view, molData, _jsv_propagateView) {
 		var vJmol = view.Jmol;
 		var vJME = view.JME;
 		if (vJmol) {
@@ -300,7 +337,7 @@
 			if (vJmol.applet)
 				vJmol.applet._loadModelFromView(this._currentView);
 			if (vJME)
-				vJME.applet._loadFromJmol(vJmol.applet);
+				vJME.applet._loadFromJmol(vJmol.applet, "jmeh");
 		} else if (vJME) {
 			vJME.data = molData;
 			vJME.applet._loadModelFromView(this._currentView);
@@ -308,6 +345,11 @@
 		this.__selectSpectrum();
 	}
 	
+  proto._reset = function(_jmol_resetView) {
+    this._script("view clear");
+  }
+  
+
 	proto._updateView = function(msgOrPanel, peakData, _jsv_updateView) {
 		if (this._viewSet == null || !this._applet || msgOrPanel && msgOrPanel.vwr)
 			return;
@@ -575,16 +617,18 @@
 	
 Jmol._newGrayScaleImage = function(context, image, width, height, grayBuffer) {
 	var c;
+  image || (image = Jmol.$(context.canvas.applet, "image")[0]);
 	if (image == null) {
-		var id = ("" + Math.random()).substring(3);
+		var appId = context.canvas.applet._id;
+    var id = appId + "_imagediv";
 		c = document.createElement("canvas");
 		c.id = id;
 		c.style.width = width + "px";
 		c.style.height = height + "px";
 		c.width = width;
 		c.height = height;
-		var appId = context.canvas.applet._id;
-		var layer = document.getElementById(appId + "_imagelayer");
+
+		var layer = document.getElementById(appId + "_contentLayer");
 		image = new Image();
 		image.canvas = c;
 		image.appId = appId;
@@ -599,7 +643,7 @@ Jmol._newGrayScaleImage = function(context, image, width, height, grayBuffer) {
 		};
 		var div = document.createElement("div");
 		image.div = div;
-		div.style.position="relative";
+		div.style.position="absolute";
 		layer.appendChild(div);
 		div.appendChild(image);
 	}

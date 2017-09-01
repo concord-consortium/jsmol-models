@@ -1,5 +1,5 @@
 Clazz.declarePackage ("JSV.appletjs");
-Clazz.load (["javajs.api.JSInterface", "JSV.api.AppletFrame", "$.JSVAppletInterface"], "JSV.appletjs.JSVApplet", ["java.lang.Boolean", "java.net.URL", "java.util.Hashtable", "JU.PT", "JSV.app.JSVApp", "JSV.common.JSVersion", "JSV.js2d.JsMainPanel", "$.JsPanel", "JU.Logger"], function () {
+Clazz.load (["javajs.api.JSInterface", "JSV.api.AppletFrame", "$.JSVAppletInterface"], "JSV.appletjs.JSVApplet", ["java.lang.Boolean", "java.net.URL", "java.util.Hashtable", "JU.PT", "JSV.app.JSVApp", "JSV.js2d.JsMainPanel", "$.JsPanel", "JU.Logger"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.app = null;
 this.viewer = null;
@@ -80,7 +80,7 @@ return this.isStandalone ? System.getProperty (key, def) : (this.getParameter (k
 }, "~S,~S");
 Clazz.overrideMethod (c$, "getAppletInfo", 
 function () {
-return "JSpecView Applet " + JSV.common.JSVersion.VERSION;
+return JSV.app.JSVApp.getAppletInfo ();
 });
 Clazz.overrideMethod (c$, "getSolnColour", 
 function () {
@@ -243,10 +243,6 @@ return 0;
 Clazz.overrideMethod (c$, "cachePut", 
 function (key, data) {
 }, "~S,~O");
-Clazz.overrideMethod (c$, "getGLmolView", 
-function () {
-return null;
-});
 Clazz.overrideMethod (c$, "getFullName", 
 function () {
 return this.app.vwr.fullName;
@@ -266,11 +262,7 @@ Clazz.overrideMethod (c$, "update",
 function () {
 this.app.vwr.updateJS ();
 });
-Clazz.overrideMethod (c$, "loadInlineString", 
-function (mol, script, isAppend) {
-return null;
-}, "~S,~S,~B");
-Clazz.overrideMethod (c$, "openFile", 
+Clazz.defineMethod (c$, "openFile", 
 function (fileName) {
 this.app.vwr.openFile (fileName, true);
 return null;
@@ -287,4 +279,10 @@ Clazz.overrideMethod (c$, "setScreenDimension",
 function (width, height) {
 this.app.vwr.setScreenDimension (width, height);
 }, "~N,~N");
+Clazz.overrideMethod (c$, "checkScript", 
+function (script) {
+var s = this.app.checkScript (script);
+if (s != null) System.out.println (s);
+return s;
+}, "~S");
 });

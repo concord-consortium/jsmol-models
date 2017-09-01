@@ -9,10 +9,11 @@ this.vc = 0;
 this.vs = null;
 this.vvs = null;
 this.vertexSource = null;
+this.surfaceAtoms = null;
 this.pc = 0;
 this.pis = null;
 this.colorsExplicit = false;
-this.isTriangleSet = false;
+this.isDrawPolygon = false;
 this.haveQuads = false;
 this.colix = 0;
 this.colixBack = 0;
@@ -168,7 +169,7 @@ return (this.bsSlabGhost != null && this.slabMeshType == 1073742018 ? "mesh" : n
 });
 Clazz.defineMethod (c$, "resetSlab", 
 function () {
-if (this.slicer != null) this.slicer.slabPolygons (JU.TempArray.getSlabObjectType (1048587, null, false, null), false);
+if (this.slicer != null) this.slicer.slabPolygons (JU.TempArray.getSlabObjectType (1073742333, null, false, null), false);
 });
 Clazz.defineMethod (c$, "slabPolygonsList", 
 function (slabInfo, allowCap) {

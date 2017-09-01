@@ -1,5 +1,5 @@
 Clazz.declarePackage ("JV");
-Clazz.load (null, "JV.ColorManager", ["java.lang.Float", "JU.AU", "J.c.PAL", "JU.C", "$.ColorEncoder", "$.Elements", "$.Logger", "JV.JC"], function () {
+Clazz.load (null, "JV.ColorManager", ["java.lang.Character", "$.Float", "JU.AU", "J.c.PAL", "JU.C", "$.ColorEncoder", "$.Elements", "$.Logger", "JV.JC"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.ce = null;
 this.vwr = null;
@@ -63,7 +63,8 @@ var lo;
 var hi;
 switch (pid) {
 case 84:
-return (this.colorData == null || atom.i >= this.colorData.length ? 12 : this.ce.getColorIndex (this.colorData[atom.i]));
+var c = this.colorData[atom.i];
+return (this.colorData == null || Float.isNaN (c) || atom.i >= this.colorData.length ? 12 : this.ce.getColorIndex (c));
 case 0:
 case 1:
 id = atom.getAtomicAndIsotopeNumber ();
@@ -89,10 +90,14 @@ lo = 0;
 hi = 10000;
 }return this.ce.getColorIndexFromPalette (atom.getBfactor100 (), lo, hi, 7, false);
 case 86:
-return this.ce.getColorIndexFromPalette (atom.group.getGroupParameter (1112539150), -1, 1, 7, false);
+return this.ce.getColorIndexFromPalette (atom.group.getGroupParameter (1111490574), -1, 1, 7, false);
 case 70:
 hi = this.vwr.ms.getSurfaceDistanceMax ();
 return this.ce.getColorIndexFromPalette (atom.getSurfaceDistance100 (), 0, hi, 7, false);
+case 24:
+id = atom.group.groupID;
+if (id >= 42) id = 24 + "PGCATU".indexOf (Character.toUpperCase (atom.group.group1)) - 1;
+return this.ce.getColorIndexFromPalette (id, 0, 0, 17, false);
 case 8:
 return this.ce.getColorIndexFromPalette (atom.group.groupID, 0, 0, 5, false);
 case 9:
@@ -126,8 +131,8 @@ break;
 case 10:
 var chain = atom.getChainID ();
 if (JU.ColorEncoder.argbsChainAtom == null) {
-JU.ColorEncoder.argbsChainAtom = this.getArgbs (1141899265);
-JU.ColorEncoder.argbsChainHetero = this.getArgbs (1613758470);
+JU.ColorEncoder.argbsChainAtom = this.getArgbs (1140850689);
+JU.ColorEncoder.argbsChainHetero = this.getArgbs (1612709894);
 }chain = ((chain < 0 ? 0 : chain >= 256 ? chain - 256 : chain) & 0x1F) % JU.ColorEncoder.argbsChainAtom.length;
 argb = (atom.isHetero () ? JU.ColorEncoder.argbsChainHetero : JU.ColorEncoder.argbsChainAtom)[chain];
 break;
@@ -154,18 +159,20 @@ return JV.JC.altArgbsCpk[JU.Elements.altElementIndexFromNumber (id)];
 }, "~N,~N");
 Clazz.defineMethod (c$, "setElementArgb", 
 function (id, argb) {
-if (argb == 1073741991 && this.argbsCpk === J.c.PAL.argbsCpk) return;
+if (argb == 1073741991 && this.argbsCpk === J.c.PAL.argbsCpk) return 0;
 argb = this.getJmolOrRasmolArgb (id, argb);
 if (this.argbsCpk === J.c.PAL.argbsCpk) {
 this.argbsCpk = JU.AU.arrayCopyRangeI (J.c.PAL.argbsCpk, 0, -1);
 this.altArgbsCpk = JU.AU.arrayCopyRangeI (JV.JC.altArgbsCpk, 0, -1);
 }if (id < JU.Elements.elementNumberMax) {
+if (argb == 2147483647) return JU.C.getColix (this.argbsCpk[id]);
 this.argbsCpk[id] = argb;
 this.g3d.changeColixArgb (id, argb);
-return;
+return 0;
 }id = JU.Elements.altElementIndexFromNumber (id);
 this.altArgbsCpk[id] = argb;
 this.g3d.changeColixArgb (JU.Elements.elementNumberMax + id, argb);
+return 0;
 }, "~N,~N");
 Clazz.defineMethod (c$, "getPropertyColorRange", 
 function () {

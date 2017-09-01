@@ -31,6 +31,8 @@ throw e;
 }
 }
 this.output ("\n");
+this.output (this.getJmolPerspective ());
+this.output ("\n");
 this.output ("// ******************************************************\n");
 this.output ("// Declare the resolution, camera, and light sources.\n");
 this.output ("// ******************************************************\n");
@@ -45,14 +47,25 @@ this.output ("#declare showAtoms = true;\n");
 this.output ("#declare showBonds = true;\n");
 this.output ("#declare noShadows = true;\n");
 this.output ("camera{\n");
+var offsetX;
+var offsetY;
+var f;
+if (this.wasPerspective) {
+offsetX = this.vwr.tm.getTranslationXPercent () / 100 * this.screenWidth;
+offsetY = this.vwr.tm.getTranslationYPercent () / 100 * this.screenHeight;
+f = 1 / this.vwr.tm.getPerspectiveFactor ((this.vwr.tm.getCameraDepth () - 0.5) * this.vwr.getScreenDim ());
+this.output ("  perspective\n");
+this.output ("  angle " + this.apertureAngle + "\n");
+this.output ("  right < " + this.screenWidth + ", 0, 0>\n");
+this.output ("  up < 0, " + -this.screenHeight + ", 0 >\n");
+} else {
+offsetX = offsetY = f = 0;
 this.output ("  orthographic\n");
-this.output ("  location < " + this.screenWidth / 2 + ", " + this.screenHeight / 2 + ", 0>\n" + "\n");
-this.output ("  // Negative right for a right hand coordinate system.\n");
-this.output ("\n");
-this.output ("  sky < 0, -1, 0 >\n");
-this.output ("  right < -" + this.screenWidth + ", 0, 0>\n");
+this.output ("  right < " + -this.screenWidth + ", 0, 0>\n");
 this.output ("  up < 0, " + this.screenHeight + ", 0 >\n");
-this.output ("  look_at < " + this.screenWidth / 2 + ", " + this.screenHeight / 2 + ", 1000 >\n");
+}this.output ("  sky < 0, -1, 0 >\n");
+this.output ("  location < " + (this.screenWidth / 2 + offsetX) + ", " + (this.screenHeight / 2 + offsetY) + ", 0>\n");
+this.output ("  look_at < " + (this.screenWidth / 2 + f * offsetX) + ", " + (this.screenHeight / 2 + f * offsetY) + ", 1000 >\n");
 this.output ("}\n");
 this.output ("\n");
 this.output ("background { color rgb <" + this.rgbFractionalFromColix (this.backgroundColix) + "> }\n");
@@ -116,7 +129,7 @@ Clazz.defineMethod (c$, "getAuxiliaryFileData",
  function () {
 var fName = this.fileName.substring (this.fileName.lastIndexOf ("/") + 1);
 fName = fName.substring (fName.lastIndexOf ("\\") + 1);
-return "; Created by: Jmol " + JV.Viewer.getJmolVersion () + "\n; Creation date: " + this.getExportDate () + "\n; File created: " + this.fileName + " (" + this.out.getByteCount () + " bytes)\n\n" + (this.commandLineOptions != null ? this.commandLineOptions : "\n; Jmol state: (embedded in input file)\nInput_File_Name=" + fName + "\nOutput_to_File=true" + "\nOutput_File_Type=N" + "\nOutput_File_Name=" + fName + ".png" + "\nWidth=" + this.screenWidth + "\nHeight=" + this.screenHeight + "\nAntialias=true" + "\nAntialias_Threshold=0.1" + "\nDisplay=true" + "\nPause_When_Done=true" + "\nWarning_Level=5" + "\nVerbose=false" + "\n");
+return "; Created by: Jmol " + JV.Viewer.getJmolVersion () + "\n; Creation date: " + this.getExportDate () + "\n; File created: " + this.fileName + " (" + this.getByteCount () + " bytes)\n\n" + (this.commandLineOptions != null ? this.commandLineOptions : "\n; Jmol state: (embedded in input file)\nInput_File_Name=" + fName + "\nOutput_to_File=true" + "\nOutput_File_Type=N" + "\nOutput_File_Name=" + fName + ".png" + "\nWidth=" + this.screenWidth + "\nHeight=" + this.screenHeight + "\nAntialias=true" + "\nAntialias_Threshold=0.1" + "\nDisplay=true" + "\nPause_When_Done=true" + "\nWarning_Level=5" + "\nVerbose=false" + "\n");
 });
 Clazz.defineMethod (c$, "output", 
 function (pt) {
@@ -151,7 +164,7 @@ var s = coef[0] + "," + coef[1] + "," + coef[2] + "," + coef[3] + "," + coef[4] 
 this.output ("q(" + s + ")\n");
 }, "JU.P3,~N,~A,~N");
 Clazz.overrideMethod (c$, "outputSurface", 
-function (vertices, normals, colixes, indices, polygonColixes, nVertices, nPolygons, nFaces, bsPolygons, faceVertexMax, colix, colorList, htColixes, offset) {
+function (vertices, normals, colixes, indices, polygonColixes, nVertices, nPolygons, nTriangles, bsPolygons, faceVertexMax, colix, colorList, htColixes, offset) {
 if (polygonColixes != null) {
 var isAll = (bsPolygons == null);
 var i0 = (isAll ? nPolygons - 1 : bsPolygons.nextSetBit (0));
@@ -188,7 +201,7 @@ var finish = ">} translucentFinish(" + J["export"].___Exporter.translucencyFract
 for (var i = 0; i < nColix; i++) this.output ("\n, texture{pigment{rgbt<" + this.color4 (colorList.get (i).shortValue ()) + finish);
 
 this.output ("\n}\n");
-}this.output ("face_indices { " + nFaces);
+}this.output ("face_indices { " + nTriangles);
 var isAll = (bsPolygons == null);
 var i0 = (isAll ? nPolygons - 1 : bsPolygons.nextSetBit (0));
 for (var i = i0; i >= 0; i = (isAll ? i - 1 : bsPolygons.nextSetBit (i + 1))) {
