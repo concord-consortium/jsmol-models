@@ -1,8 +1,12 @@
 // Store all files loaded, so this variable can be inspected and a smaller bundle created (based on this list).
 Jmol._filesLoaded = [];
 
+function __startsWith(string, pattern) {
+  return string.indexOf(pattern) === 0
+}
+
 Jmol._getFileData = function(fileName, fSuccess, doProcess) {
-  if (fileName.startsWith('file:/')) {
+  if (__startsWith(fileName, 'file:/')) {
     // Sometimes JSmol resolves paths to:
     // file:/<full-path-of-the-jsmol-dir>/<path-of-the-file>
     // We want to get rid of `file:/<full-path-of-the-jsmol-dir>/` part and leave just relative path, as this is ID
@@ -13,7 +17,7 @@ Jmol._getFileData = function(fileName, fSuccess, doProcess) {
     var path = window.location.pathname;
     path = path.substr(0, path.lastIndexOf('/') + 1);
     fileName = fileName.replace('file:' + path, '');
-  } else if (fileName.startsWith('http')) {
+  } else if (__startsWith(fileName, 'http')) {
     // When http server is used, we need to remove http(s)://<full-path-of-the-jsmol-dir>/ part.
     var href = window.location.href;
     href = href.substr(0, href.lastIndexOf('/') + 1);
@@ -28,7 +32,7 @@ Jmol._getFileData = function(fileName, fSuccess, doProcess) {
   var localElement = document.getElementById(fileName);
   if (localElement) {
     data = localElement.innerText;
-    if (data.startsWith('//<![CDATA[\n')) {
+    if (__startsWith(data, '//<![CDATA[\n')) {
       data = data.slice('//<![CDATA[\n'.length, -'\n//]]>'.length);
     }
   } else {
