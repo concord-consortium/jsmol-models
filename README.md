@@ -83,3 +83,10 @@ There is no ``master`` branch in this repository. The ``gh-pages`` branch is the
 As soon as you push a change it will be available here:
 
 [http://concord-consortium.github.io/jsmol-models/embeddable.html](http://concord-consortium.github.io/jsmol-models/embeddable.html)
+
+
+## License
+
+This project uses [JSMol](https://sourceforge.net/projects/jsmol/), licensed under the [LGPL](http://www.gnu.org/licenses/lgpl.html) license.
+
+Other code is distributed under the [MIT](http://www.opensource.org/licenses/MIT) license.
