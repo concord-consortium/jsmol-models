@@ -31,7 +31,7 @@ Jmol._getFileData = function(fileName, fSuccess, doProcess) {
   var data = null;
   var localElement = document.getElementById(fileName);
   if (localElement) {
-    data = localElement.innerText;
+    data = localElement.textContent;
     if (__startsWith(data, '//<![CDATA[\n')) {
       data = data.slice('//<![CDATA[\n'.length, -'\n//]]>'.length);
     }
