@@ -24,7 +24,7 @@
 	}
 	.jsmol-cont {
 		width: 100%;
-		height: 100%;	
+		height: 100%;
 		display: inline-block;
 	}
 	#overlay {
@@ -65,7 +65,7 @@ var jsmolApplets = {};
 // It matches m1:, m2:, ... (+ whitespace characters). Subgroup contains only id (m1, m2, ...).
 var appIdRegExp = /^(m\d+):\s*/;
 
-// Developers: The debugCode flag is checked in j2s/core/core.z.js, 
+// Developers: The debugCode flag is checked in j2s/core/core.z.js,
 // and, if TRUE, skips loading the core methods, forcing those
 // to be read from their individual directories. Set this
 // true if you want to do some code debugging by inserting
@@ -113,7 +113,7 @@ $(document).ready(function() {
  			// Insert applet in the page.
  			var $container = $('<div class="jsmol-cont">').appendTo($appdiv);
 	 		$container.html(Jmol.getAppletHtml(jsmolApplets[id]));
-	 		$container.css("width", (100 / jsmolAppletsCount) + "%");	 	
+	 		$container.css("width", (100 / jsmolAppletsCount) + "%");
  		}(i));
  	}
 
@@ -139,10 +139,16 @@ function forEachHashProp(callback) {
 
 function execJsmolScript(appletId, content) {
 	if (appletId === "all") {
-		Object.keys(jsmolApplets).forEach(function (id) {
-			Jmol.script(jsmolApplets[id], content);
-		});
-		return;
+	  // The loop below used to be a bit more elegant and look like this:
+    //   Object.keys(jsmolApplets).forEach(function (id) {
+    //     Jmol.script(jsmolApplets[id], content);
+    //   });
+    // however it was breaking MS Edge for some reason.
+    var appletIds = Object.keys(jsmolApplets)
+    for (var i = 0; i < appletIds.length; i += 1) {
+      Jmol.script(jsmolApplets[appletIds[i]], content);
+    }
+    return;
 	}
 	Jmol.script(jsmolApplets[appletId], content);
 }
@@ -159,7 +165,7 @@ function setProperty(name, value) {
 		propName = name;
 	}
 	switch (propName) {
-		case 'moleculesCount': 
+		case 'moleculesCount':
 			// Special property, not supported natively by JSmol, but it can be used
 			// by Lab to set number of jsmol applets. However it can be set ONLY using
 			// hash, can't be changed dynamically later.
@@ -211,13 +217,13 @@ phone.addListener('set', function (content) {
 	setProperty(content.name, content.value);
 });
 
-// Register Scripting API functions shortcuts. 
+// Register Scripting API functions shortcuts.
 phone.post('registerScriptingAPIFunc', 'play');
 phone.post('registerScriptingAPIFunc', 'stop');
 phone.post('registerScriptingAPIFunc', 'jsmolScript');
 phone.post('registerScriptingAPIFunc', 'set');
 
-</script>	
+</script>
 </head>
 <body>
 	<div id="appdiv"></div>
