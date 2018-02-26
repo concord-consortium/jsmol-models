@@ -35,7 +35,7 @@ var modelNumber = vwr.getModelNumber (vwr.ms.getModelBS (bs, false).nextSetBit (
 var s = "          " + modelNumber;
 data = "MODEL" + s.substring (s.length - 9) + "\n" + data + "ENDMDL\n";
 data = vwr.getFileAsString3 (name + data, false, null);
-var x = vwr.parseJSON (data);
+var x = vwr.parseJSONMap (data);
 if (x != null) {
 info.put ("dssr", x);
 this.setGroup1 (vwr.ms, modelIndex);

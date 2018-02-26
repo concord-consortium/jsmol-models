@@ -199,7 +199,7 @@ var l = this.line;
 for (var i = 0; i < this.shellCount; i++) {
 var slater =  Clazz.newIntArray (4, 0);
 var nc = ncomp[i];
-slater[0] = centers[ptCenter] - 1;
+slater[0] = centers[ptCenter];
 this.line = "";
 for (var ii = 0; ii < nc; ii++) this.line += labels[ptCenter++] + " ";
 
@@ -233,31 +233,31 @@ case 1:
 slater[1] = 0;
 break;
 case 3:
-if (!this.getDFMap (this.line, 1, J.adapter.readers.quantum.GenNBOReader.$P_LIST, 3)) return false;
+if (!this.getDFMap ("P", this.line, 1, J.adapter.readers.quantum.GenNBOReader.$P_LIST, 3)) return false;
 slater[1] = 1;
 break;
 case 4:
-if (!this.getDFMap (this.line, 2, J.adapter.readers.quantum.GenNBOReader.SP_LIST, 1)) return false;
+if (!this.getDFMap ("SP", this.line, 2, J.adapter.readers.quantum.GenNBOReader.SP_LIST, 1)) return false;
 slater[1] = 2;
 break;
 case 5:
-if (!this.getDFMap (this.line, 3, J.adapter.readers.quantum.GenNBOReader.$DS_LIST, 3)) return false;
+if (!this.getDFMap ("DS", this.line, 3, J.adapter.readers.quantum.GenNBOReader.$DS_LIST, 3)) return false;
 slater[1] = 3;
 break;
 case 6:
-if (!this.getDFMap (this.line, 4, J.adapter.readers.quantum.GenNBOReader.$DC_LIST, 3)) return false;
+if (!this.getDFMap ("DC", this.line, 4, J.adapter.readers.quantum.GenNBOReader.$DC_LIST, 3)) return false;
 slater[1] = 4;
 break;
 case 7:
-if (!this.getDFMap (this.line, 5, J.adapter.readers.quantum.GenNBOReader.$FS_LIST, 3)) return false;
+if (!this.getDFMap ("FS", this.line, 5, J.adapter.readers.quantum.GenNBOReader.$FS_LIST, 3)) return false;
 slater[1] = 5;
 break;
 case 10:
-if (!this.getDFMap (this.line, 6, J.adapter.readers.quantum.GenNBOReader.$FC_LIST, 3)) return false;
+if (!this.getDFMap ("FC", this.line, 6, J.adapter.readers.quantum.GenNBOReader.$FC_LIST, 3)) return false;
 slater[1] = 6;
 break;
 }
-slater[2] = pt;
+slater[2] = pt + 1;
 slater[3] = ng;
 this.shells.addLast (slater);
 return true;
@@ -312,7 +312,7 @@ this.nOrbitals = 0;
 for (var i = 0; i < this.shellCount; i++) {
 tokens = JU.PT.getTokens (this.rd ());
 var slater =  Clazz.newIntArray (4, 0);
-slater[0] = this.parseIntStr (tokens[0]) - 1;
+slater[0] = this.parseIntStr (tokens[0]);
 var n = this.parseIntStr (tokens[1]);
 var pt = this.parseIntStr (tokens[2]) - 1;
 var ng = this.parseIntStr (tokens[3]);

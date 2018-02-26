@@ -52,7 +52,7 @@ for (var j = m.bioPolymerCount; --j >= 0; ) m.bioPolymers[j].calcSelectedMonomer
 });
 Clazz.defineMethod (c$, "calculateAllPolymers", 
 function (groups, groupCount, baseGroupIndex, modelsExcluded) {
-var checkConnections = !this.vwr.getBoolean (603979895);
+var checkConnections = !this.vwr.getBoolean (603979896);
 if (groupCount < 0) groupCount = groups.length;
 if (modelsExcluded != null) for (var j = 0; j < groupCount; ++j) {
 var group = groups[j];

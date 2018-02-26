@@ -595,6 +595,11 @@ if (pt1 != null) pts.addLast (pt1);
 }
 return Clazz.doubleToInt (n / pts.size ());
 }, "JU.P3,JS.UnitCell");
+Clazz.defineMethod (c$, "setName", 
+function (name) {
+this.name = name;
+if (name.startsWith ("HM:")) this.latticeType = name.substring (3, 4);
+}, "~S");
 Clazz.defineStatics (c$,
 "canonicalSeitzList", null,
 "NAME_UNK", 0,

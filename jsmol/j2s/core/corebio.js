@@ -287,8 +287,10 @@ this.finalizeReaderPDB ();
 Clazz_defineMethod (c$, "finalizeReaderPDB", 
 function () {
 this.checkNotPDB ();
-if (this.pdbID != null) this.asc.setAtomSetName (this.pdbID);
-this.checkUnitCellParams ();
+if (this.pdbID != null) {
+this.asc.setAtomSetName (this.pdbID);
+this.asc.setCurrentModelInfo ("pdbID", this.pdbID);
+}this.checkUnitCellParams ();
 if (!this.isCourseGrained) this.connectAll (this.maxSerial, this.isConnectStateBug);
 var symmetry;
 if (this.vBiomolecules != null && this.vBiomolecules.size () > 0 && this.asc.ac > 0) {
@@ -817,8 +819,9 @@ this.checkNotPDB ();
 this.haveMappedSerials = false;
 this.sbConect = null;
 this.asc.newAtomSet ();
+this.asc.setCurrentModelInfo ("pdbID", this.pdbID);
 if (this.asc.iSet == 0 || this.isTrajectory) this.asc.setAtomSetName (this.pdbID);
- else this.asc.setModelInfoForSet ("name", this.pdbID, this.asc.iSet);
+ else this.asc.setCurrentModelInfo ("name", this.pdbID);
 this.checkUnitCellParams ();
 if (!this.isCourseGrained) this.setModelPDB (true);
 this.asc.setCurrentAtomSetNumber (modelNumber);
@@ -906,6 +909,7 @@ return;
 if (htName != null) {
 hetName = htName + hetName;
 }this.htHetero.put (groupName, hetName);
+this.appendLoadNote (groupName + " = " + hetName);
 });
 Clazz_defineMethod (c$, "anisou", 
  function () {
@@ -3103,7 +3107,7 @@ for (var j = m.bioPolymerCount; --j >= 0; ) m.bioPolymers[j].calcSelectedMonomer
 });
 Clazz_defineMethod (c$, "calculateAllPolymers", 
 function (groups, groupCount, baseGroupIndex, modelsExcluded) {
-var checkConnections = !this.vwr.getBoolean (603979895);
+var checkConnections = !this.vwr.getBoolean (603979896);
 if (groupCount < 0) groupCount = groups.length;
 if (modelsExcluded != null) for (var j = 0; j < groupCount; ++j) {
 var group = groups[j];
@@ -3808,7 +3812,7 @@ var cache = (this.dssrCache == null && ann != null ? this.dssrCache =  new java.
 if (cache == null) return null;
 var annotv = cache.get (key);
 if (annotv == null && ann != null) {
-annotv = (Clazz_instanceOf (ann, JS.SV) || Clazz_instanceOf (ann, java.util.Hashtable) ? ann : this.vwr.parseJSON (ann));
+annotv = (Clazz_instanceOf (ann, JS.SV) || Clazz_instanceOf (ann, java.util.Hashtable) ? ann : this.vwr.parseJSONMap (ann));
 cache.put (key, annotv);
 }return (Clazz_instanceOf (annotv, JS.SV) || Clazz_instanceOf (annotv, java.util.Hashtable) ? annotv : null);
 }, "~S,~O");
@@ -6568,7 +6572,7 @@ this.bsVisible.set (i);
 haveVisible = true;
 }
 if (!haveVisible) return false;
-this.ribbonBorder = this.vwr.getBoolean (603979900);
+this.ribbonBorder = this.vwr.getBoolean (603979901);
 this.isNucleic = Clazz_instanceOf (bioShape.bioPolymer, JM.NucleicPolymer);
 this.isPhosphorusOnly = !this.isNucleic && Clazz_instanceOf (bioShape.bioPolymer, JM.PhosphorusPolymer);
 this.isCarbohydrate = Clazz_instanceOf (bioShape.bioPolymer, JM.CarbohydratePolymer);
@@ -6851,7 +6855,7 @@ this.isRockets = isRockets;
 if (this.wireframeOnly) {
 this.renderStrands ();
 } else if (this.wingVectors != null && !this.isCarbohydrate && !(isRockets && this.isNucleic)) {
-var val = !this.vwr.getBoolean (603979901);
+var val = !this.vwr.getBoolean (603979902);
 if (!this.isNucleic && this.renderArrowHeads != val) {
 bioShape.falsifyMesh ();
 this.renderArrowHeads = val;

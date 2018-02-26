@@ -72,9 +72,9 @@ return true;
 }if (this.line.startsWith ("[CELLAXES]")) {
 var f =  Clazz.newFloatArray (9, 0);
 this.fillFloatArray (null, 0, f);
-this.addPrimitiveLatticeVector (0, f, 0);
-this.addPrimitiveLatticeVector (1, f, 3);
-this.addPrimitiveLatticeVector (2, f, 6);
+this.addExplicitLatticeVector (0, f, 0);
+this.addExplicitLatticeVector (1, f, 3);
+this.addExplicitLatticeVector (2, f, 6);
 return true;
 }return false;
 });
@@ -89,13 +89,13 @@ var n = this.shells.size ();
 for (var i = 0; i < n; i++) {
 var iatom = this.shells.get (i)[0];
 if (iatom != 2147483647) {
-ilast = atoms[iatom].elementNumber;
+ilast = atoms[iatom - 1].elementNumber;
 continue;
 }for (var j = this.bsAtomOK.nextClearBit (0); j >= 0; j = this.bsAtomOK.nextClearBit (j + 1)) {
 if (atoms[j].elementNumber == ilast) {
-this.shells.get (i)[0] = j;
+this.shells.get (i)[0] = j + 1;
 JU.Logger.info ("MoldenReader assigning shells starting with " + i + " for ** to atom " + (j + 1) + " z " + ilast);
-for (; ++i < n && !this.bsBadIndex.get (i) && this.shells.get (i)[0] == 2147483647; ) this.shells.get (i)[0] = j;
+for (; ++i < n && !this.bsBadIndex.get (i) && this.shells.get (i)[0] == 2147483647; ) this.shells.get (i)[0] = j + 1;
 
 i--;
 this.bsAtomOK.set (j);
@@ -130,10 +130,12 @@ atom.elementNumber = this.parseIntStr (tokens[2]);
 });
 Clazz.defineMethod (c$, "readSlaterBasis", 
 function () {
+this.nCoef = 0;
 while (this.rd () != null && this.line.indexOf ("[") < 0) {
 var tokens = this.getTokens ();
 if (tokens.length < 7) continue;
-this.addSlater (this.parseIntStr (tokens[0]) - 1, this.parseIntStr (tokens[1]), this.parseIntStr (tokens[2]), this.parseIntStr (tokens[3]), this.parseIntStr (tokens[4]), this.parseFloatStr (tokens[5]), this.parseFloatStr (tokens[6]));
+this.addSlater (this.parseIntStr (tokens[0]), this.parseIntStr (tokens[1]), this.parseIntStr (tokens[2]), this.parseIntStr (tokens[3]), this.parseIntStr (tokens[4]), this.parseFloatStr (tokens[5]), this.parseFloatStr (tokens[6]));
+this.nCoef++;
 }
 this.setSlaters (false, false);
 return false;
@@ -161,9 +163,9 @@ var type = J.adapter.readers.quantum.BasisFunctionReader.getQuantumShellTagID (s
 var nPrimitives = this.parseIntStr (tokens[1]);
 var slater =  Clazz.newIntArray (4, 0);
 this.nSPDF[type]++;
-slater[0] = atomIndex;
+slater[0] = atomIndex + 1;
 slater[1] = type;
-slater[2] = gaussianPtr;
+slater[2] = gaussianPtr + 1;
 slater[3] = nPrimitives;
 var n = this.getDfCoefMaps ()[type].length;
 this.nCoef += n;

@@ -1236,7 +1236,7 @@ fv = (data == null ? 0 : data[i]);
 break;
 case 1275069443:
 if (planeRef != null) fv = JU.Measure.distanceToPlane (planeRef, atom);
- else fv = atom.distance (ptRef);
+ else fv = (atom !== ptRef || minmaxtype != 32 ? atom.distance (ptRef) : NaN);
 break;
 default:
 fv = atom.atomPropertyFloat (this.vwr, tok, this.ptTemp);

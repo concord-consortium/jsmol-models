@@ -179,7 +179,7 @@ Jmol = (function(document) {
 		}
 	};
 	var j = {
-		_version: "$Date: 2017-07-06 02:22:33 -0500 (Thu, 06 Jul 2017) $", // svn.keywords:lastUpdated
+		_version: "$Date: 2018-01-28 23:38:52 -0600 (Sun, 28 Jan 2018) $", // svn.keywords:lastUpdated
 		_alertNoBinary: true,
 		// this url is used to Google Analytics tracking of Jmol use. You may remove it or modify it if you wish. 
 		_allowedJmolSize: [25, 2048, 300],   // min, max, default (pixels)
@@ -699,7 +699,7 @@ Jmol = (function(document) {
 				query = encodeURIComponent(query.substring(pt));		
 			}
       if (query.indexOf(".mmtf") >= 0) {
-        query = "http://mmtf.rcsb.org/full/" + query.replace(/\.mmtf/, "");
+        query = "https://mmtf.rcsb.org/v1.0/full/" + query.replace(/\.mmtf/, "");
 			} else if (call.indexOf("FILENCI") >= 0) {
 				query = query.replace(/\%2F/g, "/");				
 				query = call.replace(/\%FILENCI/, query);
@@ -750,11 +750,49 @@ Jmol = (function(document) {
 		return fSuccess;
 	}
 	
-  Jmol._playAudio = function(filePath) {
+  Jmol.playAudio = function(filePath) {
+    Jmol._playAudio(null, filePath);
+  }
+  
+  Jmol._playAudio = function(applet, params) {
+  
+    var get = (params.get ? function(key){return params.get(key)} : null);
+    var put = (params.put ? function(key,val){return params.put(key,val)} : null);
+    var filePath = (get ? get("audioFile") : params);
+    var jmolAudio = get && get("audioPlayer");
     var audio = document.createElement("audio");
+    put && put("audioElement", audio);
+    var callback = null;
+    if (jmolAudio) {
+      callback = function(type){jmolAudio.processUpdate(type)};
+      jmolAudio.myClip = {
+         open: function() {callback("open")},
+         start: function() { audio.play(); callback("start")},
+         loop: function(n) { audio.loop = (n != 0); },
+         stop: function() { audio.pause(); },
+         close: function() { callback("close") },
+         setMicrosecondPosition: function(us) { audio.currentTime = us / 1e6; }
+      };
+    }    
     audio.controls = "true";
     audio.src = filePath;
-    audio.play();
+    if (get && get("loop"))
+      audio.loop = "true";
+    if (callback) {
+      audio.addEventListener("pause", function() {
+          callback("pause");
+      });
+      audio.addEventListener("play", function() {
+          callback("play");
+      });
+      audio.addEventListener("playing", function() {
+          callback("playing");
+      });
+      audio.addEventListener("ended", function() {
+          callback("ended");
+      });
+      callback("open")
+    }
   }
   
 	Jmol._loadFileData = function(applet, fileName, fSuccess, fError){
@@ -934,7 +972,7 @@ Jmol = (function(document) {
 		return true;  
 	}
 
-	Jmol._binaryTypes = ["mmtf",".gz",".bz2",".jpg",".gif",".png",".zip",".jmol",".bin",".smol",".spartan",".pmb",".mrc",".map",".ccp4",".dn6",".delphi",".omap",".pse",".dcd"];
+	Jmol._binaryTypes = ["mmtf",".gz",".bz2",".jpg",".gif",".png",".zip",".jmol",".bin",".smol",".spartan",".pmb",".mrc",".map",".ccp4",".dn6",".delphi",".omap",".pse",".dcd",".uk/pdbe/densities/"];
 
 	Jmol._isBinaryUrl = function(url) {
 		for (var i = Jmol._binaryTypes.length; --i >= 0;)

@@ -305,6 +305,7 @@ function (fileName, flags) {
 var noScript = ((flags & 2) == 2);
 var isAppend = ((flags & 4) == 4);
 var pdbCartoons = ((flags & 1) == 1 && !isAppend);
+var noAutoPlay = ((flags & 8) == 8);
 var cmd = null;
 fileName = fileName.trim ();
 if (fileName.startsWith ("\t")) {
@@ -342,7 +343,7 @@ cmd = JU.PT.rep (cmd, "load SYNC", "load append");
 }}if (cmd == null && !noScript && this.vwr.scriptEditorVisible) this.vwr.showEditor ( Clazz.newArray (-1, [fileName, this.vwr.getFileAsString3 (fileName, true, null)]));
  else cmd = (cmd == null ? "script " : cmd) + JU.PT.esc (fileName);
 } finally {
-if (cmd != null) this.vwr.evalString (cmd);
+if (cmd != null) this.vwr.evalString (cmd + (noAutoPlay ? "#!NOAUTOPLAY" : ""));
 }
 }, "~S,~N");
 Clazz.defineMethod (c$, "getDragDropFileTypeName", 

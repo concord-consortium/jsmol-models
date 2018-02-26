@@ -46,7 +46,6 @@ this.vTemp = null;
 this.echoShapeActive = false;
 this.modelSetTypeName = null;
 this.translations = null;
-this.pointGroup = null;
 this.defaultBBox = null;
 this.maxBondWarned = false;
 Clazz.instantialize (this, arguments);
@@ -57,6 +56,7 @@ return this.boxInfo;
 });
 Clazz.makeConstructor (c$, 
 function (vwr, name) {
+Clazz.superConstructor (this, JM.ModelSet, []);
 this.vwr = vwr;
 this.modelSetName = name;
 this.selectedMolecules =  new JU.BS ();
@@ -435,6 +435,10 @@ Clazz.defineMethod (c$, "resetMolecules",
 function () {
 this.molecules = null;
 this.moleculeCount = 0;
+this.resetChirality ();
+});
+Clazz.defineMethod (c$, "resetChirality", 
+ function () {
 if (this.haveChirality) {
 var modelIndex = -1;
 for (var i = this.ac; --i >= 0; ) {
@@ -563,7 +567,7 @@ Clazz.defineMethod (c$, "getUnitCell",
 function (modelIndex) {
 if (modelIndex < 0 || modelIndex >= this.mc) return null;
 if (this.am[modelIndex].simpleCage != null) return this.am[modelIndex].simpleCage;
-if (this.unitCells != null && modelIndex < this.unitCells.length && this.unitCells[modelIndex].haveUnitCell ()) return this.unitCells[modelIndex];
+if (this.unitCells != null && modelIndex < this.unitCells.length && this.unitCells[modelIndex] != null && this.unitCells[modelIndex].haveUnitCell ()) return this.unitCells[modelIndex];
 if (this.getInfo (modelIndex, "unitCellParams") != null) {
 if (this.unitCells == null) this.unitCells =  new Array (this.mc);
 this.haveUnitCells = true;
@@ -730,7 +734,7 @@ var bbox = this.getInfoM ("boundbox");
 if (bbox == null) this.defaultBBox = null;
  else {
 if (this.defaultBBox == null) this.defaultBBox =  new JU.BoxInfo ();
-this.defaultBBox.setBoundBoxFromCriticalPoints (bbox);
+this.defaultBBox.setBoundBoxFromOABC (bbox);
 }return this.defaultBBox;
 });
 Clazz.defineMethod (c$, "getBoxInfo", 
@@ -1126,7 +1130,7 @@ return (this.unitCells == null ? null : this.unitCells[modelIndex].getCellRange 
 }, "~N");
 Clazz.defineMethod (c$, "getLastVibrationVector", 
 function (modelIndex, tok) {
-if (this.vibrations != null) {
+if (this.vibrations != null && modelIndex < this.vwr.ms.mc) {
 var v;
 var a1 = (modelIndex < 0 || this.isTrajectory (modelIndex) || modelIndex >= this.mc - 1 ? this.ac : this.am[modelIndex + 1].firstAtomIndex);
 var a0 = (modelIndex <= 0 ? 0 : this.am[modelIndex].firstAtomIndex);
@@ -1219,7 +1223,7 @@ nPos++;
 cPos += c;
 pos.scaleAdd2 (c, this.at[i], pos);
 }}
-if (Math.abs (cPos + cNeg) > 0.01) {
+if (Math.abs (cPos + cNeg) > 0.015) {
 JU.Logger.info ("Dipole calculation requires balanced charges: " + cPos + " " + cNeg);
 return null;
 }if (nNeg == 0 || nPos == 0) return null;
@@ -1844,10 +1848,10 @@ break;
 }var maxXYDistance = this.vwr.getFloat (570425361);
 var minAttachedAngle = (this.vwr.getFloat (570425360) * 3.141592653589793 / 180);
 var hbondMax2 = maxXYDistance * maxXYDistance;
-var hbondMin2 = JM.ModelSet.hbondMin * JM.ModelSet.hbondMin;
+var hbondMin2 = JM.ModelSet.hbondMinRasmol * JM.ModelSet.hbondMinRasmol;
 var hxbondMin2 = 1;
-var hxbondMax2 = (maxXYDistance > JM.ModelSet.hbondMin ? hbondMin2 : hbondMax2);
-var hxbondMax = (maxXYDistance > JM.ModelSet.hbondMin ? JM.ModelSet.hbondMin : maxXYDistance);
+var hxbondMax2 = (maxXYDistance > JM.ModelSet.hbondMaxReal ? JM.ModelSet.hbondMaxReal * JM.ModelSet.hbondMaxReal : hbondMax2);
+var hxbondMax = (maxXYDistance > JM.ModelSet.hbondMaxReal ? JM.ModelSet.hbondMaxReal : maxXYDistance);
 var nNew = 0;
 var d2 = 0;
 var v1 =  new JU.V3 ();
@@ -1914,10 +1918,12 @@ return (haveHAtoms ? nNew : -nNew);
 c$.checkMinAttachedAngle = Clazz.defineMethod (c$, "checkMinAttachedAngle", 
  function (atom1, minAngle, v1, v2, haveHAtoms) {
 var bonds = atom1.bonds;
-if (bonds == null || bonds.length == 0) return JU.P3.new3 (NaN, 0, 0);
+var ignore = true;
 var X = null;
+if (bonds != null && bonds.length > 0) {
 var dMin = 3.4028235E38;
 for (var i = bonds.length; --i >= 0; ) if (bonds[i].isCovalent ()) {
+ignore = false;
 var atomA = bonds[i].getOtherAtom (atom1);
 if (!haveHAtoms && atomA.getElementNumber () == 1) continue;
 v2.sub2 (atom1, atomA);
@@ -1927,7 +1933,7 @@ if (d < dMin) {
 X = atomA;
 dMin = d;
 }}
-return X;
+}return (ignore ? JU.P3.new3 (NaN, 0, 0) : X);
 }, "JM.Atom,~N,JU.V3,JU.V3,~B");
 Clazz.defineMethod (c$, "setStructureIndexes", 
 function () {
@@ -2336,8 +2342,14 @@ if (!haveMods) this.bsModulated = null;
 }, "JU.BS,~B,JU.P3,~B");
 Clazz.defineMethod (c$, "getBoundBoxOrientation", 
 function (type, bsAtoms) {
+var dx = 0;
+var dy = 0;
+var dz = 0;
+var q = null;
+var qBest = null;
 var j0 = bsAtoms.nextSetBit (0);
-if (j0 < 0) return "{0 0 0 1}";
+var vMin = 0;
+if (j0 >= 0) {
 var n = (this.vOrientations == null ? 0 : this.vOrientations.length);
 if (n == 0) {
 var av =  new Array (3375);
@@ -2355,21 +2367,21 @@ p4.set4 (av[i].x, av[i].y, av[i].z, cos);
 this.vOrientations[i] = JU.Quat.newP4 (p4);
 }
 }var pt =  new JU.P3 ();
-var vMin = 3.4028235E38;
-var q;
-var qBest = null;
+vMin = 3.4028235E38;
 var bBest = null;
 var v;
+var b =  new JU.BoxInfo ();
+b.setMargin (type == 1312817669 ? 0 : 0.1);
 for (var i = 0; i < n; i++) {
 q = this.vOrientations[i];
-var b =  new JU.BoxInfo ();
-b.setMargin (0);
+b.reset ();
 for (var j = j0; j >= 0; j = bsAtoms.nextSetBit (j + 1)) b.addBoundBoxPoint (q.transform2 (this.at[j], pt));
 
 switch (type) {
 default:
 case 1312817669:
 case 1073741864:
+case 1814695966:
 v = (b.bbCorner1.x - b.bbCorner0.x) * (b.bbCorner1.y - b.bbCorner0.y) * (b.bbCorner1.z - b.bbCorner0.z);
 break;
 case 1111492629:
@@ -2385,13 +2397,28 @@ break;
 if (v < vMin) {
 qBest = q;
 bBest = b;
+b =  new JU.BoxInfo ();
+b.setMargin (0.1);
 vMin = v;
 }}
-if (type != 1312817669 && type != 1073741864) return qBest.toString ();
+switch (type) {
+default:
+return qBest;
+case 1814695966:
+var pts = bBest.getBoundBoxVertices ();
+pts =  Clazz.newArray (-1, [pts[0], pts[4], pts[2], pts[1]]);
+qBest = qBest.inv ();
+for (var i = 0; i < 4; i++) {
+qBest.transform2 (pts[i], pts[i]);
+if (i > 0) pts[i].sub (pts[0]);
+}
+return pts;
+case 1312817669:
+case 1073741864:
 q = JU.Quat.newQ (qBest);
-var dx = bBest.bbCorner1.x - bBest.bbCorner0.x;
-var dy = bBest.bbCorner1.y - bBest.bbCorner0.y;
-var dz = bBest.bbCorner1.z - bBest.bbCorner0.z;
+dx = bBest.bbCorner1.x - bBest.bbCorner0.x;
+dy = bBest.bbCorner1.y - bBest.bbCorner0.y;
+dz = bBest.bbCorner1.z - bBest.bbCorner0.z;
 if (dx < dy) {
 pt.set (0, 0, 1);
 q = JU.Quat.newVA (pt, 90).mulQ (q);
@@ -2410,7 +2437,9 @@ q = JU.Quat.newVA (pt, 90).mulQ (q);
 var f = dy;
 dy = dz;
 dz = f;
-}return (type == 1312817669 ? vMin + "\t{" + dx + " " + dy + " " + dz + "}" : q.getTheta () == 0 ? "{0 0 0 1}" : q.toString ());
+}break;
+}
+}return (type == 1312817669 ? vMin + "\t{" + dx + " " + dy + " " + dz + "}\t" + bsAtoms : type == 1814695966 ? null : q == null || q.getTheta () == 0 ?  new JU.Quat () : q);
 }, "~N,JU.BS");
 Clazz.defineMethod (c$, "getUnitCellForAtom", 
 function (index) {
@@ -2580,6 +2609,7 @@ this.recalculatePositionDependentQuantities (bs, null);
 }, "JU.BS,~N,~O");
 Clazz.defineMethod (c$, "invertSelected", 
 function (pt, plane, iAtom, bsAtoms) {
+this.resetChirality ();
 if (pt != null) {
 for (var i = bsAtoms.nextSetBit (0); i >= 0; i = bsAtoms.nextSetBit (i + 1)) {
 var x = (pt.x - this.at[i].x) * 2;
@@ -2812,5 +2842,6 @@ for (var i = bsAtoms.nextSetBit (0); i >= 0; i = bsAtoms.nextSetBit (i + 1)) s +
 return s;
 }, "JU.BS,~B");
 Clazz.defineStatics (c$,
-"hbondMin", 2.5);
+"hbondMinRasmol", 2.5,
+"hbondMaxReal", 3.5);
 });

@@ -1,5 +1,5 @@
 Clazz.declarePackage ("JU");
-Clazz.load (null, "JU.MessagePackReader", ["java.lang.Boolean", "$.Float", "$.Long", "java.util.Hashtable", "JU.BC", "$.SB"], function () {
+Clazz.load (null, "JU.MessagePackReader", ["java.lang.Boolean", "$.Float", "$.Long", "java.util.Hashtable", "JU.BC", "$.BinaryDocument", "$.SB"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.doc = null;
 this.isHomo = false;
@@ -10,6 +10,16 @@ function (binaryDoc, isHomogeneousArrays) {
 this.isHomo = isHomogeneousArrays;
 this.doc = binaryDoc;
 }, "javajs.api.GenericBinaryDocumentReader,~B");
+Clazz.makeConstructor (c$, 
+function () {
+});
+Clazz.defineMethod (c$, "getMapForStream", 
+function (is) {
+this.doc =  new JU.BinaryDocument ().setStream (is, true);
+var map = this.readMap ();
+is.close ();
+return map;
+}, "java.io.BufferedInputStream");
 Clazz.defineMethod (c$, "readMap", 
 function () {
 return this.getNext (null, 0);

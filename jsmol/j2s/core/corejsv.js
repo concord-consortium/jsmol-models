@@ -64,9 +64,9 @@
 ){
 var $t$;
 //var c$;
-Jmol.___JmolDate="$Date: 2017-08-29 19:36:55 -0500 (Tue, 29 Aug 2017) $"
+Jmol.___JmolDate="$Date: 2018-02-07 23:40:37 -0600 (Wed, 07 Feb 2018) $"
 Jmol.___fullJmolProperties="src/org/jmol/viewer/Jmol.properties"
-Jmol.___JmolVersion="14.20.5" // 2017.08.29
+Jmol.___JmolVersion="14.29.4"
 // JSmolJavaExt.js
  
 
@@ -76,6 +76,9 @@ Jmol.___JmolVersion="14.20.5" // 2017.08.29
 // (local scope) Clazz_xxx, allowing them to be further compressed using
 // Google Closure Compiler in that same ANT task.
 
+// BH 10/16/2017 6:51:20 AM fixing range error for MSIE in prepareCallback setting arguments.length < 0
+// BH 10/13/2017 7:03:28 AM fix for String.initialize(bytes) applying bytes as arguments
+// BH 9/18/2017 10:15:18 PM adding Integer.compare()
 // BH 4/7/2017 10:48:50 AM adds Math.signum(f)
 // BH 10/15/2016 9:28:13 AM adds Float.floatToIntBits(f)
 // BH 3/9/2016 6:25:08 PM at least allow Error() by itself to work as before (inchi.js uses this)
@@ -249,6 +252,11 @@ Integer.MIN_VALUE=Integer.prototype.MIN_VALUE=-0x80000000;
 Integer.MAX_VALUE=Integer.prototype.MAX_VALUE=0x7fffffff;
 Integer.TYPE=Integer.prototype.TYPE=Integer;
 
+
+Integer.compare = Clazz_defineMethod(Integer,"compare",
+function(i,j) {
+  return (i < j ? -1 : i > j ? 1 : 0);
+},"Number,Number");
 
 Clazz_defineMethod(Integer,"bitCount",
 function(i) {
@@ -882,8 +890,19 @@ return Encoding.ASCII;
 }
 };
 
+Encoding.guessEncodingArray=function(a){
+if(a[0]==0xEF&&a[1]==0xBB&&a[2]==0xBF){
+return Encoding.UTF8;
+}else if(a[0]==0xFF&&a[1]==0xFE){
+return Encoding.UTF16;
+}else{
+return Encoding.ASCII;
+}
+};
+
 Encoding.readUTF8=function(str){
-var encoding=this.guessEncoding(str);
+if (typeof str != "string") return Encoding.readUTF8Array(str);
+var encoding=Encoding.guessEncoding(str);
 var startIdx=0;
 if(encoding==Encoding.UTF8){
 startIdx=3;
@@ -907,6 +926,35 @@ i++;
 var c2=str.charCodeAt(i)&0x3f;
 i++;
 var c3=str.charCodeAt(i)&0x3f;
+var c=(c1<<12)+(c2<<6)+c3;
+arrs[arrs.length]=String.fromCharCode(c);
+}
+}
+return arrs.join('');
+};
+
+Encoding.readUTF8Array=function(a){
+var encoding=Encoding.guessEncodingArray(a);
+var startIdx=0;
+if(encoding==Encoding.UTF8){
+startIdx=3;
+}else if(encoding==Encoding.UTF16){
+startIdx=2;
+}
+var arrs=new Array();
+for(var i=startIdx;i<a.length;i++){
+var charCode=a[i];
+if(charCode<0x80){
+arrs[arrs.length]=String.fromCharCode(charCode);
+}else if(charCode>0xc0&&charCode<0xe0){
+var c1=charCode&0x1f;
+var c2=a[++i]&0x3f;
+var c=(c1<<6)+c2;
+arrs[arrs.length]=String.fromCharCode(c);
+}else if(charCode>=0xe0){
+var c1=charCode&0x0f;
+var c2=a[++i]&0x3f;
+var c3=a[++i]&0x3f;
 var c=(c1<<12)+(c2<<6)+c3;
 arrs[arrs.length]=String.fromCharCode(c);
 }
@@ -1290,7 +1338,7 @@ arrs[ii]=c;
 }
 ii++;
 }
-return arrs;
+return Clazz_newByteArray(arrs);
 };
 
 /*
@@ -1449,7 +1497,7 @@ case 0:
 case 1:
 	var x=arguments[0];
   if (x.BYTES_PER_ELEMENT || x instanceof Array){
-		return (x.length == 0 ? "" : typeof x[0]=="number" ? Encoding.readUTF8(String.fromCharCode.apply(null, x)) : x.join(''));
+		return (x.length == 0 ? "" : typeof x[0]=="number" ? Encoding.readUTF8Array(x) : x.join(''));
   }
 	if(typeof x=="string"||x instanceof String){
 		return new String(x);
@@ -1506,15 +1554,8 @@ case 4:
 		var arr=new Array(length);
 		for(var i=0;i<length;i++){
 			arr[i]=bytes[offset+i];
-			if(typeof arr[i]=="number"){
-				arr[i]=String.fromCharCode(arr[i]&0xff);
-			}
 		}
-		var cs=y.toLowerCase();
-		if(cs=="utf-8"||cs=="utf8"){
-			return Encoding.readUTF8(arr.join(''));
-		}
-		return arr.join('');
+		return Encoding.readUTF8Array(arr);
 	}
 	var count=arguments[3];
 	var offset=arguments[2];
@@ -11684,7 +11725,7 @@ var n;
 if (decimalDigits < 0) {
 decimalDigits = -decimalDigits;
 if (decimalDigits > JU.DF.formattingStrings.length) decimalDigits = JU.DF.formattingStrings.length;
-if (value == 0) return JU.DF.formattingStrings[decimalDigits] + "E+0";
+if (value == 0) return JU.DF.formattingStrings[decimalDigits - 1] + "E+0";
 n = 0;
 var d;
 if (Math.abs (value) < 1) {
@@ -11696,7 +11737,16 @@ d = value * 1e10;
 }var s = ("" + d).toUpperCase ();
 var i = s.indexOf ("E");
 n = JU.PT.parseInt (s.substring (i + 1)) + n;
-return (i < 0 ? "" + value : JU.DF.formatDecimal (JU.PT.parseFloat (s.substring (0, i)), decimalDigits - 1) + "E" + (n >= 0 ? "+" : "") + n);
+var sf;
+if (i < 0) {
+sf = "" + value;
+} else {
+var f = JU.PT.parseFloat (s.substring (0, i));
+if (f == 10 || f == -10) {
+f /= 10;
+n += (n < 0 ? 1 : -1);
+}sf = JU.DF.formatDecimal (f, decimalDigits - 1);
+}return sf + "E" + (n >= 0 ? "+" : "") + n;
 }if (decimalDigits >= JU.DF.formattingStrings.length) decimalDigits = JU.DF.formattingStrings.length - 1;
 var s1 = ("" + value).toUpperCase ();
 var pt = s1.indexOf (".");
@@ -13141,13 +13191,13 @@ c$.isRemote = Clazz_defineMethod (c$, "isRemote",
 function (fileName) {
 if (fileName == null) return false;
 var itype = JU.OC.urlTypeIndex (fileName);
-return (itype >= 0 && itype != 4);
+return (itype >= 0 && itype != 5);
 }, "~S");
 c$.isLocal = Clazz_defineMethod (c$, "isLocal", 
 function (fileName) {
 if (fileName == null) return false;
 var itype = JU.OC.urlTypeIndex (fileName);
-return (itype < 0 || itype == 4);
+return (itype < 0 || itype == 5);
 }, "~S");
 c$.urlTypeIndex = Clazz_defineMethod (c$, "urlTypeIndex", 
 function (name) {
@@ -13176,8 +13226,8 @@ function (x) {
 this.writeInt (x == 0 ? 0 : Float.floatToIntBits (x));
 }, "~N");
 Clazz_defineStatics (c$,
-"urlPrefixes",  Clazz_newArray (-1, ["http:", "https:", "sftp:", "ftp:", "file:"]),
-"URL_LOCAL", 4);
+"urlPrefixes",  Clazz_newArray (-1, ["http:", "https:", "sftp:", "ftp:", "cache://", "file:"]),
+"URL_LOCAL", 5);
 });
 Clazz_declarePackage ("JU");
 Clazz_load (["JU.T3"], "JU.P3", null, function () {
@@ -13585,6 +13635,24 @@ while (++i < len && line.charAt (i) != '"') if (line.charAt (i) == '\\') i++;
 next[0] = i + 1;
 return line.substring (pt, i);
 }, "~S,~A");
+c$.getQuotedOrUnquotedAttribute = Clazz_defineMethod (c$, "getQuotedOrUnquotedAttribute", 
+function (line, key) {
+if (line == null || key == null) return null;
+var pt = line.toLowerCase ().indexOf (key.toLowerCase () + "=");
+if (pt < 0 || (pt = pt + key.length + 1) >= line.length) return "";
+var c = line.charAt (pt);
+switch (c) {
+case '\'':
+case '"':
+pt++;
+break;
+default:
+c = ' ';
+line += " ";
+}
+var pt1 = line.indexOf (c, pt);
+return (pt1 < 0 ? null : line.substring (pt, pt1));
+}, "~S,~S");
 c$.getCSVString = Clazz_defineMethod (c$, "getCSVString", 
 function (line, next) {
 var i = next[1];
@@ -19571,6 +19639,11 @@ Clazz_defineMethod (c$, "getSpectrumCount",
 function () {
 return 0;
 });
+Clazz_defineMethod (c$, "invertYAxis", 
+function () {
+this.viewList.get (0).init (null, 0, 0, this.getSpectrum ().invertYAxis ().isContinuous ());
+this.resetViewCompletely ();
+});
 c$.$GraphSet$Highlight$ = function () {
 Clazz_pu$h(self.c$);
 c$ = Clazz_decorateAsClass (function () {
@@ -20044,7 +20117,6 @@ Clazz_defineMethod (c$, "calculateIntegral",
 function () {
 var specXyCoords = this.spec.getXYCoords ();
 this.xyCoords =  new Array (specXyCoords.length);
-var minYForIntegral = -1.7976931348623157E308;
 this.integralTotal = 0;
 this.checkRange ();
 var minY = 1E100;
@@ -20052,16 +20124,21 @@ for (var i = 0; i < specXyCoords.length; i++) {
 var y = specXyCoords[i].getYVal ();
 if (y < minY && y >= 0) minY = y;
 }
+var minI = 1E100;
+var maxI = -1.0E100;
 for (var i = 0; i < specXyCoords.length; i++) {
 var y = specXyCoords[i].getYVal ();
-if (y > minYForIntegral) this.integralTotal += (y - minY);
+this.integralTotal += (y - minY);
+if (this.integralTotal < minI) minI = this.integralTotal;
+if (this.integralTotal > maxI) maxI = this.integralTotal;
 }
+this.integralTotal = maxI - minI;
 this.intRange = (this.percentRange / 100) / this.integralTotal;
 this.offset = (this.percentOffset / 100);
 var integral = 0;
 for (var i = specXyCoords.length; --i >= 0; ) {
 var y = specXyCoords[i].getYVal ();
-if (y > minYForIntegral) integral += (y - minY);
+integral += (y - minY);
 this.xyCoords[i] =  new JSV.common.Coordinate ().set (specXyCoords[i].getXVal (), integral * this.intRange + this.offset);
 }
 return this.xyCoords;
@@ -21462,6 +21539,9 @@ case JSV.common.ScriptToken.INTEGRALOFFSET:
 case JSV.common.ScriptToken.INTEGRALRANGE:
 this.execSetIntegralParameter (st, Double.parseDouble (value));
 break;
+case JSV.common.ScriptToken.INVERTY:
+this.execZoom ("invertY");
+break;
 case JSV.common.ScriptToken.JMOL:
 this.si.syncToJmol (value);
 break;
@@ -21783,11 +21863,22 @@ this.pd ().previousView ();
 this.pd ().resetView ();
 } else if (value.equalsIgnoreCase ("clear")) {
 this.pd ().clearAllView ();
+} else if (value.equalsIgnoreCase ("invertY")) {
+this.pd ().getCurrentGraphSet ().invertYAxis ();
 }return true;
 case 2:
 x1 = Double.parseDouble (tokens.get (0));
 x2 = Double.parseDouble (tokens.get (1));
 break;
+case 3:
+var xy = tokens.get (0);
+if (xy.equalsIgnoreCase ("X")) {
+x1 = Double.parseDouble (tokens.get (1));
+x2 = Double.parseDouble (tokens.get (2));
+} else if (xy.equalsIgnoreCase ("Y")) {
+y1 = Double.parseDouble (tokens.get (1));
+y2 = Double.parseDouble (tokens.get (2));
+}break;
 case 4:
 x1 = Double.parseDouble (tokens.get (0));
 y1 = Double.parseDouble (tokens.get (1));
@@ -25494,67 +25585,68 @@ Clazz_defineEnumConstant (c$, "INTEGRATION", 30, ["ON/OFF/TOGGLE/AUTO/CLEAR/MIN 
 Clazz_defineEnumConstant (c$, "INTEGRALPLOTCOLOR", 31, ["C", "color of the integration line"]);
 Clazz_defineEnumConstant (c$, "INTEGRATIONRATIOS", 32, ["'x:value,x:value,..'", "annotate the spectrum with numbers or text at specific x values"]);
 Clazz_defineEnumConstant (c$, "INTERFACE", 33, ["SINGLE or OVERLAY", "set how multiple spectra are displayed"]);
-Clazz_defineEnumConstant (c$, "IRMODE", 34, ["A or T or TOGGLE", "set the IR mode to absorption or transmission"]);
-Clazz_defineEnumConstant (c$, "JMOL", 35, ["...Jmol command...", "send a command to Jmol (if present)"]);
-Clazz_defineEnumConstant (c$, "JSV", 36, []);
-Clazz_defineEnumConstant (c$, "LABEL", 37, ["x y [color and/or \"text\"]", "add a text label"]);
-Clazz_defineEnumConstant (c$, "LINK", 38, ["AB or ABC or NONE or ALL", "synchronize the crosshair of a 2D spectrum with 1D cursors"]);
-Clazz_defineEnumConstant (c$, "LOAD", 39, ["[APPEND] \"fileName\" [first] [last]; use \"\" for current file; $H1/name or $C13/name for simulation", "load a specturm"]);
-Clazz_defineEnumConstant (c$, "LOADFILECALLBACKFUNCTIONNAME", 40, []);
-Clazz_defineEnumConstant (c$, "LOADIMAGINARY", 41, ["TF", "set TRUE to load imaginary NMR component"]);
-Clazz_defineEnumConstant (c$, "MENUON", 42, []);
-Clazz_defineEnumConstant (c$, "OBSCURE", 43, []);
-Clazz_defineEnumConstant (c$, "OVERLAY", 44, []);
-Clazz_defineEnumConstant (c$, "OVERLAYSTACKED", 45, ["TF", "whether viewed spectra are shown separately, in a stack"]);
-Clazz_defineEnumConstant (c$, "PEAK", 46, ["[IR,CNMR,HNMR,MS] [#nnn or ID=xxx or text] [ALL], for example: PEAK HNMR #3", "highlights a peak based on its number or title text, optionally checking all loade spectra"]);
-Clazz_defineEnumConstant (c$, "PEAKCALLBACKFUNCTIONNAME", 47, []);
-Clazz_defineEnumConstant (c$, "PEAKLIST", 48, ["[THRESHOLD=n] [INTERPOLATE=PARABOLIC or NONE]", "creates a peak list based on a threshold value and parabolic or no interpolation"]);
-Clazz_defineEnumConstant (c$, "PEAKTABCOLOR", 49, ["C", "sets the color of peak marks for a peak listing"]);
-Clazz_defineEnumConstant (c$, "PEAKTABSON", 50, ["T", "show peak tabs for simulated spectra"]);
-Clazz_defineEnumConstant (c$, "PLOTAREACOLOR", 51, ["C", "sets the color of the plot background"]);
-Clazz_defineEnumConstant (c$, "PLOTCOLOR", 52, ["C", "sets the color of the graph line"]);
-Clazz_defineEnumConstant (c$, "PLOTCOLORS", 53, ["color,color,color,...", "sets the colors of multiple plots"]);
-Clazz_defineEnumConstant (c$, "PRINT", 54, ["", "prints the current spectrum"]);
-Clazz_defineEnumConstant (c$, "REVERSEPLOT", 55, ["T", "reverses the x-axis of a spectrum"]);
-Clazz_defineEnumConstant (c$, "SCALEBY", 56, ["factor", "multiplies the y-scale of the spectrum by a factor"]);
-Clazz_defineEnumConstant (c$, "SCALECOLOR", 57, ["C", "sets the color of the x-axis and y-axis scales"]);
-Clazz_defineEnumConstant (c$, "SCRIPT", 58, ["filename.jsv", "runs a script from a file"]);
-Clazz_defineEnumConstant (c$, "SELECT", 59, ["spectrumID, spectrumID,...", "selects one or more spectra based on IDs"]);
-Clazz_defineEnumConstant (c$, "SETPEAK", 60, ["xNew, xOld xNew, ?, or NONE", "sets nearest peak to xOld ppm to a new value; NONE resets (1D NMR only)"]);
-Clazz_defineEnumConstant (c$, "SETX", 61, ["xNew, xOld xNew, ?, or NONE", "sets an old ppm position in the spectrum to a new value; NONE resets (1D NMR only)"]);
-Clazz_defineEnumConstant (c$, "SHIFTX", 62, ["dx or NONE", "shifts the x-axis of a 1D NMR spectrum by the given ppm; NONE resets (1D NMR only)"]);
-Clazz_defineEnumConstant (c$, "SHOWERRORS", 63, ["shows recent errors"]);
-Clazz_defineEnumConstant (c$, "SHOWINTEGRATION", 64, ["T", "shows an integration listing"]);
-Clazz_defineEnumConstant (c$, "SHOWKEY", 65, ["T", "shows a color key when multiple spectra are displayed"]);
-Clazz_defineEnumConstant (c$, "SHOWMEASUREMENTS", 66, ["T", "shows a listing of measurements"]);
-Clazz_defineEnumConstant (c$, "SHOWMENU", 67, ["displays the popup menu"]);
-Clazz_defineEnumConstant (c$, "SHOWPEAKLIST", 68, ["T", "shows a listing for peak picking"]);
-Clazz_defineEnumConstant (c$, "SHOWPROPERTIES", 69, ["displays the header information of a JDX file"]);
-Clazz_defineEnumConstant (c$, "SHOWSOURCE", 70, ["displays the source JDX file associated with the selected data"]);
-Clazz_defineEnumConstant (c$, "SPECTRUM", 71, ["id", "displays a specific spectrum, where id is a number 1, 2, 3... or a file.spectrum number such as 2.1"]);
-Clazz_defineEnumConstant (c$, "SPECTRUMNUMBER", 72, ["n", "displays the nth spectrum loaded"]);
-Clazz_defineEnumConstant (c$, "STACKOFFSETY", 73, ["percent", "sets the y-axis offset of stacked spectra"]);
-Clazz_defineEnumConstant (c$, "STARTINDEX", 74, []);
-Clazz_defineEnumConstant (c$, "SYNCCALLBACKFUNCTIONNAME", 75, []);
-Clazz_defineEnumConstant (c$, "SYNCID", 76, []);
-Clazz_defineEnumConstant (c$, "TEST", 77, []);
-Clazz_defineEnumConstant (c$, "TITLEON", 78, ["T", "turns the title in the bottom left corner on or off"]);
-Clazz_defineEnumConstant (c$, "TITLEBOLDON", 79, ["T", "makes the title bold"]);
-Clazz_defineEnumConstant (c$, "TITLECOLOR", 80, ["C", "sets the color of the title"]);
-Clazz_defineEnumConstant (c$, "TITLEFONTNAME", 81, ["fontName", "sets the title font"]);
-Clazz_defineEnumConstant (c$, "UNITSCOLOR", 82, ["C", "sets the color of the x-axis and y-axis units"]);
-Clazz_defineEnumConstant (c$, "VERSION", 83, []);
-Clazz_defineEnumConstant (c$, "VIEW", 84, ["spectrumID, spectrumID, ... Example: VIEW 3.1, 3.2  or  VIEW \"acetophenone\"", "creates a view of one or more spectra"]);
-Clazz_defineEnumConstant (c$, "XSCALEON", 85, ["T", "set FALSE to turn off the x-axis scale"]);
-Clazz_defineEnumConstant (c$, "XUNITSON", 86, ["T", "set FALSE to turn off the x-axis units"]);
-Clazz_defineEnumConstant (c$, "YSCALE", 87, ["[ALL] lowValue highValue"]);
-Clazz_defineEnumConstant (c$, "YSCALEON", 88, ["T", "set FALSE to turn off the y-axis scale"]);
-Clazz_defineEnumConstant (c$, "YUNITSON", 89, ["T", "set FALSE to turn off the y-axis units"]);
-Clazz_defineEnumConstant (c$, "WINDOW", 90, []);
-Clazz_defineEnumConstant (c$, "WRITE", 91, ["[XY,DIF,DIFDUP,PAC,FIX,SQZ,AML,CML,JPG,PDF,PNG,SVG] \"filename\"", "writes a file in the specified format"]);
-Clazz_defineEnumConstant (c$, "ZOOM", 92, ["OUT or PREVIOUS or NEXT or x1,x2 or x1,y1 x2,y2", "sets the zoom"]);
-Clazz_defineEnumConstant (c$, "ZOOMBOXCOLOR", 93, []);
-Clazz_defineEnumConstant (c$, "ZOOMBOXCOLOR2", 94, []);
+Clazz_defineEnumConstant (c$, "INVERTY", 34, ["", "invert the Y axis"]);
+Clazz_defineEnumConstant (c$, "IRMODE", 35, ["A or T or TOGGLE", "set the IR mode to absorption or transmission"]);
+Clazz_defineEnumConstant (c$, "JMOL", 36, ["...Jmol command...", "send a command to Jmol (if present)"]);
+Clazz_defineEnumConstant (c$, "JSV", 37, []);
+Clazz_defineEnumConstant (c$, "LABEL", 38, ["x y [color and/or \"text\"]", "add a text label"]);
+Clazz_defineEnumConstant (c$, "LINK", 39, ["AB or ABC or NONE or ALL", "synchronize the crosshair of a 2D spectrum with 1D cursors"]);
+Clazz_defineEnumConstant (c$, "LOAD", 40, ["[APPEND] \"fileName\" [first] [last]; use \"\" for current file; $H1/name or $C13/name for simulation", "load a specturm"]);
+Clazz_defineEnumConstant (c$, "LOADFILECALLBACKFUNCTIONNAME", 41, []);
+Clazz_defineEnumConstant (c$, "LOADIMAGINARY", 42, ["TF", "set TRUE to load imaginary NMR component"]);
+Clazz_defineEnumConstant (c$, "MENUON", 43, []);
+Clazz_defineEnumConstant (c$, "OBSCURE", 44, []);
+Clazz_defineEnumConstant (c$, "OVERLAY", 45, []);
+Clazz_defineEnumConstant (c$, "OVERLAYSTACKED", 46, ["TF", "whether viewed spectra are shown separately, in a stack"]);
+Clazz_defineEnumConstant (c$, "PEAK", 47, ["[IR,CNMR,HNMR,MS] [#nnn or ID=xxx or text] [ALL], for example: PEAK HNMR #3", "highlights a peak based on its number or title text, optionally checking all loade spectra"]);
+Clazz_defineEnumConstant (c$, "PEAKCALLBACKFUNCTIONNAME", 48, []);
+Clazz_defineEnumConstant (c$, "PEAKLIST", 49, ["[THRESHOLD=n] [INTERPOLATE=PARABOLIC or NONE]", "creates a peak list based on a threshold value and parabolic or no interpolation"]);
+Clazz_defineEnumConstant (c$, "PEAKTABCOLOR", 50, ["C", "sets the color of peak marks for a peak listing"]);
+Clazz_defineEnumConstant (c$, "PEAKTABSON", 51, ["T", "show peak tabs for simulated spectra"]);
+Clazz_defineEnumConstant (c$, "PLOTAREACOLOR", 52, ["C", "sets the color of the plot background"]);
+Clazz_defineEnumConstant (c$, "PLOTCOLOR", 53, ["C", "sets the color of the graph line"]);
+Clazz_defineEnumConstant (c$, "PLOTCOLORS", 54, ["color,color,color,...", "sets the colors of multiple plots"]);
+Clazz_defineEnumConstant (c$, "PRINT", 55, ["", "prints the current spectrum"]);
+Clazz_defineEnumConstant (c$, "REVERSEPLOT", 56, ["T", "reverses the x-axis of a spectrum"]);
+Clazz_defineEnumConstant (c$, "SCALEBY", 57, ["factor", "multiplies the y-scale of the spectrum by a factor"]);
+Clazz_defineEnumConstant (c$, "SCALECOLOR", 58, ["C", "sets the color of the x-axis and y-axis scales"]);
+Clazz_defineEnumConstant (c$, "SCRIPT", 59, ["filename.jsv", "runs a script from a file"]);
+Clazz_defineEnumConstant (c$, "SELECT", 60, ["spectrumID, spectrumID,...", "selects one or more spectra based on IDs"]);
+Clazz_defineEnumConstant (c$, "SETPEAK", 61, ["xNew, xOld xNew, ?, or NONE", "sets nearest peak to xOld ppm to a new value; NONE resets (1D NMR only)"]);
+Clazz_defineEnumConstant (c$, "SETX", 62, ["xNew, xOld xNew, ?, or NONE", "sets an old ppm position in the spectrum to a new value; NONE resets (1D NMR only)"]);
+Clazz_defineEnumConstant (c$, "SHIFTX", 63, ["dx or NONE", "shifts the x-axis of a 1D NMR spectrum by the given ppm; NONE resets (1D NMR only)"]);
+Clazz_defineEnumConstant (c$, "SHOWERRORS", 64, ["shows recent errors"]);
+Clazz_defineEnumConstant (c$, "SHOWINTEGRATION", 65, ["T", "shows an integration listing"]);
+Clazz_defineEnumConstant (c$, "SHOWKEY", 66, ["T", "shows a color key when multiple spectra are displayed"]);
+Clazz_defineEnumConstant (c$, "SHOWMEASUREMENTS", 67, ["T", "shows a listing of measurements"]);
+Clazz_defineEnumConstant (c$, "SHOWMENU", 68, ["displays the popup menu"]);
+Clazz_defineEnumConstant (c$, "SHOWPEAKLIST", 69, ["T", "shows a listing for peak picking"]);
+Clazz_defineEnumConstant (c$, "SHOWPROPERTIES", 70, ["displays the header information of a JDX file"]);
+Clazz_defineEnumConstant (c$, "SHOWSOURCE", 71, ["displays the source JDX file associated with the selected data"]);
+Clazz_defineEnumConstant (c$, "SPECTRUM", 72, ["id", "displays a specific spectrum, where id is a number 1, 2, 3... or a file.spectrum number such as 2.1"]);
+Clazz_defineEnumConstant (c$, "SPECTRUMNUMBER", 73, ["n", "displays the nth spectrum loaded"]);
+Clazz_defineEnumConstant (c$, "STACKOFFSETY", 74, ["percent", "sets the y-axis offset of stacked spectra"]);
+Clazz_defineEnumConstant (c$, "STARTINDEX", 75, []);
+Clazz_defineEnumConstant (c$, "SYNCCALLBACKFUNCTIONNAME", 76, []);
+Clazz_defineEnumConstant (c$, "SYNCID", 77, []);
+Clazz_defineEnumConstant (c$, "TEST", 78, []);
+Clazz_defineEnumConstant (c$, "TITLEON", 79, ["T", "turns the title in the bottom left corner on or off"]);
+Clazz_defineEnumConstant (c$, "TITLEBOLDON", 80, ["T", "makes the title bold"]);
+Clazz_defineEnumConstant (c$, "TITLECOLOR", 81, ["C", "sets the color of the title"]);
+Clazz_defineEnumConstant (c$, "TITLEFONTNAME", 82, ["fontName", "sets the title font"]);
+Clazz_defineEnumConstant (c$, "UNITSCOLOR", 83, ["C", "sets the color of the x-axis and y-axis units"]);
+Clazz_defineEnumConstant (c$, "VERSION", 84, []);
+Clazz_defineEnumConstant (c$, "VIEW", 85, ["spectrumID, spectrumID, ... Example: VIEW 3.1, 3.2  or  VIEW \"acetophenone\"", "creates a view of one or more spectra"]);
+Clazz_defineEnumConstant (c$, "XSCALEON", 86, ["T", "set FALSE to turn off the x-axis scale"]);
+Clazz_defineEnumConstant (c$, "XUNITSON", 87, ["T", "set FALSE to turn off the x-axis units"]);
+Clazz_defineEnumConstant (c$, "YSCALE", 88, ["[ALL] lowValue highValue"]);
+Clazz_defineEnumConstant (c$, "YSCALEON", 89, ["T", "set FALSE to turn off the y-axis scale"]);
+Clazz_defineEnumConstant (c$, "YUNITSON", 90, ["T", "set FALSE to turn off the y-axis units"]);
+Clazz_defineEnumConstant (c$, "WINDOW", 91, []);
+Clazz_defineEnumConstant (c$, "WRITE", 92, ["[XY,DIF,DIFDUP,PAC,FIX,SQZ,AML,CML,JPG,PDF,PNG,SVG] \"filename\"", "writes a file in the specified format"]);
+Clazz_defineEnumConstant (c$, "ZOOM", 93, ["OUT or PREVIOUS or NEXT or x1,x2 or x1,y1 x2,y2", "sets the zoom"]);
+Clazz_defineEnumConstant (c$, "ZOOMBOXCOLOR", 94, []);
+Clazz_defineEnumConstant (c$, "ZOOMBOXCOLOR2", 95, []);
 });
 Clazz_declarePackage ("JSV.common");
 Clazz_load (null, "JSV.common.ScriptTokenizer", ["JU.PT"], function () {
@@ -25657,6 +25749,7 @@ this.scaleData = null;
 this.thisScale = null;
 this.nSpectra = 0;
 this.iThisScale = 0;
+this.spectra = null;
 Clazz_instantialize (this, arguments);
 }, JSV.common, "ViewData");
 Clazz_defineMethod (c$, "getScaleData", 
@@ -25684,7 +25777,9 @@ this.scaleData[0] =  new JSV.common.ScaleData (0, n - 1);
 this.init (spectra, yPt1, yPt2, isContinuous);
 }, "JU.Lst,~N,~N,~B");
 Clazz_defineMethod (c$, "init", 
- function (spectra, yPt1, yPt2, isContinuous) {
+function (spectra, yPt1, yPt2, isContinuous) {
+if (spectra == null) spectra = this.spectra;
+ else this.spectra = spectra;
 this.thisScale = this.scaleData[this.iThisScale = 0];
 for (var i = 0; i < this.scaleData.length; i++) {
 this.scaleData[i].userYFactor = spectra.get (i).getUserYFactor ();
@@ -27763,6 +27858,16 @@ Clazz_defineMethod (c$, "setXYCoords",
 function (coords) {
 this.xyCoords = coords;
 }, "~A");
+Clazz_defineMethod (c$, "invertYAxis", 
+function () {
+for (var i = this.xyCoords.length; --i >= 0; ) {
+this.xyCoords[i].setYVal (-this.xyCoords[i].getYVal ());
+}
+var d = this.minY;
+this.minY = -this.maxY;
+this.maxY = -d;
+return this;
+});
 Clazz_defineMethod (c$, "getFirstX", 
 function () {
 return this.xyCoords[0].getXVal ();

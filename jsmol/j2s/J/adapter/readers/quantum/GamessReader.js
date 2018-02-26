@@ -80,7 +80,7 @@ JU.Logger.error ("slater for atom " + i + " atomType " + atomType + " was not fo
 return;
 }for (var j = 0; j < slaters.size (); j++) {
 slater = slaters.get (j);
-this.shells.addLast ( Clazz.newIntArray (-1, [i, slater[0], slater[1], slater[2]]));
+this.shells.addLast ( Clazz.newIntArray (-1, [i + 1, slater[0], slater[1] + 1, slater[2]]));
 }
 }
 }if (this.debugging) {

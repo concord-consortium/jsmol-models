@@ -307,7 +307,7 @@ this.haveData = (this.columnCount > 0);
 }}, "~A,~S,~S,~A,~A");
 Clazz.overrideMethod (c$, "fixKey", 
 function (key) {
-return (JU.PT.rep (key.startsWith ("_magnetic") ? key.substring (9) : key.startsWith ("_jana") ? key.substring (5) : key, ".", "_").toLowerCase ());
+return (key.startsWith ("_magnetic") ? key.substring (9) : key.startsWith ("_jana") ? key.substring (5) : key).$replace ('.', '_').toLowerCase ();
 }, "~S");
 Clazz.defineMethod (c$, "setString", 
 function (str) {

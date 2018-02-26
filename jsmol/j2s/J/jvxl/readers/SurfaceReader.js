@@ -151,7 +151,9 @@ this.volumeData.setMappingPlane (null);
 } else {
 if (!this.readVolumeData (false)) return false;
 this.generateSurfaceData ();
-}if (this.jvxlFileHeaderBuffer != null) {
+}if (this.jvxlFileHeaderBuffer == null) {
+this.jvxlData.jvxlFileTitle = "";
+} else {
 var s = this.jvxlFileHeaderBuffer.toString ();
 var i = s.indexOf ('\n', s.indexOf ('\n', s.indexOf ('\n') + 1) + 1) + 1;
 this.jvxlData.jvxlFileTitle = s.substring (0, i);

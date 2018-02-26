@@ -99,7 +99,7 @@ var name = names[i];
 var f = vwr.getFileAsString3 (name, false, null);
 if (i > 0 && size <= 3 && f.startsWith ("{")) {
 var type = (f.contains ("version\":\"DSSR") ? "dssr" : f.contains ("/outliers/") ? "validation" : "domains");
-var x = vwr.parseJSON (f);
+var x = vwr.parseJSONMap (f);
 if (x != null) htParams.put (type, (type.equals ("dssr") ? x : JS.SV.getVariableMap (x)));
 continue;
 }if (name.indexOf ("|") >= 0) name = JU.PT.rep (name, "_", "/");
@@ -170,6 +170,7 @@ return "" + e;
 if (htParams.containsKey ("trajectorySteps")) {
 result = asc[0];
 try {
+if (asc.length > 1) asc[0].setInfo ("ignoreUnitCell", asc[1].atomSetInfo.get ("ignoreUnitCell"));
 result.finalizeTrajectoryAs (htParams.get ("trajectorySteps"), htParams.get ("vibrationSteps"));
 } catch (e) {
 if (Clazz.exceptionOf (e, Exception)) {

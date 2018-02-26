@@ -500,7 +500,7 @@ var navigating = (tm.mode == 1);
 if (navigating) this.app (commands, "set navigationMode true");
 this.app (commands, this.vwr.ms.getBoundBoxCommand (false));
 this.app (commands, "center " + JU.Escape.eP (tm.fixedRotationCenter));
-commands.append (this.vwr.getOrientationText (1073742034, null));
+commands.append (this.vwr.getOrientationText (1073742034, null, null).toString ());
 this.app (commands, moveToText);
 if (!navigating && !tm.zoomEnabled) this.app (commands, "zoom off");
 commands.append ("  slab ").appendI (tm.slabPercentSetting).append (";depth ").appendI (tm.depthPercentSetting).append (tm.slabEnabled && !navigating ? ";slab on" : "").append (";\n");

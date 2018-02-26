@@ -27,7 +27,7 @@ this.b_ = 0;
 this.c_ = 0;
 this.dimension = 0;
 this.fractionalOrigin = null;
-this.matrixCtoFANoOffset = null;
+this.matrixCtoFNoOffset = null;
 this.matrixFtoCNoOffset = null;
 Clazz.instantialize (this, arguments);
 }, JU, "SimpleUnitCell");
@@ -54,13 +54,17 @@ function (params) {
 if (params == null) params =  Clazz.newFloatArray (-1, [1, 1, 1, 90, 90, 90]);
 if (!JU.SimpleUnitCell.isValid (params)) return;
 this.unitCellParams = JU.AU.arrayCopyF (params, params.length);
+var rotateHex = false;
 this.a = params[0];
 this.b = params[1];
 this.c = params[2];
 this.alpha = params[3];
 this.beta = params[4];
 this.gamma = params[5];
-var fa = this.na = Math.max (1, params.length >= 25 && !Float.isNaN (params[22]) ? Clazz.floatToInt (params[22]) : 1);
+if (this.gamma == -1) {
+rotateHex = true;
+this.gamma = 120;
+}var fa = this.na = Math.max (1, params.length >= 25 && !Float.isNaN (params[22]) ? Clazz.floatToInt (params[22]) : 1);
 var fb = this.nb = Math.max (1, params.length >= 25 && !Float.isNaN (params[23]) ? Clazz.floatToInt (params[23]) : 1);
 var fc = this.nc = Math.max (1, params.length >= 25 && !Float.isNaN (params[24]) ? Clazz.floatToInt (params[24]) : 1);
 if (params.length > 25 && !Float.isNaN (params[25])) {
@@ -138,12 +142,16 @@ m.setColumn4 (3, 0, 0, 0, 1);
 this.matrixCartesianToFractional = JU.M4.newM4 (this.matrixFractionalToCartesian).invert ();
 } else {
 var m = this.matrixFractionalToCartesian =  new JU.M4 ();
+if (rotateHex) {
+m.setColumn4 (0, (-this.b * this.cosGamma), (-this.b * this.sinGamma), 0, 0);
+m.setColumn4 (1, (-this.b * this.cosGamma), (this.b * this.sinGamma), 0, 0);
+} else {
 m.setColumn4 (0, this.a, 0, 0, 0);
 m.setColumn4 (1, (this.b * this.cosGamma), (this.b * this.sinGamma), 0, 0);
-m.setColumn4 (2, (this.c * this.cosBeta), (this.c * (this.cosAlpha - this.cosBeta * this.cosGamma) / this.sinGamma), (this.volume / (this.a * this.b * this.sinGamma)), 0);
+}m.setColumn4 (2, (this.c * this.cosBeta), (this.c * (this.cosAlpha - this.cosBeta * this.cosGamma) / this.sinGamma), (this.volume / (this.a * this.b * this.sinGamma)), 0);
 m.setColumn4 (3, 0, 0, 0, 1);
 this.matrixCartesianToFractional = JU.M4.newM4 (this.matrixFractionalToCartesian).invert ();
-}this.matrixCtoFANoOffset = this.matrixCartesianToFractional;
+}this.matrixCtoFNoOffset = this.matrixCartesianToFractional;
 this.matrixFtoCNoOffset = this.matrixFractionalToCartesian;
 }, "~A");
 Clazz.defineMethod (c$, "setParamsFromMatrix", 
@@ -209,7 +217,7 @@ m.mul2 (this.matrixCartesianToFractional, m);
 Clazz.defineMethod (c$, "toFractional", 
 function (pt, ignoreOffset) {
 if (this.matrixCartesianToFractional == null) return;
-(ignoreOffset ? this.matrixCtoFANoOffset : this.matrixCartesianToFractional).rotTrans (pt);
+(ignoreOffset ? this.matrixCtoFNoOffset : this.matrixCartesianToFractional).rotTrans (pt);
 }, "JU.T3,~B");
 Clazz.defineMethod (c$, "isPolymer", 
 function () {

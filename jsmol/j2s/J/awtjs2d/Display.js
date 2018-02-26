@@ -22,7 +22,7 @@ function (vwr, g, size) {
 c$.prompt = Clazz.defineMethod (c$, "prompt", 
 function (label, data, list, asButtons) {
 {
-var s = prompt(label, data);
+var s = (data == null ? alert(label) : prompt(label, data));
 if (s != null)return s;
 }return "null";
 }, "~S,~S,~A,~B");

@@ -2969,6 +2969,11 @@ Clazz.defineMethod (c$, "getSpectrumCount",
 function () {
 return 0;
 });
+Clazz.defineMethod (c$, "invertYAxis", 
+function () {
+this.viewList.get (0).init (null, 0, 0, this.getSpectrum ().invertYAxis ().isContinuous ());
+this.resetViewCompletely ();
+});
 c$.$GraphSet$Highlight$ = function () {
 Clazz.pu$h(self.c$);
 c$ = Clazz.decorateAsClass (function () {

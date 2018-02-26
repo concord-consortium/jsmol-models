@@ -52,6 +52,7 @@ this.pressAction = 0;
 this.dragAction = 0;
 this.clickAction = 0;
 this.measurementQueued = null;
+this.zoomTrigger = false;
 this.selectionWorking = false;
 Clazz.instantialize (this, arguments);
 }, JV, "ActionManager", null, javajs.api.EventManager);
@@ -74,7 +75,12 @@ this.dragGesture =  new JV.Gesture (20, vwr);
 }, "JV.Viewer,~S");
 Clazz.defineMethod (c$, "checkHover", 
 function () {
-if (!this.vwr.getInMotion (true) && !this.vwr.tm.spinOn && !this.vwr.tm.navOn && !this.vwr.checkObjectHovered (this.current.x, this.current.y)) {
+if (this.zoomTrigger) {
+this.zoomTrigger = false;
+if (this.vwr.currentCursor == 8) this.vwr.setCursor (0);
+this.vwr.setInMotion (false);
+return;
+}if (!this.vwr.getInMotion (true) && !this.vwr.tm.spinOn && !this.vwr.tm.navOn && !this.vwr.checkObjectHovered (this.current.x, this.current.y)) {
 var atomIndex = this.vwr.findNearestAtomIndex (this.current.x, this.current.y);
 if (atomIndex < 0) return;
 var isLabel = (this.apm == 2 && this.bnd (JV.binding.Binding.getMouseAction (this.clickedCount, this.moved.modifiers, 1), [10]));
@@ -366,6 +372,7 @@ this.exitMeasurementMode (null);
 Clazz.defineMethod (c$, "setDragAtomIndex", 
 function (iatom) {
 this.dragAtomIndex = iatom;
+this.setAtomsPicked (JU.BSUtil.newAndSetBit (iatom), "Label picked for atomIndex = " + iatom);
 }, "~N");
 Clazz.defineMethod (c$, "isMTClient", 
 function () {
@@ -565,10 +572,8 @@ if (this.pressAction == 0) return;
 buttonMods = JV.binding.Binding.getButtonMods (this.pressAction);
 }this.setMouseActions (this.pressedCount, buttonMods, false);
 if (JU.Logger.debuggingHigh && this.vwr.getBoolean (603979960)) JU.Logger.debug (JV.binding.Binding.getMouseActionName (this.pressAction, false));
-if (this.isDrawOrLabelAction (this.dragAction)) {
-this.vwr.checkObjectDragged (-2147483648, 0, x, y, this.dragAction);
-return;
-}this.checkUserAction (this.pressAction, x, y, 0, 0, time, 4);
+if (this.isDrawOrLabelAction (this.dragAction) && this.vwr.checkObjectDragged (-2147483648, 0, x, y, this.dragAction)) return;
+this.checkUserAction (this.pressAction, x, y, 0, 0, time, 4);
 var isBound = false;
 switch (this.apm) {
 case 32:
@@ -682,9 +687,9 @@ this.dragSelected (dragWheelAction, deltaX, deltaY, false);
 return;
 }if (this.isDrawOrLabelAction (dragWheelAction)) {
 this.setMotion (13, true);
-this.vwr.checkObjectDragged (this.dragged.x, this.dragged.y, x, y, dragWheelAction);
+if (this.vwr.checkObjectDragged (this.dragged.x, this.dragged.y, x, y, dragWheelAction)) {
 return;
-}if (this.checkMotionRotateZoom (dragWheelAction, x, deltaX, deltaY, true)) {
+}}if (this.checkMotionRotateZoom (dragWheelAction, x, deltaX, deltaY, true)) {
 if (this.vwr.tm.slabEnabled && this.bnd (dragWheelAction, [39])) this.vwr.slabDepthByPixels (deltaY);
  else this.vwr.zoomBy (deltaY);
 return;
@@ -773,13 +778,16 @@ return;
 }}var nearestPoint = null;
 var isBond = false;
 var isIsosurface = false;
-var t = null;
+var map = null;
 if (!this.drawMode) {
-t = this.vwr.checkObjectClicked (x, y, this.clickAction);
-if (t != null) {
-isBond = "bond".equals (t.get ("type"));
-isIsosurface = "isosurface".equals (t.get ("type"));
-nearestPoint = this.getPoint (t);
+map = this.vwr.checkObjectClicked (x, y, this.clickAction);
+if (map != null) {
+if (this.labelMode) {
+this.pickLabel ((map.get ("atomIndex")).intValue ());
+return;
+}isBond = "bond".equals (map.get ("type"));
+isIsosurface = "isosurface".equals (map.get ("type"));
+nearestPoint = this.getPoint (map);
 }}if (isBond) clickedCount = 1;
 if (nearestPoint != null && Float.isNaN (nearestPoint.x)) return;
 var nearestAtomIndex = this.findNearestAtom (x, y, nearestPoint, clickedCount > 0);
@@ -797,7 +805,7 @@ this.vwr.navTranslatePercent (x * 100 / this.vwr.getScreenWidth () - 50, y * 100
 return;
 }if (isBond) {
 if (this.bnd (this.clickAction, [this.bondPickingMode == 34 || this.bondPickingMode == 33 ? 0 : 5])) {
-this.bondPicked ((t.get ("index")).intValue ());
+this.bondPicked ((map.get ("index")).intValue ());
 return;
 }} else if (isIsosurface) {
 return;
@@ -822,6 +830,17 @@ return;
 if (nearestAtomIndex < 0) this.reset ();
 return;
 }}, "~N,~N,~N,~N");
+Clazz.defineMethod (c$, "pickLabel", 
+ function (iatom) {
+var label = this.vwr.ms.at[iatom].atomPropertyString (this.vwr, 1825200146);
+if (this.pressedCount == 2) {
+label = this.vwr.apiPlatform.prompt ("Set label for atomIndex=" + iatom, label, null, false);
+if (label != null) {
+this.vwr.shm.setAtomLabel (label, iatom);
+this.vwr.refresh (1, "label atom");
+}} else {
+this.setAtomsPicked (JU.BSUtil.newAndSetBit (iatom), "Label picked for atomIndex = " + iatom + ": " + label);
+}}, "~N");
 Clazz.defineMethod (c$, "checkUserAction", 
  function (mouseAction, x, y, deltaX, deltaY, time, mode) {
 if (!this.b.isUserAction (mouseAction)) return false;
@@ -928,8 +947,7 @@ return (this.bnd (action, [17]) || !this.drawMode && !this.labelMode && this.apm
 }, "~N");
 Clazz.defineMethod (c$, "enterMeasurementMode", 
  function (iAtom) {
-this.vwr.setPicked (-1);
-this.vwr.setPicked (iAtom);
+this.vwr.setPicked (iAtom, true);
 this.vwr.setCursor (1);
 this.vwr.setPendingMeasurement (this.mp = this.getMP ());
 this.measurementQueued = this.mp;
@@ -984,7 +1002,7 @@ this.vwr.dragMinimizeAtom (iAtom);
 Clazz.defineMethod (c$, "queueAtom", 
  function (atomIndex, ptClicked) {
 var n = this.measurementQueued.addPoint (atomIndex, ptClicked, true);
-if (atomIndex >= 0) this.vwr.setStatusAtomPicked (atomIndex, "Atom #" + n + ":" + this.vwr.getAtomInfo (atomIndex), null);
+if (atomIndex >= 0) this.vwr.setStatusAtomPicked (atomIndex, "Atom #" + n + ":" + this.vwr.getAtomInfo (atomIndex), null, false);
 return n;
 }, "~N,JU.Point3fi");
 Clazz.defineMethod (c$, "setMotion", 
@@ -1002,7 +1020,10 @@ function (dz, x, y) {
 if (dz == 0) return;
 this.setMotion (8, true);
 this.vwr.zoomByFactor (Math.pow (this.mouseWheelFactor, dz), x, y);
-this.vwr.setInMotion (false);
+this.moved.setCurrent (this.current, 0);
+this.vwr.setInMotion (true);
+this.zoomTrigger = true;
+this.startHoverWatcher (true);
 }, "~N,~N,~N");
 Clazz.defineMethod (c$, "runScript", 
  function (script) {
@@ -1052,10 +1073,8 @@ this.enterMeasurementMode (atomIndex);
 }this.addToMeasurement (atomIndex, ptClicked, true);
 this.queueAtom (atomIndex, ptClicked);
 var i = this.measurementQueued.count;
-if (i == 1) {
-this.vwr.setPicked (-1);
-this.vwr.setPicked (atomIndex);
-}if (i < n) return;
+if (i == 1) this.vwr.setPicked (atomIndex, true);
+if (i < n) return;
 if (this.apm == 22) {
 this.getSequence ();
 } else {
@@ -1083,23 +1102,23 @@ var bs;
 switch (mode) {
 case 1:
 if (!this.drawMode && !this.labelMode && this.bnd (this.clickAction, [1])) this.zoomTo (atomIndex);
- else if (this.bnd (this.clickAction, [17])) this.vwr.setStatusAtomPicked (atomIndex, null, null);
+ else if (this.bnd (this.clickAction, [17])) this.vwr.setStatusAtomPicked (atomIndex, null, null, false);
 return;
 case 2:
 if (this.bnd (this.clickAction, [19])) {
 this.runScript ("set labeltoggle {atomindex=" + atomIndex + "}");
-this.vwr.setStatusAtomPicked (atomIndex, "label picked", null);
+this.pickLabel (atomIndex);
 }return;
 case 31:
 if (this.bnd (this.clickAction, [0])) {
 this.vwr.invertRingAt (atomIndex, true);
-this.vwr.setStatusAtomPicked (atomIndex, "invert stereo", null);
+this.vwr.setStatusAtomPicked (atomIndex, "invert stereo for atomIndex=" + atomIndex, null, true);
 }return;
 case 7:
 if (this.bnd (this.clickAction, [4])) {
 bs = JU.BSUtil.newAndSetBit (atomIndex);
 this.vwr.deleteAtoms (bs, false);
-this.vwr.setStatusAtomPicked (atomIndex, "deleted: " + JU.Escape.eBS (bs), null);
+this.vwr.setStatusAtomPicked (atomIndex, "deleted: " + JU.Escape.eBS (bs), null, false);
 }return;
 }
 var spec = "atomindex=" + atomIndex;
@@ -1135,7 +1154,7 @@ this.selectAtoms ("visible and within(site, " + spec + ")");
 break;
 }
 this.vwr.clearClickCount ();
-this.vwr.setStatusAtomPicked (atomIndex, null, null);
+this.vwr.setStatusAtomPicked (atomIndex, null, null, false);
 }, "~N,JU.Point3fi");
 Clazz.defineMethod (c$, "assignNew", 
  function (x, y) {
@@ -1214,8 +1233,7 @@ if (s != null) {
 s += "(" + item + ")";
 try {
 var bs = this.vwr.getAtomBitSetEval (null, s);
-this.vwr.select (bs, false, 0, false);
-this.vwr.setStatusAtomPicked (-1, "selected: " + JU.Escape.eBS (bs), null);
+this.setAtomsPicked (bs, "selected: " + JU.Escape.eBS (bs));
 this.vwr.refresh (3, "selections set");
 } catch (e) {
 if (Clazz.exceptionOf (e, Exception)) {
@@ -1225,6 +1243,11 @@ throw e;
 }
 }this.selectionWorking = false;
 }, "~S");
+Clazz.defineMethod (c$, "setAtomsPicked", 
+ function (bs, msg) {
+this.vwr.select (bs, false, 0, false);
+this.vwr.setStatusAtomPicked (-1, msg, null, false);
+}, "JU.BS,~S");
 Clazz.defineMethod (c$, "selectRb", 
  function (action) {
 var bs = this.vwr.ms.findAtomsInRectangle (this.rectRubber);
@@ -1245,7 +1268,7 @@ this.exitMeasurementMode (null);
 Clazz.defineMethod (c$, "zoomTo", 
  function (atomIndex) {
 this.runScript ("zoomTo (atomindex=" + atomIndex + ")");
-this.vwr.setStatusAtomPicked (atomIndex, null, null);
+this.vwr.setStatusAtomPicked (atomIndex, null, null, false);
 }, "~N");
 Clazz.overrideMethod (c$, "keyTyped", 
 function (keyChar, modifiers) {

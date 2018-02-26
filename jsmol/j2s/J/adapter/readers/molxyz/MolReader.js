@@ -119,7 +119,8 @@ isotope = J.api.JmolAdapter.getNaturalIsotope (J.api.JmolAdapter.getElementNumbe
 this.rd ();
 if (this.line.startsWith ("V  ")) {
 this.readAtomValues ();
-}for (var i = 0; i < bc; ++i) {
+}if (bc == 0) this.asc.setNoAutoBond ();
+for (var i = 0; i < bc; ++i) {
 if (i > 0) this.rd ();
 var iAtom1;
 var iAtom2;
@@ -146,7 +147,7 @@ continue;
 if (this.atomData != null) {
 var atomValueName = molData.get ("atom_value_name");
 molData.put (atomValueName == null ? "atom_values" : atomValueName.toString (), this.atomData);
-}if (!molData.isEmpty ()) this.asc.setModelInfoForSet ("molData", molData, this.asc.iSet);
+}if (!molData.isEmpty ()) this.asc.setCurrentModelInfo ("molData", molData);
 }, "~N,~N");
 Clazz.defineMethod (c$, "readAtomValues", 
  function () {

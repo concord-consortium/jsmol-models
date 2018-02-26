@@ -583,7 +583,7 @@ Clazz.defineMethod (c$, "getIdentity",
 function (allInfo) {
 var info =  new JU.SB ();
 var group3 = this.getGroup3 (true);
-if (group3 != null && group3.length > 0 && !group3.equals ("UNK")) {
+if (group3 != null && group3.length > 0 && (!group3.equals ("UNK") || this.group.chain.model.isBioModel)) {
 info.append ("[");
 info.append (group3);
 info.append ("]");

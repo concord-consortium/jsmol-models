@@ -1,5 +1,5 @@
 Clazz.declarePackage ("JS");
-Clazz.load (["JS.ScriptError"], "JS.ScriptParam", ["java.lang.Float", "java.util.Hashtable", "JU.BS", "$.CU", "$.Lst", "$.Measure", "$.P3", "$.P4", "$.PT", "$.Quat", "$.SB", "$.V3", "JM.TickInfo", "JS.SV", "$.T", "JU.BSUtil", "$.Edge", "$.Escape", "$.Logger"], function () {
+Clazz.load (["JS.ScriptError"], "JS.ScriptParam", ["java.lang.Float", "java.util.Hashtable", "JU.BS", "$.CU", "$.Lst", "$.Measure", "$.P3", "$.P4", "$.PT", "$.Quat", "$.SB", "$.V3", "JM.TickInfo", "JS.SV", "$.T", "JU.BSUtil", "$.Edge", "$.Logger"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.contextVariables = null;
 this.thisContext = null;
@@ -597,7 +597,7 @@ return true;
 return false;
 }, "~N");
 Clazz.defineMethod (c$, "getQuaternionParameter", 
-function (i) {
+function (i, bsAtoms, divideByCurrent) {
 switch (this.tokAt (i)) {
 case 7:
 var sv = (this.getToken (i)).getList ();
@@ -605,11 +605,11 @@ var p4 = null;
 if (sv.size () == 0 || (p4 = JS.SV.pt4Value (sv.get (0))) == null) this.invArg ();
 return JU.Quat.newP4 (p4);
 case 1073741864:
-return (this.chk ? null : JU.Quat.newP4 (JU.Escape.uP (this.vwr.getOrientationText (1073741864, null))));
+return (this.chk ? null : this.vwr.getOrientationText (1073741864, (divideByCurrent ? "best" : ""), bsAtoms));
 default:
 return JU.Quat.newP4 (this.getPoint4f (i));
 }
-}, "~N");
+}, "~N,JU.BS,~B");
 Clazz.defineMethod (c$, "checkLast", 
 function (i) {
 return this.checkLength (i + 1) - 1;

@@ -192,6 +192,9 @@ case JSV.common.ScriptToken.INTEGRALOFFSET:
 case JSV.common.ScriptToken.INTEGRALRANGE:
 this.execSetIntegralParameter (st, Double.parseDouble (value));
 break;
+case JSV.common.ScriptToken.INVERTY:
+this.execZoom ("invertY");
+break;
 case JSV.common.ScriptToken.JMOL:
 this.si.syncToJmol (value);
 break;
@@ -513,11 +516,22 @@ this.pd ().previousView ();
 this.pd ().resetView ();
 } else if (value.equalsIgnoreCase ("clear")) {
 this.pd ().clearAllView ();
+} else if (value.equalsIgnoreCase ("invertY")) {
+this.pd ().getCurrentGraphSet ().invertYAxis ();
 }return true;
 case 2:
 x1 = Double.parseDouble (tokens.get (0));
 x2 = Double.parseDouble (tokens.get (1));
 break;
+case 3:
+var xy = tokens.get (0);
+if (xy.equalsIgnoreCase ("X")) {
+x1 = Double.parseDouble (tokens.get (1));
+x2 = Double.parseDouble (tokens.get (2));
+} else if (xy.equalsIgnoreCase ("Y")) {
+y1 = Double.parseDouble (tokens.get (1));
+y2 = Double.parseDouble (tokens.get (2));
+}break;
 case 4:
 x1 = Double.parseDouble (tokens.get (0));
 y1 = Double.parseDouble (tokens.get (1));

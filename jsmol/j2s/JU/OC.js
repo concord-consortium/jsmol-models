@@ -247,13 +247,13 @@ c$.isRemote = Clazz.defineMethod (c$, "isRemote",
 function (fileName) {
 if (fileName == null) return false;
 var itype = JU.OC.urlTypeIndex (fileName);
-return (itype >= 0 && itype != 4);
+return (itype >= 0 && itype != 5);
 }, "~S");
 c$.isLocal = Clazz.defineMethod (c$, "isLocal", 
 function (fileName) {
 if (fileName == null) return false;
 var itype = JU.OC.urlTypeIndex (fileName);
-return (itype < 0 || itype == 4);
+return (itype < 0 || itype == 5);
 }, "~S");
 c$.urlTypeIndex = Clazz.defineMethod (c$, "urlTypeIndex", 
 function (name) {
@@ -282,6 +282,6 @@ function (x) {
 this.writeInt (x == 0 ? 0 : Float.floatToIntBits (x));
 }, "~N");
 Clazz.defineStatics (c$,
-"urlPrefixes",  Clazz.newArray (-1, ["http:", "https:", "sftp:", "ftp:", "file:"]),
-"URL_LOCAL", 4);
+"urlPrefixes",  Clazz.newArray (-1, ["http:", "https:", "sftp:", "ftp:", "cache://", "file:"]),
+"URL_LOCAL", 5);
 });

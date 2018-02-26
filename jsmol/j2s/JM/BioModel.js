@@ -101,7 +101,7 @@ var cache = (this.dssrCache == null && ann != null ? this.dssrCache =  new java.
 if (cache == null) return null;
 var annotv = cache.get (key);
 if (annotv == null && ann != null) {
-annotv = (Clazz.instanceOf (ann, JS.SV) || Clazz.instanceOf (ann, java.util.Hashtable) ? ann : this.vwr.parseJSON (ann));
+annotv = (Clazz.instanceOf (ann, JS.SV) || Clazz.instanceOf (ann, java.util.Hashtable) ? ann : this.vwr.parseJSONMap (ann));
 cache.put (key, annotv);
 }return (Clazz.instanceOf (annotv, JS.SV) || Clazz.instanceOf (annotv, java.util.Hashtable) ? annotv : null);
 }, "~S,~O");

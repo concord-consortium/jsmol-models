@@ -26,7 +26,6 @@ this.moFactor = 1;
 this.havePoints = false;
 this.testing = true;
 this.sum = -1;
-this.c = 1;
 this.nGaussians = 0;
 this.doShowShellType = false;
 this.warned = null;
@@ -111,14 +110,7 @@ this.atomIndex = this.firstAtomOffset - 1;
 this.moCoeff = 0;
 if (this.slaters == null) {
 var nShells = this.shells.size ();
-if (this.c < 0) {
-this.c = 0;
-for (var i = 0; i < nShells; i++) this.c += this.normalizeShell (i);
-
-this.c = Math.sqrt (this.c);
-this.atomIndex = this.firstAtomOffset - 1;
-this.moCoeff = 0;
-}for (var i = 0; i < nShells; i++) this.processShell (i);
+for (var i = 0; i < nShells; i++) this.processShell (i);
 
 return;
 }for (var i = 0; i < this.slaters.length; i++) {
@@ -140,26 +132,13 @@ JU.Logger.warn ("unknown calculation type may not render correctly -- continuing
 JU.Logger.info ("calculation type: " + this.calculationType + " OK.");
 }return true;
 });
-Clazz.defineMethod (c$, "normalizeShell", 
- function (iShell) {
-var c = 0;
-var shell = this.shells.get (iShell);
-var basisType = shell[1];
-this.gaussianPtr = shell[2];
-this.nGaussians = shell[3];
-this.doShowShellType = this.doDebug;
-if (!this.setCoeffs (basisType, false)) return 0;
-for (var i = this.map.length; --i >= 0; ) c += this.coeffs[i] * this.coeffs[i];
-
-return c;
-}, "~N");
 Clazz.defineMethod (c$, "processShell", 
  function (iShell) {
 var lastAtom = this.atomIndex;
 var shell = this.shells.get (iShell);
-this.atomIndex = shell[0] + this.firstAtomOffset;
+this.atomIndex = shell[0] - 1 + this.firstAtomOffset;
 var basisType = shell[1];
-this.gaussianPtr = shell[2];
+this.gaussianPtr = shell[2] - 1;
 this.nGaussians = shell[3];
 this.doShowShellType = this.doDebug;
 if (this.atomIndex != lastAtom && (this.thisAtom = this.qmAtoms[this.atomIndex]) != null) this.thisAtom.setXYZ (this, true);
@@ -231,7 +210,7 @@ sum += c1 * f1 * c2 * f2 / Math.pow (alpha1 + alpha2, 2 * p);
 }
 }
 }sum = 1 / Math.sqrt (f * sum);
-if (JU.Logger.debugging) JU.Logger.debug ("\t\t\tnormalization for l=" + el + " nGaussians=" + this.nGaussians + " is " + sum);
+if (JU.Logger.debuggingHigh) JU.Logger.debug ("\t\t\tnormalization for l=" + el + " nGaussians=" + this.nGaussians + " is " + sum);
 return sum;
 }, "~N,~N");
 Clazz.defineMethod (c$, "setCoeffs", 
@@ -741,7 +720,7 @@ Clazz.defineMethod (c$, "processSlater",
  function (slaterIndex) {
 var lastAtom = this.atomIndex;
 var slater = this.slaters[slaterIndex];
-this.atomIndex = slater.iAtom;
+this.atomIndex = slater.atomNo - 1;
 var minuszeta = -slater.zeta;
 if ((this.thisAtom = this.qmAtoms[this.atomIndex]) == null) {
 if (minuszeta <= 0) this.moCoeff++;

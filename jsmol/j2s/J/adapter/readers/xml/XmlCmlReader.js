@@ -317,7 +317,7 @@ this.state = 4;
 }break;
 case 18:
 var values = J.adapter.smarter.AtomSetCollectionReader.getTokensFloat (this.chars.toString (), null, 3);
-this.parent.addPrimitiveLatticeVector (this.latticeVectorPtr, values, 0);
+this.parent.addExplicitLatticeVector (this.latticeVectorPtr, values, 0);
 this.latticeVectorPtr = (this.latticeVectorPtr + 1) % 3;
 this.setKeepChars (false);
 this.state = 0;

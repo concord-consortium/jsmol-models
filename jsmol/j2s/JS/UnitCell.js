@@ -13,18 +13,18 @@ Clazz.instantialize (this, arguments);
 Clazz.prepareFields (c$, function () {
 this.cartesianOffset =  new JU.P3 ();
 });
-c$.newP = Clazz.defineMethod (c$, "newP", 
-function (points, setRelative) {
+c$.fromOABC = Clazz.defineMethod (c$, "fromOABC", 
+function (oabc, setRelative) {
 var c =  new JS.UnitCell ();
-if (points.length == 3) points =  Clazz.newArray (-1, [ new JU.P3 (), points[0], points[1], points[2]]);
-var parameters =  Clazz.newFloatArray (-1, [-1, 0, 0, 0, 0, 0, points[1].x, points[1].y, points[1].z, points[2].x, points[2].y, points[2].z, points[3].x, points[3].y, points[3].z]);
+if (oabc.length == 3) oabc =  Clazz.newArray (-1, [ new JU.P3 (), oabc[0], oabc[1], oabc[2]]);
+var parameters =  Clazz.newFloatArray (-1, [-1, 0, 0, 0, 0, 0, oabc[1].x, oabc[1].y, oabc[1].z, oabc[2].x, oabc[2].y, oabc[2].z, oabc[3].x, oabc[3].y, oabc[3].z]);
 c.init (parameters);
 c.allFractionalRelative = setRelative;
 c.initUnitcellVertices ();
-c.setCartesianOffset (points[0]);
+c.setCartesianOffset (oabc[0]);
 return c;
 }, "~A,~B");
-c$.newA = Clazz.defineMethod (c$, "newA", 
+c$.fromParams = Clazz.defineMethod (c$, "fromParams", 
 function (params, setRelative) {
 var c =  new JS.UnitCell ();
 c.init (params);
@@ -49,7 +49,7 @@ this.matrixCartesianToFractional.rotTrans (pt);
 this.unitize (pt);
 this.matrixFractionalToCartesian.rotTrans (pt);
 } else {
-this.matrixCtoFANoOffset.rotTrans (pt);
+this.matrixCtoFNoOffset.rotTrans (pt);
 this.unitize (pt);
 pt.add (offset);
 this.matrixFtoCNoOffset.rotTrans (pt);
@@ -92,7 +92,7 @@ this.matrixFractionalToCartesian.m03 = this.cartesianOffset.x;
 this.matrixFractionalToCartesian.m13 = this.cartesianOffset.y;
 this.matrixFractionalToCartesian.m23 = this.cartesianOffset.z;
 if (this.allFractionalRelative) {
-this.matrixCtoFANoOffset.setM4 (this.matrixCartesianToFractional);
+this.matrixCtoFNoOffset.setM4 (this.matrixCartesianToFractional);
 this.matrixFtoCNoOffset.setM4 (this.matrixFractionalToCartesian);
 }}, "JU.T3");
 Clazz.defineMethod (c$, "setCartesianOffset", 
@@ -112,7 +112,7 @@ this.matrixCartesianToFractional.m03 = -this.fractionalOffset.x;
 this.matrixCartesianToFractional.m13 = -this.fractionalOffset.y;
 this.matrixCartesianToFractional.m23 = -this.fractionalOffset.z;
 if (this.allFractionalRelative) {
-this.matrixCtoFANoOffset.setM4 (this.matrixCartesianToFractional);
+this.matrixCtoFNoOffset.setM4 (this.matrixCartesianToFractional);
 this.matrixFtoCNoOffset.setM4 (this.matrixFractionalToCartesian);
 }if (!wasOffset && this.fractionalOffset.lengthSquared () == 0) this.fractionalOffset = null;
 }, "JU.T3");
@@ -220,7 +220,7 @@ return x;
 Clazz.defineMethod (c$, "initUnitcellVertices", 
  function () {
 if (this.matrixFractionalToCartesian == null) return;
-this.matrixCtoFANoOffset = JU.M4.newM4 (this.matrixCartesianToFractional);
+this.matrixCtoFNoOffset = JU.M4.newM4 (this.matrixCartesianToFractional);
 this.matrixFtoCNoOffset = JU.M4.newM4 (this.matrixFractionalToCartesian);
 this.vertices =  new Array (8);
 for (var i = 8; --i >= 0; ) this.vertices[i] = this.matrixFractionalToCartesian.rotTrans2 (JU.BoxInfo.unitCubePoints[i],  new JU.P3 ());
@@ -340,6 +340,7 @@ return JU.Quat.getQuaternionFrame (null, v, x).inv ();
 }, "~S");
 Clazz.defineMethod (c$, "getV0abc", 
 function (def) {
+if (Clazz.instanceOf (def, Array)) return def;
 var m;
 var isRev = false;
 var pts =  new Array (4);
@@ -414,7 +415,7 @@ case 'C':
 mf = JU.M3.newA9 ( Clazz.newFloatArray (-1, [0.5, 0.5, 0, -0.5, 0.5, 0, 0, 0, 1]));
 break;
 case 'R':
-mf = JU.M3.newA9 ( Clazz.newFloatArray (-1, [0.33333334, 0.33333334, -0.6666667, -0.33333334, 0.6666667, -0.33333334, 0.33333334, 0.33333334, 0.33333334]));
+mf = JU.M3.newA9 ( Clazz.newFloatArray (-1, [0.6666667, -0.33333334, -0.33333334, 0.33333334, 0.33333334, -0.6666667, 0.33333334, 0.33333334, 0.33333334]));
 break;
 case 'I':
 mf = JU.M3.newA9 ( Clazz.newFloatArray (-1, [-0.5, .5, .5, .5, -0.5, .5, .5, .5, -0.5]));
@@ -432,6 +433,12 @@ this.toCartesian (p, false);
 }
 return true;
 }, "~B,~S,~A");
+Clazz.defineMethod (c$, "getConventionalUnitCell", 
+function (latticeType) {
+var oabc = this.getUnitCellVectors ();
+if (!latticeType.equals ("P")) this.toFromPrimitive (false, latticeType.charAt (0), oabc);
+return oabc;
+}, "~S");
 Clazz.defineStatics (c$,
 "twoP2", 19.739208802178716);
 c$.unitVectors = c$.prototype.unitVectors =  Clazz.newArray (-1, [JV.JC.axisX, JV.JC.axisY, JV.JC.axisZ]);

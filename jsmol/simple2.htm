@@ -47,7 +47,7 @@ var Info = {
 	jarFile: "JmolAppletSigned.jar",
 	isSigned: false,
 	addSelectionOptions: false,
-	serverURL: "http://chemapps.stolaf.edu/jmol/jsmol/php/jsmol.php",
+	serverURL: "https://chemapps.stolaf.edu/jmol/jsmol/php/jsmol.php",
 	readyFunction: null,
 	console: "jmol_infodiv",
 	disableInitialConsole: true,
@@ -164,7 +164,7 @@ $(document).ready(function(){
 //		+ "<br><br>"
 		Jmol.jmolButton(jmol,"write FILE ?","Save FILE")
 		+ "<br>"
-		+ Jmol.jmolButton(jmol,"write PNGJ ?.png","Save PNG")
+		+ Jmol.jmolButton(jmol,"write PNGJ jsmol.png","Save PNG")
 		+ "<br><br><a href=simple2.htm?_USE=HTML5>HTML5 version</a>"
 		+ "<br><br><a href=simple2.htm?_USE=SIGNED>(Signed) Java version</a>"
 		+ "<br><br>" + Jmol.jmolLink(jmol, "JSCONSOLE", "show info")
@@ -172,7 +172,7 @@ $(document).ready(function(){
 		"<br><br>"
 		+ Jmol.jmolButton(jmol,"write FILE ?","Save FILE")
 		+ "<br>"
-		+ Jmol.jmolButton(jmol,"write PNGJ ?.png","Save PNG")
+		+ Jmol.jmolButton(jmol,"write PNGJ jsmol.png","Save PNG")
 		+ "<br><br><a href=simple2.htm?_USE=SIGNED>JAVA version</a>"
     + "<br><br><a href=javascript:Jmol.showInfo(jmol,true)>show info</a>"
     )

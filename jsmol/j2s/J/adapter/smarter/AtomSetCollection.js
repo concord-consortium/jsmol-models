@@ -755,6 +755,7 @@ if (!this.isTrajectory || !a.isTrajectory || this.vibrationSteps != null) return
 for (var i = 0; i < a.trajectoryStepCount; i++) this.trajectorySteps.add (this.trajectoryStepCount++, a.trajectorySteps.get (i));
 
 this.setInfo ("trajectorySteps", this.trajectorySteps);
+this.setInfo ("ignoreUnitCell", a.atomSetInfo.get ("ignoreUnitCell"));
 }, "J.adapter.smarter.AtomSetCollection");
 Clazz.defineStatics (c$,
 "globalBooleans",  Clazz.newArray (-1, ["someModelsHaveFractionalCoordinates", "someModelsHaveSymmetry", "someModelsHaveUnitcells", "someModelsHaveCONECT", "isPDB", "someModelsHaveDomains", "someModelsHaveValidations"]),

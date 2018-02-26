@@ -7,6 +7,7 @@ this.bioModelset = null;
 this.at = null;
 this.ac = 0;
 this.trajectory = null;
+this.pointGroup = null;
 this.labeler = null;
 this.maxBondingRadius = 1.4E-45;
 this.maxVanderwaalsRadius = 1.4E-45;
@@ -77,8 +78,7 @@ this.atomSeqIDs = null;
 this.vibrations = null;
 this.occupancies = null;
 this.bfactor100s = null;
-this.partialCharges = null;
-this.bsPartialCharges = null;
+this.resetPartialCharges ();
 this.bondingRadii = null;
 this.atomTensors = null;
 });
@@ -171,11 +171,13 @@ return -1;
 }, "~N,JU.BS");
 Clazz.defineMethod (c$, "setFormalCharges", 
 function (bs, formalCharge) {
-if (bs != null) for (var i = bs.nextSetBit (0); i >= 0; i = bs.nextSetBit (i + 1)) {
+if (bs != null) {
+this.resetPartialCharges ();
+for (var i = bs.nextSetBit (0); i >= 0; i = bs.nextSetBit (i + 1)) {
 this.at[i].setFormalCharge (formalCharge);
 this.taintAtom (i, 4);
 }
-}, "JU.BS,~N");
+}}, "JU.BS,~N");
 Clazz.defineMethod (c$, "getAtomicCharges", 
 function () {
 var charges =  Clazz.newFloatArray (this.ac, 0);
@@ -433,6 +435,7 @@ case 1086326789:
 this.setElement (atom, iValue, true);
 break;
 case 1631586315:
+this.resetPartialCharges ();
 atom.setFormalCharge (iValue);
 this.taintAtom (i, 4);
 break;
@@ -607,8 +610,14 @@ if (doTaint && atom.getElementNumber () == atomicNumber) return;
 atom.setAtomicAndIsotopeNumber (atomicNumber);
 atom.paletteID = J.c.PAL.CPK.id;
 atom.colixAtom = this.vwr.cm.getColixAtomPalette (atom, J.c.PAL.CPK.id);
+this.resetPartialCharges ();
 if (doTaint) this.taintAtom (atom.i, 3);
 }, "JM.Atom,~N,~B");
+Clazz.defineMethod (c$, "resetPartialCharges", 
+ function () {
+this.partialCharges = null;
+this.bsPartialCharges = null;
+});
 Clazz.defineMethod (c$, "setAtomResno", 
  function (atomIndex, resno) {
 if (resno == this.at[atomIndex].getResno ()) return;
@@ -833,6 +842,7 @@ Clazz.defineMethod (c$, "taintModelCoord",
 var m = (this).am[this.at[atomIndex].mi];
 this.validateBspfForModel (m.trajectoryBaseIndex, false);
 if (m.isBioModel) m.resetDSSR (true);
+this.pointGroup = null;
 }, "~N");
 Clazz.defineMethod (c$, "untaint", 
  function (atomIndex, type) {
@@ -1841,8 +1851,7 @@ this.dssrData = JU.AU.deleteElements (this.dssrData, firstAtomIndex, nAtoms);
 this.bfactor100s = JU.AU.deleteElements (this.bfactor100s, firstAtomIndex, nAtoms);
 this.hasBfactorRange = false;
 this.occupancies = JU.AU.deleteElements (this.occupancies, firstAtomIndex, nAtoms);
-this.partialCharges = JU.AU.deleteElements (this.partialCharges, firstAtomIndex, nAtoms);
-this.bsPartialCharges = JU.BSUtil.deleteBits (this.bsPartialCharges, bsAtoms);
+this.resetPartialCharges ();
 this.atomTensorList = JU.AU.deleteElements (this.atomTensorList, firstAtomIndex, nAtoms);
 this.vibrations = JU.AU.deleteElements (this.vibrations, firstAtomIndex, nAtoms);
 this.nSurfaceAtoms = 0;

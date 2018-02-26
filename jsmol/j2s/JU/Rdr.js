@@ -1,5 +1,5 @@
 Clazz.declarePackage ("JU");
-Clazz.load (["javajs.api.GenericLineReader"], "JU.Rdr", ["java.io.BufferedInputStream", "$.BufferedReader", "$.ByteArrayInputStream", "$.InputStreamReader", "$.StringReader", "JU.AU", "$.Base64", "$.Encoding", "$.SB"], function () {
+Clazz.load (["java.io.BufferedReader", "javajs.api.GenericLineReader"], "JU.Rdr", ["java.io.BufferedInputStream", "$.ByteArrayInputStream", "$.InputStreamReader", "$.StringReader", "JU.AU", "$.Base64", "$.Encoding", "$.SB"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.reader = null;
 Clazz.instantialize (this, arguments);
@@ -106,11 +106,12 @@ return (bytes != null && bytes.length >= 2 && (bytes[0] & 0xFF) == 0x7D && (byte
 }, "~A");
 c$.isMessagePackS = Clazz.defineMethod (c$, "isMessagePackS", 
 function (is) {
-return JU.Rdr.isMessagePackB (JU.Rdr.getMagic (is, 1));
+return JU.Rdr.isMessagePackB (JU.Rdr.getMagic (is, 2));
 }, "java.io.InputStream");
 c$.isMessagePackB = Clazz.defineMethod (c$, "isMessagePackB", 
 function (bytes) {
-return (bytes != null && bytes.length >= 1 && (bytes[0] & 0xFF) == 0xDE);
+var b;
+return (bytes != null && bytes.length >= 1 && (((b = bytes[0] & 0xFF)) == 0xDE || (b & 0xE0) == 0x80 && bytes[1] != 0x50));
 }, "~A");
 c$.isPngZipStream = Clazz.defineMethod (c$, "isPngZipStream", 
 function (is) {
@@ -212,7 +213,7 @@ return JU.AU.arrayCopyByte (bytes, totalLen);
 }, "java.io.BufferedInputStream,JU.OC");
 c$.getBufferedReader = Clazz.defineMethod (c$, "getBufferedReader", 
 function (bis, charSet) {
-if (JU.Rdr.getUTFEncodingForStream (bis) === JU.Encoding.NONE) return  new java.io.BufferedReader ( new java.io.InputStreamReader (bis, (charSet == null ? "UTF-8" : charSet)));
+if (JU.Rdr.getUTFEncodingForStream (bis) === JU.Encoding.NONE) return  new JU.Rdr.StreamReader (bis, charSet);
 var bytes = JU.Rdr.getLimitedStreamBytes (bis, -1);
 bis.close ();
 return JU.Rdr.getBR (charSet == null ? JU.Rdr.fixUTF (bytes) :  String.instantialize (bytes, charSet));
@@ -330,4 +331,27 @@ function (fileName) {
 var pt = fileName.indexOf ("|");
 return (pt < 0 ? fileName : fileName.substring (0, pt));
 }, "~S");
+Clazz.pu$h(self.c$);
+c$ = Clazz.decorateAsClass (function () {
+this.stream = null;
+Clazz.instantialize (this, arguments);
+}, JU.Rdr, "StreamReader", java.io.BufferedReader);
+Clazz.makeConstructor (c$, 
+function (a, b) {
+Clazz.superConstructor (this, JU.Rdr.StreamReader, [ new java.io.InputStreamReader (a, (b == null ? "UTF-8" : b))]);
+this.stream = a;
+}, "java.io.BufferedInputStream,~S");
+Clazz.defineMethod (c$, "getStream", 
+function () {
+try {
+this.stream.reset ();
+} catch (e) {
+if (Clazz.exceptionOf (e, java.io.IOException)) {
+} else {
+throw e;
+}
+}
+return this.stream;
+});
+c$ = Clazz.p0p ();
 });

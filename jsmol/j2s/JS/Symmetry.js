@@ -148,6 +148,12 @@ Clazz.overrideMethod (c$, "getSpaceGroupName",
 function () {
 return (this.symmetryInfo != null ? this.symmetryInfo.sgName : this.spaceGroup != null ? this.spaceGroup.getName () : this.unitCell != null && this.unitCell.name.length > 0 ? "cell=" + this.unitCell.name : "");
 });
+Clazz.overrideMethod (c$, "setSpaceGroupName", 
+function (name) {
+if (this.spaceGroup != null) {
+this.spaceGroup.name = name;
+if (this.spaceGroup.name.startsWith ("HM:")) this.spaceGroup.latticeType = this.spaceGroup.name.substring (3, 4);
+}}, "~S");
 Clazz.overrideMethod (c$, "getSpaceGroupOperationCount", 
 function () {
 return (this.symmetryInfo != null ? this.symmetryInfo.symmetryOperations.length : this.spaceGroup != null && this.spaceGroup.finalOperations != null ? this.spaceGroup.finalOperations.length : 0);
@@ -156,6 +162,10 @@ Clazz.overrideMethod (c$, "getLatticeType",
 function () {
 return (this.symmetryInfo != null ? this.symmetryInfo.latticeType : this.spaceGroup == null ? "P" : this.spaceGroup.latticeType);
 });
+Clazz.overrideMethod (c$, "setLatticeType", 
+function (type) {
+if (this.spaceGroup != null) this.spaceGroup.latticeType = type;
+}, "~S");
 Clazz.overrideMethod (c$, "getIntTableNumber", 
 function () {
 return (this.symmetryInfo != null ? this.symmetryInfo.intlTableNo : this.spaceGroup == null ? null : this.spaceGroup.intlTableNumber);
@@ -207,7 +217,7 @@ return (ptTemp.x >= cell.x - 1 - 0.02 && ptTemp.x <= cell.x + 0.02 && ptTemp.y >
 }, "J.api.SymmetryInterface,JU.P3,JU.P3,~B");
 Clazz.overrideMethod (c$, "setUnitCell", 
 function (unitCellParams, setRelative) {
-this.unitCell = JS.UnitCell.newA (unitCellParams, setRelative);
+this.unitCell = JS.UnitCell.fromParams (unitCellParams, setRelative);
 }, "~A,~B");
 Clazz.overrideMethod (c$, "unitCellEquals", 
 function (uc2) {
@@ -264,7 +274,7 @@ return this.unitCell.getUnitCellAsArray (vectorsOnly);
 Clazz.overrideMethod (c$, "getTensor", 
 function (vwr, parBorU) {
 if (parBorU == null) return null;
-if (this.unitCell == null) this.unitCell = JS.UnitCell.newA ( Clazz.newFloatArray (-1, [1, 1, 1, 90, 90, 90]), true);
+if (this.unitCell == null) this.unitCell = JS.UnitCell.fromParams ( Clazz.newFloatArray (-1, [1, 1, 1, 90, 90, 90]), true);
 return this.unitCell.getTensor (vwr, parBorU);
 }, "JV.Viewer,~A");
 Clazz.overrideMethod (c$, "getUnitCellVerticesNoOffset", 
@@ -326,8 +336,9 @@ function () {
 return this.unitCell.getUnitCellVectors ();
 });
 Clazz.overrideMethod (c$, "getUnitCell", 
-function (points, setRelative, name) {
-this.unitCell = JS.UnitCell.newP (points, setRelative);
+function (oabc, setRelative, name) {
+if (oabc == null) return null;
+this.unitCell = JS.UnitCell.fromOABC (oabc, setRelative);
 if (name != null) this.unitCell.name = name;
 return this;
 }, "~A,~B,~S");
@@ -429,7 +440,7 @@ return (J.api.Interface.getInterface ("JS.UnitCellIterator", vwr, "script")).set
 }, "JV.Viewer,JM.Atom,~A,JU.BS,~N");
 Clazz.overrideMethod (c$, "toFromPrimitive", 
 function (toPrimitive, type, oabc) {
-if (this.unitCell == null) this.unitCell = JS.UnitCell.newP (oabc, false);
+if (this.unitCell == null) this.unitCell = JS.UnitCell.fromOABC (oabc, false);
 return this.unitCell.toFromPrimitive (toPrimitive, type, oabc);
 }, "~B,~S,~A");
 Clazz.overrideMethod (c$, "generateCrystalClass", 
@@ -487,25 +498,16 @@ Clazz.overrideMethod (c$, "calculateCIPChiralityForAtoms",
 function (vwr, bsAtoms) {
 vwr.setCursor (3);
 var cip = this.getCIPChirality (vwr);
-var bsAtropisomer = null;
-var bsHelixM = null;
-var bsHelixP = null;
-var setAuxiliary = vwr.getBoolean (603979960);
-try {
-bsAtropisomer = vwr.getSmartsMatch ("[!H](.t1:-20,20)a{a(.t2:-20,20)-a}a[!H]", bsAtoms);
-bsHelixM = vwr.getSmartsMatch ("A{a}(.t:-10,-40)a(.t:-10,-40)aaa", bsAtoms);
-bsHelixP = vwr.getSmartsMatch ("A{a}(.t:10,40)a(.t:10,40)aaa", bsAtoms);
-} catch (e) {
-if (Clazz.exceptionOf (e, Exception)) {
-} else {
-throw e;
-}
-}
-cip.getChiralityForAtoms (vwr.ms.at, bsAtoms, bsAtropisomer, bsHelixM, bsHelixP, setAuxiliary);
+var data = (J.api.Interface.getInterface ("JS.CIPData", vwr, "script")).set (vwr, bsAtoms);
+cip.getChiralityForAtoms (data);
 vwr.setCursor (0);
 }, "JV.Viewer,JU.BS");
 Clazz.defineMethod (c$, "getCIPChirality", 
  function (vwr) {
 return (this.cip == null ? (this.cip = (J.api.Interface.getInterface ("JS.CIPChirality", vwr, "script"))) : this.cip);
 }, "JV.Viewer");
+Clazz.overrideMethod (c$, "getConventionalUnitCell", 
+function (latticeType) {
+return (this.unitCell == null || latticeType == null ? null : this.unitCell.getConventionalUnitCell (latticeType));
+}, "~S");
 });

@@ -63,8 +63,7 @@ var lo;
 var hi;
 switch (pid) {
 case 84:
-var c = this.colorData[atom.i];
-return (this.colorData == null || Float.isNaN (c) || atom.i >= this.colorData.length ? 12 : this.ce.getColorIndex (c));
+return (this.colorData == null || atom.i >= this.colorData.length || Float.isNaN (this.colorData[atom.i]) ? 12 : this.ce.getColorIndex (this.colorData[atom.i]));
 case 0:
 case 1:
 id = atom.getAtomicAndIsotopeNumber ();

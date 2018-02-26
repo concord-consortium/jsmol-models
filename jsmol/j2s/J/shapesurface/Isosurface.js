@@ -29,6 +29,8 @@ this.iHaveModelIndex = false;
 this.nLCAO = 0;
 this.lcaoDir = null;
 this.associateNormals = false;
+this.oldFileName = null;
+this.newFileName = null;
 this.ptXY = null;
 this.keyXy = null;
 Clazz.instantialize (this, arguments);
@@ -72,7 +74,7 @@ if ("cache" === propertyName) {
 if (this.currentMesh == null) return;
 var id = this.currentMesh.thisID;
 var imodel = this.currentMesh.modelIndex;
-this.vwr.cachePut ("cache://isosurface_" + id, this.getPropI ("jvxlDataXml", -1));
+this.vwr.cachePut ("cache://isosurface_" + id, (this.getPropI ("jvxlDataXml", -1)).getBytes ());
 this.deleteMeshI (this.currentMesh.index);
 this.setPropI ("init", null, null);
 this.setPropI ("thisID", id, null);
@@ -554,7 +556,6 @@ this.getMeshCommand (sb, thisMesh.index);
 thisMesh.setJvxlColorMap (true);
 return J.jvxl.data.JvxlCoder.jvxlGetFileVwr (this.vwr, this.jvxlData, meshData, this.title, "", true, 1, sb.toString (), null);
 }if (property === "jvxlFileInfo") {
-thisMesh.setJvxlColorMap (false);
 return J.jvxl.data.JvxlCoder.jvxlGetInfo (this.jvxlData);
 }if (property === "command") {
 var sb =  new JU.SB ();
@@ -944,7 +945,7 @@ this.thisMesh.surfaceAtoms = this.sg.params.bsSelected;
 this.thisMesh.insideOut = this.sg.params.isInsideOut ();
 this.thisMesh.isModelConnected = this.sg.params.isModelConnected;
 this.thisMesh.vertexSource = this.sg.params.vertexSource;
-this.thisMesh.spanningVectors = this.sg.getSpanningVectors ();
+this.thisMesh.oabc = this.sg.getOriginVaVbVc ();
 this.thisMesh.calculatedArea = null;
 this.thisMesh.calculatedVolume = null;
 if (!this.thisMesh.isMerged) {
@@ -1015,7 +1016,9 @@ return;
 this.thisMesh.dataType = this.sg.params.dataType;
 this.thisMesh.scale3d = this.sg.params.scale3d;
 if (script != null) {
-if (script.charAt (0) == ' ') {
+if (this.oldFileName != null) {
+script = script.$replace (this.oldFileName, this.newFileName);
+}if (script.charAt (0) == ' ') {
 script = this.myType + " ID " + JU.PT.esc (this.thisMesh.thisID) + script;
 pt = script.indexOf ("; isosurface map");
 }}if (pt > 0 && this.scriptAppendix.length > 0) this.thisMesh.scriptCommand = script.substring (0, pt) + this.scriptAppendix + script.substring (pt);
@@ -1027,6 +1030,11 @@ function (fileName) {
 fileName = " # /*file*/\"" + fileName + "\"";
 if (this.scriptAppendix.indexOf (fileName) < 0) this.scriptAppendix += fileName;
 }, "~S");
+Clazz.overrideMethod (c$, "setRequiredFile", 
+function (oldName, fileName) {
+this.oldFileName = oldName;
+this.newFileName = fileName;
+}, "~S,~S");
 Clazz.defineMethod (c$, "setJvxlInfo", 
  function () {
 if (this.sg.jvxlData !== this.jvxlData || this.sg.jvxlData !== this.thisMesh.jvxlData) this.jvxlData = this.thisMesh.jvxlData = this.sg.jvxlData;

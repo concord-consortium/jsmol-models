@@ -480,21 +480,25 @@ if (f != 0.0) info += "translate y " + f + ";";
 return info;
 });
 Clazz.defineMethod (c$, "getOrientationText", 
-function (type) {
+function (type, isBest) {
 switch (type) {
 case 4129:
 return this.getMoveToText (1, false);
 case 1073742132:
-return this.getRotationQ ().toString ();
+var q = this.getRotationQ ();
+if (isBest) q = q.inv ();
+return q.toString ();
 case 1073742178:
 var sb =  new JU.SB ();
-JV.TransformManager.truncate2 (sb, this.getTranslationXPercent ());
-JV.TransformManager.truncate2 (sb, this.getTranslationYPercent ());
+var d = this.getTranslationXPercent ();
+JV.TransformManager.truncate2 (sb, (isBest ? -d : d));
+d = this.getTranslationYPercent ();
+JV.TransformManager.truncate2 (sb, (isBest ? -d : d));
 return sb.toString ();
 default:
 return this.getMoveToText (1, true) + "\n#OR\n" + this.getRotateZyzText (true);
 }
-}, "~N");
+}, "~N,~B");
 Clazz.defineMethod (c$, "getRotationQ", 
 function () {
 return JU.Quat.newM (this.matrixRotate);

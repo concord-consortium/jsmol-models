@@ -2,6 +2,7 @@
 
 // see http://peter-ertl.com/jsme
 
+// BH 12/3/2017 8:56:35 PM two JSME applets on a page fail.
 // BH 2/16/2017 2:09:40 PM uses show chemical jme not show chemical/file=jme
 // BH 4/24/2016 10:51:22 PM adds getjsmeh Jmol script to derive jsme with H atoms from NCI mrv 
 // BH 9/15/2015 18:10:25 jmolAtoms no var
@@ -539,7 +540,7 @@
 	}
 
   proto._getSmiles = function(withStereoChemistry) {
-  	var s = (arguments.length == 0 || withStereoChemistry ? jme._applet.smiles() : jme._applet.nonisomericSmiles());
+  	var s = (arguments.length == 0 || withStereoChemistry ? this._applet.smiles() : this._applet.nonisomericSmiles());
 //    s = s.replace(/\:1/g,"");
 //		s = s.replace(/@H/g,"@~").replace(/H/g,"")
 //		s = s.replace(/\/\[\]/g,"/[H]")

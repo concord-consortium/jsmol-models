@@ -43,7 +43,7 @@
  // NOTES by Bob Hanson: 
   // J2S class changes:
 
-
+ // BH 10/16/2017 6:30:14 AM fix for prepareCallback reducing arguments length to -1
  // BH 7/7/2017 7:10:39 AM fixes Clazz.clone for arrays
  // BH 1/14/2017 6:23:54 AM adds URL switch  j2sDebugCore
  // BH 1/8/2016 6:21:38 PM adjustments to prevent multiple load of corejmol.js 
@@ -2148,7 +2148,8 @@ Clazz.prepareCallback = function (innerObj, args) {
 	// note that args is an instance of arguments -- NOT an array; does not have the .shift() method!
 	for (var i = 0; i < args.length - 1; i++)
 		args[i] = args[i + 1];
-	args.length--;
+  if (args.length > 0)
+  	args.length--;
 };
 
 /**

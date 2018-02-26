@@ -154,7 +154,7 @@ this.bsVisible.set (i);
 haveVisible = true;
 }
 if (!haveVisible) return false;
-this.ribbonBorder = this.vwr.getBoolean (603979900);
+this.ribbonBorder = this.vwr.getBoolean (603979901);
 this.isNucleic = Clazz.instanceOf (bioShape.bioPolymer, JM.NucleicPolymer);
 this.isPhosphorusOnly = !this.isNucleic && Clazz.instanceOf (bioShape.bioPolymer, JM.PhosphorusPolymer);
 this.isCarbohydrate = Clazz.instanceOf (bioShape.bioPolymer, JM.CarbohydratePolymer);

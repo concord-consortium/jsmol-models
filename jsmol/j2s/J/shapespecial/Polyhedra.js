@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.shapespecial");
-Clazz.load (["J.shape.AtomShape", "JU.AU", "$.BS", "$.P3", "$.V3"], "J.shapespecial.Polyhedra", ["java.lang.Boolean", "$.Float", "java.util.Arrays", "$.Hashtable", "JU.Lst", "$.Measure", "$.P4", "$.PT", "$.SB", "J.api.Interface", "J.c.PAL", "J.shapespecial.Polyhedron", "JU.BSUtil", "$.C", "$.Logger", "$.Normix"], function () {
+Clazz.load (["J.shape.AtomShape", "JU.AU", "$.BS", "$.P3", "$.V3"], "J.shapespecial.Polyhedra", ["java.lang.Boolean", "$.Float", "java.util.Arrays", "$.Hashtable", "JU.Lst", "$.Measure", "$.P4", "$.PT", "$.SB", "J.api.Interface", "J.c.PAL", "JS.SV", "J.shapespecial.Polyhedron", "JU.BSUtil", "$.C", "$.Logger", "$.Normix"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.otherAtoms = null;
 this.normalsT = null;
@@ -74,7 +74,7 @@ return;
 this.setDefinedFaces ((value)[1], (value)[0]);
 return;
 }if ("generate" === propertyName) {
-if (!this.iHaveCenterBitSet) {
+if (!this.iHaveCenterBitSet && bs != null && !bs.isEmpty ()) {
 this.centers = bs;
 this.iHaveCenterBitSet = true;
 }this.deletePolyhedra ();
@@ -143,7 +143,7 @@ this.bondedOnly = true;
 return;
 }if ("info" === propertyName) {
 this.info = value;
-this.centers = (this.info.containsKey ("center") ? null : JU.BSUtil.newAndSetBit (this.info.get ("atomIndex").intValue));
+this.centers = (this.info.containsKey ("center") ? null : JU.BSUtil.newAndSetBit ((this.info.get ("atomIndex")).intValue));
 this.iHaveCenterBitSet = (this.centers != null);
 return;
 }if ("delete" === propertyName) {
@@ -163,6 +163,9 @@ this.drawEdges = 0;
 return;
 }if ("edges" === propertyName) {
 this.drawEdges = 1;
+return;
+}if ("edgesOnly" === propertyName) {
+this.drawEdges = 3;
 return;
 }if ("frontedges" === propertyName) {
 this.drawEdges = 2;
@@ -306,6 +309,11 @@ if (i >= 0) data[1] = Integer.$valueOf (i);
 return (i >= 0);
 }if (property === "checkID") {
 return this.checkID (id);
+}if (property === "getAtomsWithin") {
+p = this.findPoly (id, iatom, true);
+if (p == null) return false;
+data[2] = this.getAtomsWithin (p, (data[1]).floatValue ());
+return true;
 }if (property === "info") {
 p = this.findPoly (id, iatom, true);
 if (p == null) return false;
@@ -373,6 +381,36 @@ data[1] = info;
 return true;
 }return this.getPropShape (property, data);
 }, "~S,~A");
+Clazz.defineMethod (c$, "getAtomsWithin", 
+ function (p, offset) {
+var faces = p.faces;
+var vertices = p.vertices;
+var center = (p.center == null ? p.centralAtom : p.center);
+if (p.planes == null) {
+var vNorm =  new JU.V3 ();
+var vAB =  new JU.V3 ();
+p.planes =  new Array (faces.length);
+for (var iface = faces.length; --iface >= 0; ) {
+var plane = p.planes[iface] =  new JU.P4 ();
+JU.Measure.getPlaneThroughPoints (vertices[faces[iface][0]], vertices[faces[iface][1]], vertices[faces[iface][2]], vNorm, vAB, plane);
+}
+}var maxDistance = 0;
+for (var i = p.nVertices; --i >= 0; ) {
+var d = vertices[i].distance (center);
+if (d > maxDistance) maxDistance = d;
+}
+var bsAtoms = JU.BSUtil.copy (this.vwr.getAtomsNearPt (maxDistance + offset, center));
+var atoms = this.vwr.ms.at;
+for (var i = bsAtoms.nextSetBit (0); i >= 0; i = bsAtoms.nextSetBit (i + 1)) {
+for (var f = faces.length; --f >= 0; ) {
+System.out.println (JU.Measure.distanceToPlane (p.planes[f], atoms[i]));
+if (JU.Measure.distanceToPlane (p.planes[f], atoms[i]) > offset + 0.001) {
+bsAtoms.clear (i);
+break;
+}}
+}
+return bsAtoms;
+}, "J.shapespecial.Polyhedron,~N");
 Clazz.defineMethod (c$, "checkID", 
  function (thisID) {
 this.thisID = thisID;
@@ -448,9 +486,12 @@ Clazz.defineMethod (c$, "buildPolyhedra",
 var p = null;
 if (this.thisID != null) {
 if (JU.PT.isWild (this.thisID)) return;
-if (this.center != null) p = this.validatePolyhedron (this.center, this.nPoints);
-} else if (this.info != null && this.info.containsKey ("id")) {
-this.thisID = this.info.get ("id").asString ();
+if (this.center != null) {
+if (this.nPoints == 0) this.setPointsFromBitset ();
+p = this.validatePolyhedron (this.center, this.nPoints);
+}} else if (this.info != null && this.info.containsKey ("id")) {
+var o = this.info.get ("id");
+this.thisID = (Clazz.instanceOf (o, JS.SV) ? (o).asString () : o.toString ());
 p =  new J.shapespecial.Polyhedron ().setInfo (this.vwr, this.info, this.vwr.ms.at);
 }if (p != null) {
 this.addPolyhedron (p);
@@ -486,6 +527,11 @@ if (p != null) this.addPolyhedron (p);
 if (this.haveBitSetVertices) break;
 }
 if (iter != null) iter.release ();
+});
+Clazz.defineMethod (c$, "setPointsFromBitset", 
+ function () {
+if (this.bsVertices != null) for (var i = this.bsVertices.nextSetBit (0); i >= 0 && this.nPoints < 250; i = this.bsVertices.nextSetBit (i + 1)) this.otherAtoms[this.nPoints++] = this.atoms[i];
+
 });
 Clazz.defineMethod (c$, "addPolyhedron", 
  function (p) {
@@ -894,6 +940,7 @@ for (var i = 0; i < this.polyhedronCount; i++) if (this.polyhedrons[i].isValid) 
 
 if (this.drawEdges == 2) J.shape.Shape.appendCmd (s, "polyhedra frontedges");
  else if (this.drawEdges == 1) J.shape.Shape.appendCmd (s, "polyhedra edges");
+ else if (this.drawEdges == 3) J.shape.Shape.appendCmd (s, "polyhedra edgesOnly");
 s.append (this.vwr.getStateCreator ().getAtomShapeState (this));
 var ia;
 for (var i = 0; i < this.polyhedronCount; i++) {
@@ -907,6 +954,7 @@ Clazz.defineStatics (c$,
 "EDGES_NONE", 0,
 "EDGES_ALL", 1,
 "EDGES_FRONT", 2,
+"EDGES_ONLY", 3,
 "MAX_VERTICES", 250,
 "FACE_COUNT_MAX", 247,
 "MAX_OTHER", 498);

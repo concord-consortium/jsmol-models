@@ -126,7 +126,7 @@ for (var i = 0; i < this.shellCount; i++) {
 var tokens = JU.PT.getTokens (this.readLine ());
 var isSpherical = (tokens[4].charAt (0) == '1');
 var slater =  Clazz.newIntArray (4, 0);
-slater[0] = this.parseInt (tokens[3]) - 1;
+slater[0] = this.parseInt (tokens[3]);
 var iBasis = this.parseInt (tokens[0]);
 switch (iBasis) {
 case 0:
@@ -143,7 +143,8 @@ iBasis = (isSpherical ? 5 : 6);
 break;
 }
 slater[1] = iBasis;
-var gaussianPtr = slater[2] = this.parseInt (tokens[2]) - 1;
+slater[2] = this.parseInt (tokens[2]);
+var gaussianPtr = slater[2] - 1;
 var nGaussians = slater[3] = this.parseInt (tokens[1]);
 for (var j = 0; j < nGaussians; j++) typeArray[gaussianPtr + j] = iBasis;
 
@@ -183,7 +184,7 @@ gaussians[i] = data;
 var nCoeff = 0;
 for (var i = 0; i < this.shellCount; i++) {
 var slater = shells.get (i);
-switch (typeArray[slater[2]]) {
+switch (typeArray[slater[2] - 1]) {
 case 0:
 nCoeff++;
 break;

@@ -54,6 +54,7 @@ return true;
 }this.br.reset ();
 } catch (e) {
 if (Clazz.exceptionOf (e, Exception)) {
+System.out.println (e);
 } else {
 throw e;
 }

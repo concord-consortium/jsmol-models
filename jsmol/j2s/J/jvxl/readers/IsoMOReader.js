@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.jvxl.readers");
-Clazz.load (["J.jvxl.readers.AtomDataReader"], "J.jvxl.readers.IsoMOReader", ["java.lang.Float", "java.util.Random", "JU.AU", "$.Measure", "$.P3", "$.PT", "$.V3", "J.api.Interface", "J.quantum.QS", "JU.Logger"], function () {
+Clazz.load (["J.jvxl.readers.AtomDataReader"], "J.jvxl.readers.IsoMOReader", ["java.lang.Boolean", "$.Float", "java.util.Random", "JU.AU", "$.Measure", "$.P3", "$.PT", "$.V3", "J.api.Interface", "J.quantum.QS", "JU.Logger"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.random = null;
 this.points = null;
@@ -12,6 +12,7 @@ this.dfCoefMaps = null;
 this.linearCombination = null;
 this.coefs = null;
 this.isElectronDensityCalc = false;
+this.mo = null;
 this.vDist = null;
 this.qSetupDone = false;
 Clazz.instantialize (this, arguments);
@@ -36,9 +37,9 @@ Clazz.overrideMethod (c$, "setup",
 function (isMapData) {
 this.mos = this.params.moData.get ("mos");
 this.linearCombination = this.params.qm_moLinearCombination;
-var mo = (this.mos != null && this.linearCombination == null ? this.mos.get (this.params.qm_moNumber - 1) : null);
+this.mo = (this.mos != null && this.linearCombination == null ? this.mos.get (this.params.qm_moNumber - 1) : null);
 var haveVolumeData = this.params.moData.containsKey ("haveVolumeData");
-if (haveVolumeData && mo != null) this.params.volumeData = mo.get ("volumeData");
+if (haveVolumeData && this.mo != null) this.params.volumeData = this.mo.get ("volumeData");
 this.setup2 ();
 this.doAddHydrogens = false;
 this.getAtoms (this.params.bsSelected, this.doAddHydrogens, !this.isNci, this.isNci, this.isNci, false, false, this.params.qm_marginAngstroms, (this.isNci ? null : this.params.modelInvRotation));
@@ -51,7 +52,7 @@ className = "quantum.MOCalculation";
 this.setHeader ("MO", "calculation type: " + this.params.moData.get ("calculationType"));
 }this.setRanges (this.params.qm_ptsPerAngstrom, this.params.qm_gridMax, 0);
 if (haveVolumeData) {
-for (var i = this.params.title.length; --i >= 0; ) this.fixTitleLine (i, mo);
+for (var i = this.params.title.length; --i >= 0; ) this.fixTitleLine (i, this.mo);
 
 } else {
 this.q = J.api.Interface.getOption (className, this.sg.atomDataServer, "file");
@@ -59,10 +60,10 @@ if (this.isNci) {
 this.qpc = this.q;
 } else {
 if (this.linearCombination == null) {
-for (var i = this.params.title.length; --i >= 0; ) this.fixTitleLine (i, mo);
+for (var i = this.params.title.length; --i >= 0; ) this.fixTitleLine (i, this.mo);
 
-this.coef = mo.get ("coefficients");
-this.dfCoefMaps = mo.get ("dfCoefMaps");
+this.coef = this.mo.get ("coefficients");
+this.dfCoefMaps = this.mo.get ("dfCoefMaps");
 } else {
 this.coefs = JU.AU.newFloat2 (this.mos.size ());
 for (var i = 1; i < this.linearCombination.length; i += 2) {
@@ -208,6 +209,7 @@ if (!isMonteCarlo) JU.Logger.info ("generating isosurface data for MO using cuto
 if (!this.setupCalculation ()) return;
 this.q.createCube ();
 this.jvxlData.integration = this.q.getIntegration ();
+if (this.mo != null) this.mo.put ("integration", Float.$valueOf (this.jvxlData.integration));
 }});
 Clazz.overrideMethod (c$, "getPlane", 
 function (x) {
@@ -221,7 +223,7 @@ switch (this.params.qmOrbitalType) {
 case 5:
 break;
 case 1:
-return (this.q).setupCalculation (this.volumeData, this.bsMySelected, this.params.moData.get ("calculationType"), this.atomData.xyz, this.atomData.atoms, this.atomData.firstAtomIndex, this.params.moData.get ("shells"), this.params.moData.get ("gaussians"), this.dfCoefMaps, null, this.coef, this.linearCombination, this.params.isSquaredLinear, this.coefs, this.params.moData.get ("isNormalized") == null, this.points);
+return (this.q).setupCalculation (this.volumeData, this.bsMySelected, this.params.moData.get ("calculationType"), this.atomData.xyz, this.atomData.atoms, this.atomData.firstAtomIndex, this.params.moData.get ("shells"), this.params.moData.get ("gaussians"), this.dfCoefMaps, null, this.coef, this.linearCombination, this.params.isSquaredLinear, this.coefs, this.params.moData.get ("isNormalized") !== Boolean.TRUE, this.points);
 case 2:
 return (this.q).setupCalculation (this.volumeData, this.bsMySelected, this.params.moData.get ("calculationType"), this.atomData.xyz, this.atomData.atoms, this.atomData.firstAtomIndex, null, null, null, this.params.moData.get ("slaters"), this.coef, this.linearCombination, this.params.isSquaredLinear, this.coefs, true, this.points);
 case 3:

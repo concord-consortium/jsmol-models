@@ -765,6 +765,7 @@ return this.vwr.evaluateExpression (exp);
 Clazz_overrideMethod (c$, "getModelExtract", 
 function (bs, doTransform, isModelKit, type, allTrajectories) {
 if (type.equalsIgnoreCase ("CIF")) return this.getModelCif (bs);
+if (type.equalsIgnoreCase ("QCJSON")) return this.getQCJSON (bs);
 if (type.equalsIgnoreCase ("CML")) return this.getModelCml (bs, 2147483647, true, doTransform, allTrajectories);
 if (type.equals ("PDB") || type.equals ("PQR")) return this.getPdbAtomData (bs, null, type.equals ("PQR"), doTransform, allTrajectories);
 var asV3000 = type.equalsIgnoreCase ("V3000");
@@ -859,6 +860,13 @@ mol.append (s);
 isOK = this.addMolFile (-1, mol, bsAtoms, bsBonds, asV3000, asJSON, noAromatic, q);
 }return (isOK ? mol.toString () : "ERROR: Too many atoms or bonds -- use V3000 format.");
 }, "JU.BS,~B,~B,~S,~B");
+Clazz_defineMethod (c$, "getQCJSON", 
+ function (bs) {
+var writer = J.api.Interface.getInterface ("J.adapter.writers.QCJSONWriter", this.vwr, "script");
+writer.set (this.vwr, null);
+writer.writeJSON ();
+return writer.toString ();
+}, "JU.BS");
 Clazz_defineMethod (c$, "getModelCif", 
  function (bs) {
 var sb =  new JU.SB ();

@@ -65,7 +65,7 @@ if (!this.isPass2) this.bsForPass2.clearAll ();
 this.slabbing = this.tm.slabEnabled;
 this.slabByAtom = this.vwr.getBoolean (603979939);
 this.endcaps = 3;
-this.dashDots = (this.vwr.getBoolean (603979892) ? J.render.FontLineShapeRenderer.sixdots : J.render.FontLineShapeRenderer.dashes);
+this.dashDots = (this.vwr.getBoolean (603979893) ? J.render.FontLineShapeRenderer.sixdots : J.render.FontLineShapeRenderer.dashes);
 this.isCartesian = (this.exportType == 1);
 this.getMultipleBondSettings (false);
 this.wireframeOnly = !this.vwr.checkMotionRendering (1677721602);

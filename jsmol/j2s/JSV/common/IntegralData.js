@@ -152,7 +152,6 @@ Clazz.defineMethod (c$, "calculateIntegral",
 function () {
 var specXyCoords = this.spec.getXYCoords ();
 this.xyCoords =  new Array (specXyCoords.length);
-var minYForIntegral = -1.7976931348623157E308;
 this.integralTotal = 0;
 this.checkRange ();
 var minY = 1E100;
@@ -160,16 +159,21 @@ for (var i = 0; i < specXyCoords.length; i++) {
 var y = specXyCoords[i].getYVal ();
 if (y < minY && y >= 0) minY = y;
 }
+var minI = 1E100;
+var maxI = -1.0E100;
 for (var i = 0; i < specXyCoords.length; i++) {
 var y = specXyCoords[i].getYVal ();
-if (y > minYForIntegral) this.integralTotal += (y - minY);
+this.integralTotal += (y - minY);
+if (this.integralTotal < minI) minI = this.integralTotal;
+if (this.integralTotal > maxI) maxI = this.integralTotal;
 }
+this.integralTotal = maxI - minI;
 this.intRange = (this.percentRange / 100) / this.integralTotal;
 this.offset = (this.percentOffset / 100);
 var integral = 0;
 for (var i = specXyCoords.length; --i >= 0; ) {
 var y = specXyCoords[i].getYVal ();
-if (y > minYForIntegral) integral += (y - minY);
+integral += (y - minY);
 this.xyCoords[i] =  new JSV.common.Coordinate ().set (specXyCoords[i].getXVal (), integral * this.intRange + this.offset);
 }
 return this.xyCoords;

@@ -10828,7 +10828,7 @@ Jmol = (function(document) {
 		}
 	};
 	var j = {
-		_version: "$Date: 2017-07-06 02:22:33 -0500 (Thu, 06 Jul 2017) $", // svn.keywords:lastUpdated
+		_version: "$Date: 2018-01-28 23:38:52 -0600 (Sun, 28 Jan 2018) $", // svn.keywords:lastUpdated
 		_alertNoBinary: true,
 		// this url is used to Google Analytics tracking of Jmol use. You may remove it or modify it if you wish. 
 		_allowedJmolSize: [25, 2048, 300],   // min, max, default (pixels)
@@ -11348,7 +11348,7 @@ Jmol = (function(document) {
 				query = encodeURIComponent(query.substring(pt));		
 			}
       if (query.indexOf(".mmtf") >= 0) {
-        query = "http://mmtf.rcsb.org/full/" + query.replace(/\.mmtf/, "");
+        query = "https://mmtf.rcsb.org/v1.0/full/" + query.replace(/\.mmtf/, "");
 			} else if (call.indexOf("FILENCI") >= 0) {
 				query = query.replace(/\%2F/g, "/");				
 				query = call.replace(/\%FILENCI/, query);
@@ -11399,11 +11399,49 @@ Jmol = (function(document) {
 		return fSuccess;
 	}
 	
-  Jmol._playAudio = function(filePath) {
+  Jmol.playAudio = function(filePath) {
+    Jmol._playAudio(null, filePath);
+  }
+  
+  Jmol._playAudio = function(applet, params) {
+  
+    var get = (params.get ? function(key){return params.get(key)} : null);
+    var put = (params.put ? function(key,val){return params.put(key,val)} : null);
+    var filePath = (get ? get("audioFile") : params);
+    var jmolAudio = get && get("audioPlayer");
     var audio = document.createElement("audio");
+    put && put("audioElement", audio);
+    var callback = null;
+    if (jmolAudio) {
+      callback = function(type){jmolAudio.processUpdate(type)};
+      jmolAudio.myClip = {
+         open: function() {callback("open")},
+         start: function() { audio.play(); callback("start")},
+         loop: function(n) { audio.loop = (n != 0); },
+         stop: function() { audio.pause(); },
+         close: function() { callback("close") },
+         setMicrosecondPosition: function(us) { audio.currentTime = us / 1e6; }
+      };
+    }    
     audio.controls = "true";
     audio.src = filePath;
-    audio.play();
+    if (get && get("loop"))
+      audio.loop = "true";
+    if (callback) {
+      audio.addEventListener("pause", function() {
+          callback("pause");
+      });
+      audio.addEventListener("play", function() {
+          callback("play");
+      });
+      audio.addEventListener("playing", function() {
+          callback("playing");
+      });
+      audio.addEventListener("ended", function() {
+          callback("ended");
+      });
+      callback("open")
+    }
   }
   
 	Jmol._loadFileData = function(applet, fileName, fSuccess, fError){
@@ -11583,7 +11621,7 @@ Jmol = (function(document) {
 		return true;  
 	}
 
-	Jmol._binaryTypes = ["mmtf",".gz",".bz2",".jpg",".gif",".png",".zip",".jmol",".bin",".smol",".spartan",".pmb",".mrc",".map",".ccp4",".dn6",".delphi",".omap",".pse",".dcd"];
+	Jmol._binaryTypes = ["mmtf",".gz",".bz2",".jpg",".gif",".png",".zip",".jmol",".bin",".smol",".spartan",".pmb",".mrc",".map",".ccp4",".dn6",".delphi",".omap",".pse",".dcd",".uk/pdbe/densities/"];
 
 	Jmol._isBinaryUrl = function(url) {
 		for (var i = Jmol._binaryTypes.length; --i >= 0;)
@@ -13565,6 +13603,7 @@ Jmol._canvasCache = {};
 })(Jmol);
 // JmolApplet.js -- Jmol._Applet and Jmol._Image
 
+// BH 1/28/2018 7:15:09 AM adding _notifyAudioEnded
 // BH 2/14/2016 12:31:02 PM fixed local reader not disappearing after script call
 // BH 2/14/2016 12:30:41 PM Info.appletLoadingImage: "j2s/img/JSmol_spinner.gif", // can be set to "none" or some other image
 // BH 2/14/2016 12:27:09 PM Jmol._setCursor, proto._getSpinner 
@@ -13893,6 +13932,10 @@ Jmol._canvasCache = {};
 		}
 	}
 
+  proto._notifyAudioEnded = function(htParams) {
+    this._applet.notifyAudioEnded(htParams);
+  }
+  
 	proto._readyCallback = function(id, fullid, isReady) {
 		if (!isReady)
 			return; // ignore -- page is closing
@@ -15495,7 +15538,7 @@ Jmol._canvasCache = {};
  // NOTES by Bob Hanson: 
   // J2S class changes:
 
-
+ // BH 10/16/2017 6:30:14 AM fix for prepareCallback reducing arguments length to -1
  // BH 7/7/2017 7:10:39 AM fixes Clazz.clone for arrays
  // BH 1/14/2017 6:23:54 AM adds URL switch  j2sDebugCore
  // BH 1/8/2016 6:21:38 PM adjustments to prevent multiple load of corejmol.js 
@@ -17600,7 +17643,8 @@ Clazz.prepareCallback = function (innerObj, args) {
 	// note that args is an instance of arguments -- NOT an array; does not have the .shift() method!
 	for (var i = 0; i < args.length - 1; i++)
 		args[i] = args[i + 1];
-	args.length--;
+  if (args.length > 0)
+  	args.length--;
 };
 
 /**
@@ -20893,6 +20937,6 @@ Sys.err.write = function (buf, offset, len) {
 })(Clazz, Jmol); // requires JSmolCore.js
 
 }; // called by external application 
-Jmol.___JmolDate="$Date: 2017-08-29 19:36:55 -0500 (Tue, 29 Aug 2017) $"
+Jmol.___JmolDate="$Date: 2018-02-07 23:40:37 -0600 (Wed, 07 Feb 2018) $"
 Jmol.___fullJmolProperties="src/org/jmol/viewer/Jmol.properties"
-Jmol.___JmolVersion="14.20.5" // 2017.08.29
+Jmol.___JmolVersion="14.29.4"

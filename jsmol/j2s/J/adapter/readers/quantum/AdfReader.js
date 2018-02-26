@@ -205,7 +205,7 @@ var energy = this.parseFloatStr (tokens[len - 2 + pt]);
 this.addMo (sym, moPt, occ, energy);
 }
 var iAtom0 = this.asc.getLastAtomSetAtomIndex ();
-for (var i = 0; i < nBF; i++) this.slaterArray[i].iAtom += iAtom0;
+for (var i = 0; i < nBF; i++) this.slaterArray[i].atomNo += iAtom0 + 1;
 
 this.setSlaters (true, true);
 this.sortOrbitals ();

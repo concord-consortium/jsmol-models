@@ -194,10 +194,10 @@ var oType = J.adapter.readers.quantum.GaussianFchkReader.AO_TYPES[Clazz.floatToI
 var nGaussians = Clazz.floatToInt (pps[i]);
 var iatom = Clazz.floatToInt (atomMap[i]);
 var slater =  Clazz.newIntArray (4, 0);
-slater[0] = iatom - 1;
+slater[0] = iatom;
 if (oType.equals ("F7") || oType.equals ("D5")) slater[1] = J.adapter.readers.quantum.BasisFunctionReader.getQuantumShellTagIDSpherical (oType.substring (0, 1));
  else slater[1] = J.adapter.readers.quantum.BasisFunctionReader.getQuantumShellTagID (oType);
-slater[2] = this.gaussianCount;
+slater[2] = this.gaussianCount + 1;
 slater[3] = nGaussians;
 if (this.debugging) JU.Logger.debug ("Slater " + this.shells.size () + " " + JU.Escape.eAI (slater));
 this.shells.addLast (slater);

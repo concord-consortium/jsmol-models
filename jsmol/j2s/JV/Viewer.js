@@ -1,5 +1,5 @@
 Clazz.declarePackage ("JV");
-Clazz.load (["java.lang.Enum", "javajs.api.PlatformViewer", "J.api.JmolViewer", "J.atomdata.AtomDataServer", "java.util.Hashtable"], "JV.Viewer", ["java.io.BufferedInputStream", "$.Reader", "java.lang.Boolean", "$.Character", "$.Float", "$.NullPointerException", "java.util.Arrays", "javajs.awt.Dimension", "JU.AU", "$.BS", "$.CU", "$.DF", "$.Lst", "$.Measure", "$.P3", "$.P3i", "$.PT", "$.Rdr", "$.SB", "$.V3", "J.adapter.smarter.SmarterJmolAdapter", "J.api.Interface", "$.JmolAppConsoleInterface", "J.atomdata.RadiusData", "J.c.FIL", "$.STER", "$.VDW", "J.i18n.GT", "JM.ModelSet", "JS.SV", "$.T", "J.thread.TimeoutThread", "JU.BSUtil", "$.C", "$.CommandHistory", "$.Elements", "$.Escape", "$.GData", "$.JmolMolecule", "$.Logger", "$.Parser", "$.TempArray", "JV.ActionManager", "$.AnimationManager", "$.ColorManager", "$.FileManager", "$.GlobalSettings", "$.JC", "$.ModelManager", "$.SelectionManager", "$.ShapeManager", "$.StateManager", "$.StatusManager", "$.TransformManager", "JV.binding.Binding"], function () {
+Clazz.load (["java.lang.Enum", "javajs.api.PlatformViewer", "J.api.JmolViewer", "J.atomdata.AtomDataServer", "java.util.Hashtable"], "JV.Viewer", ["java.io.BufferedInputStream", "$.BufferedReader", "$.Reader", "java.lang.Boolean", "$.Character", "$.Float", "$.NullPointerException", "java.util.Arrays", "javajs.awt.Dimension", "JU.AU", "$.BS", "$.CU", "$.DF", "$.Lst", "$.Measure", "$.P3", "$.P3i", "$.PT", "$.Quat", "$.Rdr", "$.SB", "$.V3", "J.adapter.smarter.SmarterJmolAdapter", "J.api.Interface", "$.JmolAppConsoleInterface", "J.atomdata.RadiusData", "J.c.FIL", "$.STER", "$.VDW", "J.i18n.GT", "JM.ModelSet", "JS.SV", "$.T", "J.thread.TimeoutThread", "JU.BSUtil", "$.C", "$.CommandHistory", "$.Elements", "$.Escape", "$.GData", "$.JmolMolecule", "$.Logger", "$.Parser", "$.TempArray", "JV.ActionManager", "$.AnimationManager", "$.ColorManager", "$.FileManager", "$.GlobalSettings", "$.JC", "$.ModelManager", "$.SelectionManager", "$.ShapeManager", "$.StateManager", "$.StatusManager", "$.TransformManager", "JV.binding.Binding"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.testAsync = false;
 this.autoExit = false;
@@ -451,6 +451,7 @@ this.setObjectColor ("axis2", "green");
 this.setObjectColor ("axis3", "blue");
 this.am.setAnimationOn (false);
 this.am.setAnimationFps (this.g.animationFps);
+this.sm.playAudio (null);
 this.sm.allowStatusReporting = this.g.statusReporting;
 this.setBooleanProperty ("antialiasDisplay", (isPyMOL ? true : this.g.antialiasDisplay));
 this.stm.resetLighting ();
@@ -695,21 +696,25 @@ function () {
 return this.getStateCreator ().getSpinState (false);
 });
 Clazz.defineMethod (c$, "getOrientationText", 
-function (type, name) {
+function (type, name, bs) {
 switch (type) {
 case 1312817669:
+case 1814695966:
 case 1073741864:
 case 1111492629:
 case 1111492630:
 case 1111492631:
 case 134221850:
-return this.ms.getBoundBoxOrientation (type, this.bsA ());
+if (bs == null) bs = this.bsA ();
+if (bs.isEmpty ()) return (type == 1312817669 ? "0" : type == 1814695966 ? null :  new JU.Quat ());
+var q = this.ms.getBoundBoxOrientation (type, bs);
+return (name === "best" && type != 1312817669 ? (q).div (this.tm.getRotationQ ()) : q);
 case 1073742034:
 return this.stm.getSavedOrientationText (name);
 default:
-return this.tm.getOrientationText (type);
+return this.tm.getOrientationText (type, name === "best");
 }
-}, "~N,~S");
+}, "~N,~S,JU.BS");
 Clazz.defineMethod (c$, "getCurrentColorRange", 
 function () {
 return this.cm.getPropertyColorRange ();
@@ -923,6 +928,10 @@ Clazz.defineMethod (c$, "getLocalUrl",
 function (fileName) {
 return this.apiPlatform.getLocalUrl (fileName);
 }, "~S");
+Clazz.defineMethod (c$, "getFileAsString", 
+function (fileName) {
+return this.getAsciiFileOrNull (fileName);
+}, "~S");
 Clazz.overrideMethod (c$, "getBufferedInputStream", 
 function (fullPathName) {
 return this.fm.getBufferedInputStream (fullPathName);
@@ -973,23 +982,23 @@ return this.loadModelFromFileRepaint ("?", "?", null, DOMNode);
 }, "~O");
 Clazz.defineMethod (c$, "loadModelFromFileRepaint", 
  function (fullPathName, fileName, fileNames, reader) {
-var ret = this.loadModelFromFile (fullPathName, fileName, fileNames, reader, false, null, null, null, 0, false);
+var ret = this.loadModelFromFile (fullPathName, fileName, fileNames, reader, false, null, null, null, 0, " ");
 this.refresh (1, "loadModelFromFileRepaint");
 return ret;
 }, "~S,~S,~A,~O");
 Clazz.defineMethod (c$, "loadModelFromFile", 
-function (fullPathName, fileName, fileNames, reader, isAppend, htParams, loadScript, sOptions, tokType, isConcat) {
+function (fullPathName, fileName, fileNames, reader, isAppend, htParams, loadScript, sOptions, tokType, filecat) {
 if (htParams == null) htParams = this.setLoadParameters (null, isAppend);
-if (isConcat) htParams.put ("concatenate", Boolean.TRUE);
+if (filecat !== " ") htParams.put ("concatenate", Boolean.TRUE);
 var atomSetCollection;
 var saveInfo = this.fm.getFileInfo ();
 if (fileNames != null) {
 if (loadScript == null) {
 loadScript =  new JU.SB ().append ("load files");
-for (var i = 0; i < fileNames.length; i++) loadScript.append (i == 0 || !isConcat ? " " : "+").append ("/*file*/$FILENAME" + (i + 1) + "$");
+for (var i = 0; i < fileNames.length; i++) loadScript.append (i == 0 || filecat == null ? " " : filecat).append ("/*file*/$FILENAME" + (i + 1) + "$");
 
-}if (sOptions.length () > 0) loadScript.append (" /*options*/ ").append (sOptions.toString ());
-var timeBegin = System.currentTimeMillis ();
+if (sOptions.length () > 0) loadScript.append (" /*options*/ ").append (sOptions.toString ());
+}var timeBegin = System.currentTimeMillis ();
 atomSetCollection = this.fm.createAtomSetCollectionFromFiles (fileNames, this.setLoadParameters (htParams, isAppend), isAppend);
 var ms = System.currentTimeMillis () - timeBegin;
 JU.Logger.info ("openFiles(" + fileNames.length + ") " + ms + " ms");
@@ -1019,7 +1028,7 @@ if (fname == null) fname = "";
 if (htParams.containsKey ("loadScript")) loadScript = htParams.get ("loadScript");
 htParams.put ("loadScript", loadScript =  new JU.SB ().append (JU.PT.rep (loadScript.toString (), "$FILENAME$", JU.PT.esc (JV.FileManager.fixDOSName (fname)))));
 }return this.createModelSetAndReturnError (atomSetCollection, isAppend, loadScript, htParams);
-}, "~S,~S,~A,~O,~B,java.util.Map,JU.SB,JU.SB,~N,~B");
+}, "~S,~S,~A,~O,~B,java.util.Map,JU.SB,JU.SB,~N,~S");
 Clazz.defineMethod (c$, "setLigandModel", 
 function (key, data) {
 if (this.ligandModels == null) this.ligandModels =  new java.util.Hashtable ();
@@ -1469,6 +1478,7 @@ this.lastData = null;
 if (this.dm != null) this.dm.clear ();
 this.setBooleanProperty ("legacyjavafloat", false);
 if (resetUndo) {
+if (zapModelKit) this.g.removeParam ("_pngjFile");
 if (zapModelKit && this.g.modelKitMode) {
 this.openStringInlineParamsAppend ("5\n\nC 0 0 0\nH .63 .63 .63\nH -.63 -.63 .63\nH -.63 .63 -.63\nH .63 -.63 -.63", null, true);
 this.setRotationRadius (5.0, true);
@@ -1720,16 +1730,35 @@ return this.ms.getFileData (this.am.cmi);
 });
 Clazz.defineMethod (c$, "getCifData", 
 function (modelIndex) {
-return this.readCifData (this.ms.getModelFileName (modelIndex), this.ms.getModelFileType (modelIndex));
+return this.readCifData (this.ms.getModelFileName (modelIndex), this.ms.getModelFileType (modelIndex).toUpperCase ());
 }, "~N");
 Clazz.defineMethod (c$, "readCifData", 
 function (fileName, type) {
-var data = (fileName == null || fileName.length == 0 ? this.getCurrentFileAsString ("script") : this.getFileAsString3 (fileName, false, null));
-if (data == null) return null;
+var fname = (fileName == null ? this.ms.getModelFileName (this.am.cmi) : fileName);
+if (type == null && fname != null && fname.toUpperCase ().indexOf ("BCIF") >= 0) {
+var is = this.fm.getBufferedInputStream (fname);
+try {
+return (J.api.Interface.getInterface ("JU.MessagePackReader", this, "script")).getMapForStream (is);
+} catch (e) {
+if (Clazz.exceptionOf (e, Exception)) {
+e.printStackTrace ();
+return  new java.util.Hashtable ();
+} else {
+throw e;
+}
+}
+}var data = (fileName == null || fileName.length == 0 ? this.getCurrentFileAsString ("script") : this.getFileAsString3 (fileName, false, null));
+if (data == null || data.length < 2) return null;
 var rdr = JU.Rdr.getBR (data);
 if (type == null) type = this.getModelAdapter ().getFileTypeName (rdr);
-return (type == null ? null : JU.Rdr.readCifData (J.api.Interface.getInterface (("cif2".equals (type.toLowerCase ()) ? "J.adapter.readers.cif.Cif2DataParser" : "JU.CifDataParser"), this, "script"), rdr));
+return (type == null ? null : this.readCifData (null, rdr, type));
 }, "~S,~S");
+Clazz.defineMethod (c$, "readCifData", 
+function (fileName, rdrOrStringData, type) {
+if (rdrOrStringData == null) rdrOrStringData = this.getFileAsString (fileName);
+var rdr = (Clazz.instanceOf (rdrOrStringData, java.io.BufferedReader) ? rdrOrStringData : JU.Rdr.getBR (rdrOrStringData));
+return JU.Rdr.readCifData (J.api.Interface.getInterface (("CIF2".equals (type) ? "J.adapter.readers.cif.Cif2DataParser" : "JU.CifDataParser"), this, "script"), rdr);
+}, "~S,~O,~S");
 Clazz.defineMethod (c$, "getStateCreator", 
 function () {
 if (this.jsc == null) (this.jsc = J.api.Interface.getInterface ("JV.StateCreator", this, "script")).setViewer (this);
@@ -1990,17 +2019,22 @@ this.rm.popHoldRepaint (why.indexOf ("\u0001## REPAINT_IGNORE ##") < 0, why);
 }}, "~S");
 Clazz.overrideMethod (c$, "refresh", 
 function (mode, strWhy) {
-if (this.rm == null || !this.refreshing) return;
-if (mode == 6 && this.getInMotion (true)) return;
+if (this.rm == null || !this.refreshing || mode == 6 && this.getInMotion (true) || !this.isWebGL && mode == 7) return;
 if (this.isWebGL) {
-if (mode == 1 || mode == 2 || mode == 7) {
+switch (mode) {
+case 1:
+case 2:
+case 7:
 this.tm.finalizeTransformParameters ();
 {
 if (!this.html5Applet) return;
 this.html5Applet._refresh();
-}}} else {
-if (mode > 0 && mode != 7) this.rm.repaintIfReady ("refresh " + mode + " " + strWhy);
-}if (mode != 7 && mode % 3 != 0 && this.sm.doSync ()) this.sm.setSync (mode == 2 ? strWhy : null);
+}if (mode == 7) return;
+break;
+}
+} else {
+this.rm.repaintIfReady ("refresh " + mode + " " + strWhy);
+}if (this.sm.doSync ()) this.sm.setSync (mode == 2 ? strWhy : null);
 }, "~N,~S");
 Clazz.defineMethod (c$, "requestRepaintAndWait", 
 function (why) {
@@ -2492,12 +2526,19 @@ format = this.g.smilesUrlFormat;
 break;
 }
 return (withPrefix ? "MOL3D::" : "") + JU.PT.formatStringS (format, "FILE", id);
+case '-':
 case '_':
-if (name.startsWith ("*")) {
-var isDiff = id.startsWith ("*");
+var isDiff = id.startsWith ("*") || id.startsWith ("=");
 if (isDiff) id = id.substring (1);
-return this.g.resolveDataBase ((isDiff ? "pdbemapdiff" : "pdbemap"), id, null);
-}return this.g.fixSurfaceFileNameVariables (id);
+var ciftype = null;
+pt = id.indexOf (".");
+if (pt >= 0) {
+ciftype = id.substring (pt + 1);
+id = id.substring (0, pt);
+}id = this.g.resolveDataBase ((isDiff ? "pdbemapdiff" : "pdbemap") + (type == '-' ? "server" : ""), id, null);
+if ("cif".equals (ciftype)) {
+id = id.$replace ("bcif", "cif");
+}break;
 }
 return id;
 }, "~S,~S,~B");
@@ -2870,11 +2911,12 @@ var ff = this.getP ("_minimizationForceField");
 this.sm.notifyMinimizationStatus (this.getP ("_minimizationStatus"), Clazz.instanceOf (step, String) ? Integer.$valueOf (0) : step, this.getP ("_minimizationEnergy"), (step.toString ().equals ("0") ? Float.$valueOf (0) : this.getP ("_minimizationEnergyDiff")), ff);
 });
 Clazz.defineMethod (c$, "setStatusAtomPicked", 
-function (atomIndex, info, map) {
+function (atomIndex, info, map, andSelect) {
+if (andSelect) this.setSelectionSet (JU.BSUtil.newAndSetBit (atomIndex));
 if (info == null) {
 info = this.g.pickLabel;
 info = (info.length == 0 ? this.getAtomInfoXYZ (atomIndex, this.g.messageStyleChime) : this.ms.getAtomInfo (atomIndex, info, this.ptTemp));
-}this.setPicked (atomIndex);
+}this.setPicked (atomIndex, false);
 if (atomIndex < 0) {
 var m = this.getPendingMeasurement ();
 if (m != null) info = info.substring (0, info.length - 1) + ",\"" + m.getString () + "\"]";
@@ -2884,7 +2926,7 @@ if (atomIndex < 0) return;
 var syncMode = this.sm.getSyncMode ();
 if (syncMode == 1 && this.doHaveJDX ()) this.getJSV ().atomPicked (atomIndex);
 if (this.isJS) this.updateJSView (this.ms.at[atomIndex].mi, atomIndex);
-}, "~N,~S,java.util.Map");
+}, "~N,~S,java.util.Map,~B");
 Clazz.defineMethod (c$, "setStatusDragDropped", 
 function (mode, x, y, fileName) {
 if (mode == 0) {
@@ -3044,6 +3086,10 @@ case 603979856:
 return this.g.hiddenLinesDashed;
 case 1073742086:
 return this.ms.getMSInfoB ("isPDB");
+case 603979802:
+return this.g.autoplayMovie;
+case 603979797:
+return !this.headless && this.g.allowAudio;
 case 603979780:
 return this.g.allowGestures;
 case 603979784:
@@ -3128,6 +3174,8 @@ case 603979873:
 return this.g.legacyAutoBonding;
 case 603979874:
 return this.g.legacyHAddition;
+case 603979875:
+return this.g.legacyJavaFloat;
 case 603979877:
 return this.g.logGestures;
 case 603979878:
@@ -3144,16 +3192,20 @@ case 603979889:
 return this.g.navigationMode;
 case 603979890:
 return this.g.navigationPeriodic;
-case 603979892:
+case 603979893:
 return this.g.partialDots;
-case 603979895:
+case 603979896:
 return this.g.pdbSequential;
-case 603979897:
+case 603979898:
 return this.g.preserveState;
 case 603979900:
-return this.g.ribbonBorder;
+return this.refreshing;
 case 603979901:
+return this.g.ribbonBorder;
+case 603979902:
 return this.g.rocketBarrels;
+case 603979892:
+return this.g.noDelay;
 case 603979906:
 return this.g.selectAllModels;
 case 603979920:
@@ -3313,15 +3365,6 @@ Clazz.defineMethod (c$, "setStringPropertyTok",
 switch (tok) {
 case 545259570:
 this.g.nihResolverFormat = value;
-break;
-case 545259556:
-this.g.edsUrlCutoff = value;
-break;
-case 545259557:
-this.g.edsUrlFormat = value;
-break;
-case 545259558:
-this.g.edsUrlFormatDiff = value;
 break;
 case 545259521:
 this.setAnimationMode (value);
@@ -3868,6 +3911,16 @@ Clazz.defineMethod (c$, "setBooleanPropertyTok",
  function (key, tok, value) {
 var doRepaint = true;
 switch (tok) {
+case 603979802:
+this.g.autoplayMovie = value;
+break;
+case 603979797:
+value = false;
+this.g.allowAudio = value;
+break;
+case 603979892:
+this.g.noDelay = value;
+break;
 case 603979891:
 this.g.nboCharges = value;
 break;
@@ -3933,7 +3986,7 @@ break;
 case 603979867:
 this.g.isosurfaceKey = value;
 break;
-case 603979892:
+case 603979893:
 this.g.partialDots = value;
 break;
 case 603979873:
@@ -3985,7 +4038,7 @@ break;
 case 603979784:
 this.g.allowMultiTouch = value;
 break;
-case 603979897:
+case 603979898:
 this.g.preserveState = value;
 this.ms.setPreserveState (value);
 this.undoClear ();
@@ -4001,7 +4054,7 @@ break;
 case 603979940:
 this.g.slabByMolecule = value;
 break;
-case 603979902:
+case 603979903:
 this.g.saveProteinStructureState = value;
 break;
 case 603979780:
@@ -4042,13 +4095,13 @@ break;
 case 603979880:
 this.g.messageStyleChime = value;
 break;
-case 603979895:
+case 603979896:
 this.g.pdbSequential = value;
 break;
-case 603979893:
+case 603979894:
 this.g.pdbAddHydrogens = value;
 break;
-case 603979894:
+case 603979895:
 this.g.pdbGetHeader = value;
 break;
 case 603979838:
@@ -4149,7 +4202,7 @@ break;
 case 603979930:
 this.g.showNavigationPointAlways = value;
 break;
-case 603979899:
+case 603979900:
 this.setRefreshing (value);
 break;
 case 603979869:
@@ -4239,7 +4292,7 @@ case 603979965:
 this.jmolTest ();
 this.g.testFlag4 = value;
 break;
-case 603979900:
+case 603979901:
 this.g.ribbonBorder = value;
 break;
 case 603979816:
@@ -4248,7 +4301,7 @@ break;
 case 603979820:
 this.g.cartoonRockets = value;
 break;
-case 603979901:
+case 603979902:
 this.g.rocketBarrels = value;
 break;
 case 603979850:
@@ -4271,7 +4324,7 @@ return;
 case 603979825:
 this.setDebugScript (value);
 return;
-case 603979896:
+case 603979897:
 this.setPerspectiveDepth (value);
 return;
 case 603979798:
@@ -4301,7 +4354,7 @@ doRepaint = false;
 this.g.zeroBasedXyzRasmol = value;
 this.reset (true);
 break;
-case 603979898:
+case 603979899:
 doRepaint = false;
 this.g.rangeSelected = value;
 break;
@@ -4784,7 +4837,9 @@ break;
 if (this.shm.checkObjectDragged (prevX, prevY, x, y, action, this.getVisibleFramesBitSet (), iShape)) {
 this.refresh (1, "checkObjectDragged");
 if (iShape == 22) this.scriptEcho (this.getShapeProperty (22, "command"));
-}}, "~N,~N,~N,~N,~N");
+return true;
+}return false;
+}, "~N,~N,~N,~N,~N");
 Clazz.defineMethod (c$, "rotateAxisAngleAtCenter", 
 function (eval, rotCenter, rotAxis, degreesPerSecond, endDegrees, isSpin, bsSelected) {
 var isOK = this.tm.rotateAxisAngleAtCenter (eval, rotCenter, rotAxis, degreesPerSecond, endDegrees, isSpin, bsSelected);
@@ -4953,7 +5008,7 @@ bs.clear (imax);
 }
 if (isClick) this.undoMoveActionClear (atomIndex, 2, true);
 this.invertSelected (null, null, atomIndex, bs);
-if (isClick) this.setStatusAtomPicked (atomIndex, "inverted: " + JU.Escape.eBS (bs), null);
+if (isClick) this.setStatusAtomPicked (atomIndex, "inverted: " + JU.Escape.eBS (bs), null, true);
 }, "~N,~B");
 Clazz.defineMethod (c$, "invertSelected", 
 function (pt, plane, iAtom, bsAtoms) {
@@ -5200,7 +5255,7 @@ if (type == '2') {
 this.fm.loadImage (s, "\1" + smiles, false);
 return s;
 }if (type == '/') {
-if (JU.PT.isOneOf (info, ";alc;cdxml;cerius;charmm;cif;cml;ctx;gjf;gromacs;hyperchem;jme;maestro;mol;mol2;sybyl2;mrv;pdb;sdf;sdf3000;sln;smiles;xyz;")) s += "file?format=" + info;
+if (JU.PT.isOneOf (info, ";alc;cdxml;cerius;charmm;cif;cml;ctx;gjf;gromacs;hyperchem;jme;maestro;mol;mol2;sybyl2;mrv;pdb;sdf;sdf3000;sln;smiles;xyz")) s += "file?format=" + info;
  else s += JU.PT.rep (info, " ", "%20");
 }s = this.getFileAsString4 (s, -1, false, false, false, "file");
 if (type == 'M' && s.indexOf ("\n") > 0) s = s.substring (0, s.indexOf ("\n"));
@@ -5276,10 +5331,11 @@ return this.getOutputManager ().processWriteOrCapture (params);
 }, "java.util.Map");
 Clazz.defineMethod (c$, "createZip", 
 function (fileName, type, params) {
+var state = this.getStateInfo ();
 var data = params.get ("data");
-params.put ("fileName", fileName);
+if (fileName != null) params.put ("fileName", fileName);
 params.put ("type", type);
-params.put ("text", this.getStateInfo ());
+params.put ("text", state);
 if (Clazz.instanceOf (data, Array)) params.put ("scripts", data);
  else if (Clazz.instanceOf (data, JU.Lst)) params.put ("imageData", data);
 return this.getOutputManager ().outputToFile (params);
@@ -5808,7 +5864,7 @@ return this.getChemicalInfo (smiles, "smiles", null).trim ();
 }, "JU.BS,~N,~N,~N,~S");
 Clazz.defineMethod (c$, "alert", 
 function (msg) {
-this.prompt (msg, "OK", null, true);
+this.prompt (msg, null, null, true);
 }, "~S");
 Clazz.defineMethod (c$, "prompt", 
 function (label, data, list, asButtons) {
@@ -5862,10 +5918,11 @@ return;
 }
 }, "java.util.Map,~S");
 Clazz.defineMethod (c$, "setPicked", 
-function (atomIndex) {
+function (atomIndex, andReset) {
 var pickedSet = null;
 var pickedList = null;
 if (atomIndex >= 0) {
+if (andReset) this.setPicked (-1, false);
 this.g.setI ("_atompicked", atomIndex);
 pickedSet = this.g.getParam ("picked", true);
 pickedList = this.g.getParam ("pickedList", true);
@@ -5879,7 +5936,7 @@ JS.SV.getBitSet (pickedSet, false).set (atomIndex);
 var p = pickedList.pushPop (null, null);
 if (p.tok == 10) pickedList.pushPop (null, p);
 if (p.tok != 10 || !(p.value).get (atomIndex)) pickedList.pushPop (null, JS.SV.newV (10, JU.BSUtil.newAndSetBit (atomIndex)));
-}, "~N");
+}, "~N,~B");
 Clazz.overrideMethod (c$, "runScript", 
 function (script) {
 return "" + this.evaluateExpression ( Clazz.newArray (-1, [ Clazz.newArray (-1, [JS.T.t (134222850), JS.T.t (268435472), JS.SV.newS (script), JS.T.t (268435473)])]));
@@ -5946,10 +6003,9 @@ return this.ms.getPartialCharges ();
 Clazz.defineMethod (c$, "calculatePartialCharges", 
 function (bsSelected) {
 if (bsSelected == null || bsSelected.isEmpty ()) bsSelected = this.getModelUndeletedAtomsBitSetBs (this.getVisibleFramesBitSet ());
-var pt = bsSelected.nextSetBit (0);
-if (pt < 0) return;
+if (bsSelected.isEmpty ()) return;
 JU.Logger.info ("Calculating MMFF94 partial charges for " + bsSelected.cardinality () + " atoms");
-this.getMinimizer (true).calculatePartialCharges (this.ms, bsSelected);
+this.getMinimizer (true).calculatePartialCharges (this.ms, bsSelected, null);
 }, "JU.BS");
 Clazz.defineMethod (c$, "setCurrentModelID", 
 function (id) {
@@ -6274,10 +6330,21 @@ Clazz.defineMethod (c$, "getAuxiliaryInfoForAtoms",
 function (atomExpression) {
 return this.ms.getAuxiliaryInfo (this.ms.getModelBS (this.getAtomBitSet (atomExpression), false));
 }, "~O");
+Clazz.defineMethod (c$, "getJSJSONParser", 
+ function () {
+return (this.jsonParser == null ? this.jsonParser = J.api.Interface.getInterface ("JU.JSJSONParser", this, "script") : this.jsonParser);
+});
 Clazz.defineMethod (c$, "parseJSON", 
-function (ann) {
-if (this.jsonParser == null) this.jsonParser = (J.api.Interface.getInterface ("JU.JSJSONParser", this, "script"));
-return this.jsonParser.parseMap (ann, true);
+function (str) {
+return (str == null ? null : str.startsWith ("{") ? this.parseJSONMap (str) : this.parseJSONArray (str));
+}, "~S");
+Clazz.defineMethod (c$, "parseJSONMap", 
+function (jsonMap) {
+return this.getJSJSONParser ().parseMap (jsonMap, true);
+}, "~S");
+Clazz.defineMethod (c$, "parseJSONArray", 
+function (jsonArray) {
+return this.getJSJSONParser ().parse (jsonArray, true);
 }, "~S");
 Clazz.defineMethod (c$, "getSymTemp", 
 function () {
@@ -6291,10 +6358,6 @@ Clazz.defineMethod (c$, "getTriangulator",
 function () {
 return (this.triangulator == null ? (this.triangulator = J.api.Interface.getUtil ("Triangulator", this, "script")) : this.triangulator);
 });
-Clazz.defineMethod (c$, "playAudio", 
-function (fileNameOrDataURI) {
-this.sm.playAudio (fileNameOrDataURI);
-}, "~S");
 Clazz.defineMethod (c$, "getCurrentModelAuxInfo", 
 function () {
 return (this.am.cmi >= 0 ? this.ms.getModelAuxiliaryInfo (this.am.cmi) : null);
@@ -6329,6 +6392,18 @@ function (bsAtoms) {
 if (bsAtoms == null) bsAtoms = this.bsA ();
 return this.ms.calculateChiralityForAtoms (bsAtoms, true);
 }, "JU.BS");
+Clazz.defineMethod (c$, "getSubstructureSetArray", 
+function (pattern, bsSelected, flags) {
+return this.getSmilesMatcher ().getSubstructureSetArray (pattern, this.ms.at, this.ms.ac, bsSelected, null, flags);
+}, "~S,JU.BS,~N");
+Clazz.defineMethod (c$, "getPdbID", 
+function () {
+return (this.ms.getInfo (this.am.cmi, "isPDB") === Boolean.TRUE ? this.ms.getInfo (this.am.cmi, "pdbID") : null);
+});
+Clazz.defineMethod (c$, "getModelInfo", 
+function (key) {
+return this.ms.getInfo (this.am.cmi, key);
+}, "~S");
 Clazz.pu$h(self.c$);
 c$ = Clazz.declareType (JV.Viewer, "ACCESS", Enum);
 Clazz.defineEnumConstant (c$, "NONE", 0, []);
@@ -6349,6 +6424,11 @@ c$.strOSName = c$.prototype.strOSName = System.getProperty ("os.name", "");
 c$.strJavaVersion = c$.prototype.strJavaVersion = "Java " + System.getProperty ("java.version", "");
 Clazz.defineStatics (c$,
 "version_date", null,
+"REFRESH_REPAINT", 1,
+"REFRESH_SYNC", 2,
+"REFRESH_SYNC_MASK", 3,
+"REFRESH_REPAINT_NO_MOTION_ONLY", 6,
+"REFRESH_SEND_WEBGL_NEW_ORIENTATION", 7,
 "SYNC_GRAPHICS_MESSAGE", "GET_GRAPHICS",
 "SYNC_NO_GRAPHICS_MESSAGE", "SET_GRAPHICS_OFF");
 c$.staticFunctions = c$.prototype.staticFunctions =  new java.util.Hashtable ();

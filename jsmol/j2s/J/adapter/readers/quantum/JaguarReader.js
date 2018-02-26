@@ -20,18 +20,20 @@ return true;
 }if (this.line.startsWith ("  basis set:")) {
 this.moData.put ("energyUnits", "");
 this.moData.put ("calculationType", this.calculationType = this.line.substring (13).trim ());
-return true;
+if ("sto-3g".equals (this.calculationType)) {
+JU.Logger.error ("STO-3G not supported for Jaguar -- unusual SP basis definition.");
+}return true;
 }if (this.line.indexOf ("XXXXXShell information") >= 0) {
 this.readUnnormalizedBasis ();
 return true;
 }if (this.line.indexOf ("Normalized coefficients") >= 0) {
-this.readBasisNormalized ();
+if (!"sto-3g".equals (this.calculationType)) this.readBasisNormalized ();
 return true;
 }if (this.line.startsWith (" LUMO energy:")) {
 this.lumoEnergy = this.parseFloatStr (this.line.substring (13));
 return true;
 }if (this.line.indexOf ("final wvfn") >= 0) {
-this.readJaguarMolecularOrbitals ();
+if (this.shells != null) this.readJaguarMolecularOrbitals ();
 return true;
 }if (this.line.startsWith ("  harmonic frequencies in")) {
 this.readFrequencies ();
@@ -65,7 +67,7 @@ for (var i = 1; i < tokens.length; i++) this.asc.atoms[iAtom++].partialCharge = 
 Clazz.defineMethod (c$, "readUnnormalizedBasis", 
  function () {
 var lastAtom = "";
-var iAtom = -1;
+var iAtom = 0;
 var sdata =  Clazz.newIntArray (this.moCount, 4, 0);
 var sgdata = JU.AU.createArrayOfArrayList (this.moCount);
 var tokens;
@@ -114,7 +116,7 @@ JU.Logger.debug (this.gaussianCount + " gaussian primitives read");
 Clazz.defineMethod (c$, "readBasisNormalized", 
  function () {
 var lastAtom = "";
-var iAtom = -1;
+var iAtom = 0;
 var id;
 var iFunc = 0;
 var iFuncLast = -1;
@@ -133,22 +135,37 @@ lastAtom = tokens[0];
 id = tokens[2];
 var iType = J.adapter.readers.quantum.BasisFunctionReader.getQuantumShellTagID (id);
 iFunc = this.parseIntStr (tokens[3]) - 1;
+var gPtr = gdata.size ();
 if (iFunc == iFuncLast) {
+sdata[3]++;
+} else if (iFunc < iFuncLast) {
+for (var i = gdata.size (); --i >= 0; ) {
+if (gdata.get (i)[2] == iFunc) {
+gPtr = i + 1;
+break;
+}}
+for (var i = sarray.size (); --i >= 0; ) {
+if (sarray.get (i)[4] == iFunc) {
+sarray.get (i)[3]++;
+while (++i < sarray.size ()) {
+sarray.get (i)[2]++;
+}
+break;
+}}
 } else {
-sdata =  Clazz.newIntArray (-1, [iAtom, iType, this.gaussianCount, 0]);
+sdata =  Clazz.newIntArray (-1, [iAtom, iType, this.gaussianCount + 1, 1, iFunc]);
 sarray.addLast (sdata);
 iFuncLast = iFunc;
 }this.gaussianCount++;
-sdata[3]++;
 var z = this.parseFloatStr (tokens[4]);
 var rCoef = this.parseFloatStr (tokens[5]);
 if (id.equals ("XX")) rCoef *= 1.7320508;
-gdata.addLast ( Clazz.newFloatArray (-1, [z, rCoef]));
+gdata.add (gPtr,  Clazz.newFloatArray (-1, [z, rCoef, iFunc]));
 }
 var garray = JU.AU.newFloat2 (this.gaussianCount);
 for (var i = gdata.size (); --i >= 0; ) garray[i] = gdata.get (i);
 
-this.moData.put ("shells", sarray);
+this.moData.put ("shells", this.shells = sarray);
 this.moData.put ("gaussians", garray);
 if (this.debugging) {
 JU.Logger.debug (sarray.size () + " slater shells read");

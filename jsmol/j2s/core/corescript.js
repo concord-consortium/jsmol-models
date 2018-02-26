@@ -2757,7 +2757,7 @@ this.chk = this.isCmdLine_c_or_C_Option = isCmdLine_c_or_C_Option;
 this.historyDisabled = historyDisabled;
 this.outputBuffer = outputBuffer;
 this.currentThread = Thread.currentThread ();
-this.allowJSThreads = allowThreads;
+this.allowJSThreads =  new Boolean (allowThreads & !this.vwr.getBoolean (603979892)).valueOf ();
 this.listCommands = listCommands;
 this.timeBeginExecution = System.currentTimeMillis ();
 this.executionStopped = this.executionPaused = false;
@@ -3041,6 +3041,7 @@ Clazz_overrideMethod (c$, "getAtomBitSet",
 function (atomExpression) {
 if (Clazz_instanceOf (atomExpression, JU.BS)) return atomExpression;
 var bs =  new JU.BS ();
+var executing = this.executing;
 try {
 this.pushContext (null, "getAtomBitSet");
 var scr = "select (" + atomExpression + ")";
@@ -3058,6 +3059,7 @@ JU.Logger.error ("getAtomBitSet " + atomExpression + "\n" + ex);
 throw ex;
 }
 }
+this.executing = executing;
 return bs;
 }, "~O");
 Clazz_defineMethod (c$, "compileScript", 
@@ -3108,13 +3110,19 @@ data[0] = filename;
 if (!this.vwr.fm.getFileDataAsString (data, -1, false, true, false)) {
 this.setErrorMessage ("io error reading " + data[0] + ": " + data[1]);
 return false;
-}if (("\n" + data[1]).indexOf ("\nJmolManifest.txt\n") >= 0) {
+}var movieScript = "";
+if (("\n" + data[1]).indexOf ("\nJmolManifest.txt\n") >= 0) {
 var path;
 if (filename.endsWith (".all.pngj") || filename.endsWith (".all.png")) {
 path = "|state.spt";
 filename += "|";
 } else {
-data[0] = filename += "|JmolManifest.txt";
+if (data[1].indexOf ("movie.spt") >= 0) {
+data[0] = filename + "|movie.spt";
+if (this.vwr.fm.getFileDataAsString (data, -1, false, true, false)) {
+movieScript = data[1];
+}}filename += "|JmolManifest.txt";
+data[0] = filename;
 if (!this.vwr.fm.getFileDataAsString (data, -1, false, true, false)) {
 this.setErrorMessage ("io error reading " + data[0] + ": " + data[1]);
 return false;
@@ -3124,14 +3132,16 @@ data[0] = filename = filename.substring (0, filename.lastIndexOf ("|")) + path;
 if (!this.vwr.fm.getFileDataAsString (data, -1, false, true, false)) {
 this.setErrorMessage ("io error reading " + data[0] + ": " + data[1]);
 return false;
-}}}this.scriptFileName = filename;
+}}if (filename.endsWith ("|state.spt")) {
+this.vwr.g.setO ("_pngjFile", filename.substring (0, filename.length - 10) + "?");
+}}this.scriptFileName = filename;
 data[1] = JV.FileManager.getEmbeddedScript (data[1]);
 var script = this.fixScriptPath (data[1], data[0]);
 if (scriptPath == null) {
 scriptPath = this.vwr.fm.getFilePath (filename, false, false);
 scriptPath = scriptPath.substring (0, Math.max (scriptPath.lastIndexOf ("|"), scriptPath.lastIndexOf ("/")));
 }script = JV.FileManager.setScriptFileReferences (script, localPath, remotePath, scriptPath);
-return this.compileScript (filename, script, this.debugScript);
+return this.compileScript (filename, script + movieScript, this.debugScript);
 }, "~S,~S,~S,~S");
 Clazz_overrideMethod (c$, "evalFunctionFloat", 
 function (func, params, values) {
@@ -3821,7 +3831,7 @@ if (sb.length () > 0) this.vwr.showString (sb.toString (), false);
 }, "~S");
 Clazz_overrideMethod (c$, "notifyResumeStatus", 
 function () {
-if (!this.chk && !this.executionStopped && !this.executionStepping) {
+if (!this.chk && !this.executionStopped && !this.executionStepping && !this.executionPaused) {
 this.vwr.scriptStatus ("script execution " + (this.$error || this.executionStopped ? "interrupted" : "resumed"));
 }if (JU.Logger.debugging) JU.Logger.debug ("script execution resumed");
 });
@@ -4063,9 +4073,6 @@ break;
 case 266265:
 if (!this.chk) this.vwr.initialize (!this.$isStateScript, false);
 break;
-case 4122:
-this.cmdInvertSelected ();
-break;
 case 134238732:
 this.cmdScript (134238732, null, null);
 break;
@@ -4205,6 +4212,7 @@ case 4106:
 case 528395:
 case 1613238294:
 case 4120:
+case 4122:
 case 528443:
 case 4124:
 case 4125:
@@ -5451,53 +5459,6 @@ if (strLabel.equalsIgnoreCase ("on")) strLabel = "%U";
  else if (strLabel.equalsIgnoreCase ("off")) strLabel = null;
 this.vwr.setHoverLabel (strLabel);
 });
-Clazz_defineMethod (c$, "cmdInvertSelected", 
- function () {
-var pt = null;
-var plane = null;
-var bs = null;
-var iAtom = -2147483648;
-var ipt = 1;
-switch (this.tokAt (1)) {
-case 0:
-if (this.chk) return;
-bs = this.vwr.bsA ();
-pt = this.vwr.ms.getAtomSetCenter (bs);
-this.vwr.invertAtomCoordPt (pt, bs);
-return;
-case 528443:
-case 1140850689:
-ipt++;
-case 10:
-case 1073742325:
-case 12290:
-bs = this.atomExpressionAt (ipt);
-if (!this.isAtomExpression (this.iToken + 1)) {
-this.checkLengthErrorPt (this.iToken + 1, this.iToken + 1);
-if (!this.chk) {
-for (var i = bs.nextSetBit (0); i >= 0; i = bs.nextSetBit (i + 1)) {
-this.vwr.invertRingAt (i, false);
-}
-}return;
-}iAtom = bs.nextSetBit (0);
-bs = this.atomExpressionAt (this.iToken + 1);
-break;
-case 134217751:
-pt = this.centerParameter (2, null);
-break;
-case 134217750:
-plane = this.planeParameter (1);
-break;
-case 134219265:
-plane = this.hklParameter (2);
-break;
-}
-this.checkLengthErrorPt (this.iToken + 1, 1);
-if (plane == null && pt == null && iAtom == -2147483648) this.invArg ();
-if (this.chk) return;
-if (iAtom == -1) return;
-this.vwr.invertSelected (pt, plane, iAtom, bs);
-});
 Clazz_defineMethod (c$, "cmdLabel", 
  function (index, bs) {
 if (this.chk) return;
@@ -5533,6 +5494,7 @@ var isAsync = this.vwr.async;
 var isConcat = false;
 var doOrient = false;
 var appendNew = this.vwr.getBoolean (603979792);
+var isAudio = false;
 var filename = null;
 var bsModels;
 var i = (this.tokAt (0) == 134221834 ? 0 : 1);
@@ -5615,8 +5577,9 @@ modelName = this.optParameterAsString (++i);
 tok = JS.T.getTokFromName (modelName);
 break;
 case 1073741851:
-if (!this.chk) this.vwr.playAudio (this.optParameterAsString (++i));
-return;
+isAudio = true;
+i++;
+break;
 case 1073741824:
 i++;
 loadScript.append (" " + modelName);
@@ -5636,6 +5599,10 @@ if (this.optParameterAsString (i).equals ("+")) {
 isConcat = true;
 i++;
 loadScript.append (" +");
+}if (this.optParameterAsString (i).equals ("-")) {
+isConcat = true;
+i++;
+loadScript.append (" -");
 }if (this.tokAt (i) == 7) {
 filenames = this.stringParameterSet (i);
 i = this.iToken;
@@ -5751,12 +5718,13 @@ appendedData = this.stringParameter (i++);
 } else {
 var fNames =  new JU.Lst ();
 if (i == 1) {
-if (this.tokAt (i + 1) == 268435617) {
+if (this.tokAt (i + 1) == 268435617 || this.tokAt (i + 1) == 268435616) {
 modelName = "files";
 } else {
 i++;
 }loadScript.append (" " + modelName);
-}filter = this.getLoadFilesList (i, loadScript, sOptions, htParams, fNames);
+}if (this.tokAt (i + 1) == 268435616) isConcat = true;
+filter = this.getLoadFilesList (i, loadScript, sOptions, htParams, fNames);
 filenames = fNames.toArray ( new Array (nFiles = fNames.size ()));
 if (!isConcat && loadScript.indexOf ("/*concat*/") >= 0) isConcat = true;
 }if (!doLoadFiles) return;
@@ -5792,6 +5760,7 @@ htParams.put ("fileData", o);
 localName = null;
 filename = this.loadFileAsync ("LOAD" + (isAppend ? "_APPEND_" : "_"), filename, i, !isAppend && this.pc != this.pcResume);
 }}var out = null;
+var filecat = null;
 if (localName != null) {
 if (localName.equals (".")) localName = this.vwr.fm.getFilePath (filename, false, true);
 if (localName.length == 0 || this.vwr.fm.getFilePath (localName, false, false).equalsIgnoreCase (this.vwr.fm.getFilePath (filename, false, false))) this.invArg ();
@@ -5810,8 +5779,7 @@ if (!filename.equals ("String[]")) loadScript.append ("/*file*/").append ((local
 isConcat = true;
 var pt = filename.indexOf ("/");
 var id;
-if (pt == 1 && this.vwr.ms.getInfo (this.vwr.am.cmi, "isPDB") === Boolean.TRUE) {
-id = this.vwr.ms.getInfo (this.vwr.am.cmi, "modelName");
+if (pt == 1 && (id = this.vwr.getPdbID ()) != null) {
 filename = filename.substring (0, 1) + id + filename.substring (1);
 pt = filename.indexOf ("/");
 } else {
@@ -5825,19 +5793,29 @@ filenames = (ext.equals ("all") ?  Clazz_newArray (-1, [filename, "*dom/" + id, 
 filename = "fileSet";
 loadScript = null;
 isVariable = false;
-sOptions.setLength (0);
+filecat = "-";
 } else {
 filename += "/" + ext;
-}}if (sOptions.length () > 0) loadScript.append (" /*options*/ ").append (sOptions.toString ());
+}}if (loadScript != null) {
+if (sOptions.length () > 0) loadScript.append (" /*options*/ ").append (sOptions.toString ());
 if (isVariable) loadScript.append ("\n  }");
-if (loadScript != null) htParams.put ("loadScript", loadScript);
+htParams.put ("loadScript", loadScript);
+}}if (isAudio) {
+if (filename != null) htParams.put ("audioFile", filename);
+this.addFilterAttribute (htParams, filter, "id");
+this.addFilterAttribute (htParams, filter, "pause");
+this.addFilterAttribute (htParams, filter, "play");
+this.addFilterAttribute (htParams, filter, "ended");
+this.addFilterAttribute (htParams, filter, "action");
+this.vwr.sm.playAudio (htParams);
+return;
 }this.setCursorWait (true);
 var timeMsg = this.vwr.getBoolean (603979934);
 if (timeMsg) JU.Logger.startTimer ("load");
 if (!this.$isStateScript && !isAppend) this.vwr.setBooleanProperty ("legacyJavaFloat", false);
 if (isMutate) htParams.put ("isMutate", Boolean.TRUE);
 htParams.put ("eval", this);
-errMsg = this.vwr.loadModelFromFile (null, filename, filenames, null, isAppend, htParams, loadScript, sOptions, tokType, isConcat);
+errMsg = this.vwr.loadModelFromFile (null, filename, filenames, null, isAppend, htParams, loadScript, sOptions, tokType, filecat != null ? filecat : isConcat ? "+" : " ");
 if (timeMsg) this.showString (JU.Logger.getTimerMsg ("load", 0));
 if (out != null) {
 this.vwr.fm.setFileInfo ( Clazz_newArray (-1, [localName]));
@@ -5851,7 +5829,12 @@ return;
 }if (errMsg != null && !this.isCmdLine_c_or_C_Option) {
 if (errMsg.indexOf ("NOTE: file recognized as a script file: ") == 0) {
 filename = errMsg.substring ("NOTE: file recognized as a script file: ".length).trim ();
-this.cmdScript (0, filename, null);
+if (filename.indexOf ("png|") >= 0 && filename.endsWith ("pdb|state.spt")) {
+filename = filename.substring (0, filename.lastIndexOf ("|"));
+filename += filename.substring (filename.lastIndexOf ("|"));
+this.runScript ("load \"" + filename + "\"");
+return;
+}this.cmdScript (0, filename, null);
 return;
 }if (this.vwr.async && errMsg.startsWith (JV.JC.READER_NOT_FOUND)) {
 throw  new JS.ScriptInterruption (this, "async", 1);
@@ -5859,6 +5842,11 @@ throw  new JS.ScriptInterruption (this, "async", 1);
 }if (this.debugHigh) this.report ("Successfully loaded:" + (filenames == null ? htParams.get ("fullPathName") : modelName), false);
 this.finalizeLoad (isAppend, appendNew, isConcat, doOrient, nFiles, ac0, modelCount0);
 });
+Clazz_defineMethod (c$, "addFilterAttribute", 
+ function (htParams, filter, key) {
+var val = JU.PT.getQuotedOrUnquotedAttribute (filter, key);
+if (val != null && val.length > 0) htParams.put (key, val);
+}, "java.util.Map,~S,~S");
 Clazz_defineMethod (c$, "addLoadData", 
  function (loadScript, key, htParams, i) {
 loadScript.append (" /*data*/ data");
@@ -5896,6 +5884,10 @@ while (i < this.slen) {
 switch (this.tokAt (i)) {
 case 268435617:
 loadScript.append ("/*concat*/ +");
+++i;
+continue;
+case 268435616:
+loadScript.append (" -");
 ++i;
 continue;
 case 2:
@@ -6060,6 +6052,16 @@ var m;
 if (!this.chk && modelIndex >= 0 && (m = this.vwr.ms.getJmolDataSourceFrame (modelIndex)) >= 0) this.vwr.setCurrentModelIndex (m == modelIndex ? -2147483648 : m);
 return;
 }switch (this.tokAt (1)) {
+case 1073877010:
+if (!this.chk && isFrame && this.slen == 2) {
+while (++modelIndex < this.vwr.ms.mc) {
+if (!this.vwr.ms.am[modelIndex].auxiliaryInfo.containsKey ("moData")) continue;
+this.vwr.am.setFrame (modelIndex);
+this.showString ("Frame set to " + (modelIndex + 1));
+return;
+}
+this.showString ("No molecular orbitals");
+}return;
 case 2:
 if (isFrame && this.slen == 2) {
 if (!this.chk) this.vwr.am.setFrame (this.intParameter (1) - 1);
@@ -6255,7 +6257,7 @@ Clazz_defineMethod (c$, "loadDssr",
 if (modelIndex < 0 && (modelIndex = this.vwr.am.cmi) < 0) this.errorStr (30, "load <dssr file>");
 if (!data.startsWith ("{")) data = this.vwr.getFileAsString3 (data, true, "script");
 this.clearDefinedVariableAtomSets ();
-var map = this.vwr.parseJSON (data);
+var map = this.vwr.parseJSONMap (data);
 this.showString (this.vwr.getAnnotationParser (true).fixDSSRJSONMap (map));
 this.vwr.ms.setInfo (modelIndex, "dssr", map);
 }, "~N,~S");
@@ -6328,7 +6330,7 @@ if (!(Clazz_instanceOf (ret[0], JU.BS))) this.invArg ();
 bsCenter = ret[0];
 q = (this.chk ?  new JU.Quat () : this.vwr.ms.getQuaternion (bsCenter.nextSetBit (0), this.vwr.getQuaternionFrame ()));
 } else {
-q = this.getQuaternionParameter (i);
+q = this.getQuaternionParameter (i, null, false);
 }i = this.iToken + 1;
 if (q == null) this.invArg ();
 break;
@@ -6496,7 +6498,7 @@ if (this.slen == 1) {
 if (!this.chk) msg = JS.ScriptEval.getContextTrace (this.vwr, this.getScriptContext ("prompt"), null, true).toString ();
 } else {
 msg = this.parameterExpressionString (1, 0);
-}if (!this.chk) this.vwr.prompt (msg, "OK", null, true);
+}if (!this.chk) this.vwr.prompt (msg, null, null, true);
 });
 Clazz_defineMethod (c$, "cmdReset", 
  function () {
@@ -6515,7 +6517,7 @@ return;
 case 134221829:
 this.vwr.cacheClear ();
 return;
-case 1073741935:
+case 1073741936:
 this.resetError ();
 return;
 case 1073741995:
@@ -6579,6 +6581,7 @@ if (!this.chk) this.vwr.tm.setSpinOff ();
 return;
 }
 var bsAtoms = null;
+var bsBest = null;
 var degreesPerSecond = 1.4E-45;
 var nPoints = 0;
 var endDegrees = 3.4028235E38;
@@ -6595,7 +6598,6 @@ var is4x4 = false;
 var direction = 1;
 var tok;
 var q = null;
-var qGT180 = false;
 var helicalPath = false;
 var isDegreesPerSecond = false;
 var isSeconds = false;
@@ -6609,8 +6611,9 @@ switch (tok = this.getToken (i).tok) {
 case 12290:
 case 10:
 case 1073742325:
+bsBest = this.atomExpressionAt (i);
 if (translation != null || q != null || nPoints == 2) {
-bsAtoms = this.atomExpressionAt (i);
+bsAtoms = bsBest;
 ptsB = null;
 isSelected = true;
 break;
@@ -6683,11 +6686,8 @@ case 134221850:
 case 1073741864:
 if (tok == 134221850) i++;
 haveRotation = true;
-q = this.getQuaternionParameter (i);
-if (q != null) {
-if (tok == 1073741864 && !(isMolecular = isSelected)) q = q.div (this.vwr.tm.getRotationQ ());
+if ((q = this.getQuaternionParameter (i, bsBest, tok == 1073741864)) != null) {
 if (q.q0 == 0) q.q0 = 1e-10;
-qGT180 = (q.q0 < 0);
 rotAxis.setT (q.getNormal ());
 endDegrees = q.getTheta ();
 }break;
@@ -6824,9 +6824,6 @@ degreesPerSecond = endDegrees;
 if (bsCompare != null) {
 isSelected = true;
 if (bsAtoms == null) bsAtoms = bsCompare;
-}if (isSpin && qGT180) {
-endDegrees = (endDegrees >= 0 ? 360 : -360) - endDegrees;
-rotAxis.scale (-1);
 }if (q != null && !isSeconds && !isDegreesPerSecond) {
 isDegreesPerSecond = (degreesPerSecond > 0);
 isSeconds = !isDegreesPerSecond;
@@ -7217,7 +7214,7 @@ var showing = (!this.chk && this.doReport () && !(this.st[0].value).equals ("var
 switch (tok) {
 case 553648148:
 case 603979866:
-case 603979902:
+case 603979903:
 case 603979924:
 case 603979960:
 case 603979962:
@@ -7448,7 +7445,7 @@ case 545259559:
 if (this.slen > 2) this.setUnits (this.getSettingStr (2, isJmolSet), tok);
 break;
 case 545259573:
-if (!this.chk) this.vwr.setPicked (-1);
+if (!this.chk) this.vwr.setPicked (-1, false);
 if (this.slen > 2) {
 this.cmdSetPicking ();
 return;
@@ -10372,7 +10369,7 @@ fv = (data == null ? 0 : data[i]);
 break;
 case 1275069443:
 if (planeRef != null) fv = JU.Measure.distanceToPlane (planeRef, atom);
- else fv = atom.distance (ptRef);
+ else fv = (atom !== ptRef || minmaxtype != 32 ? atom.distance (ptRef) : NaN);
 break;
 default:
 fv = atom.atomPropertyFloat (this.vwr, tok, this.ptTemp);
@@ -11525,6 +11522,7 @@ function (fileName, flags) {
 var noScript = ((flags & 2) == 2);
 var isAppend = ((flags & 4) == 4);
 var pdbCartoons = ((flags & 1) == 1 && !isAppend);
+var noAutoPlay = ((flags & 8) == 8);
 var cmd = null;
 fileName = fileName.trim ();
 if (fileName.startsWith ("\t")) {
@@ -11562,7 +11560,7 @@ cmd = JU.PT.rep (cmd, "load SYNC", "load append");
 }}if (cmd == null && !noScript && this.vwr.scriptEditorVisible) this.vwr.showEditor ( Clazz_newArray (-1, [fileName, this.vwr.getFileAsString3 (fileName, true, null)]));
  else cmd = (cmd == null ? "script " : cmd) + JU.PT.esc (fileName);
 } finally {
-if (cmd != null) this.vwr.evalString (cmd);
+if (cmd != null) this.vwr.evalString (cmd + (noAutoPlay ? "#!NOAUTOPLAY" : ""));
 }
 }, "~S,~N");
 Clazz_defineMethod (c$, "getDragDropFileTypeName", 
@@ -12932,7 +12930,7 @@ Clazz_defineStatics (c$,
 "qMods", " w:0 x:1 y:2 z:3 normal:4 eulerzxz:5 eulerzyz:6 vector:-1 theta:-2 axisx:-3 axisy:-4 axisz:-5 axisangle:-6 matrix:-9");
 });
 Clazz_declarePackage ("JS");
-Clazz_load (["JS.ScriptError"], "JS.ScriptParam", ["java.lang.Float", "java.util.Hashtable", "JU.BS", "$.CU", "$.Lst", "$.Measure", "$.P3", "$.P4", "$.PT", "$.Quat", "$.SB", "$.V3", "JM.TickInfo", "JS.SV", "$.T", "JU.BSUtil", "$.Edge", "$.Escape", "$.Logger"], function () {
+Clazz_load (["JS.ScriptError"], "JS.ScriptParam", ["java.lang.Float", "java.util.Hashtable", "JU.BS", "$.CU", "$.Lst", "$.Measure", "$.P3", "$.P4", "$.PT", "$.Quat", "$.SB", "$.V3", "JM.TickInfo", "JS.SV", "$.T", "JU.BSUtil", "$.Edge", "$.Logger"], function () {
 c$ = Clazz_decorateAsClass (function () {
 this.contextVariables = null;
 this.thisContext = null;
@@ -13530,7 +13528,7 @@ return true;
 return false;
 }, "~N");
 Clazz_defineMethod (c$, "getQuaternionParameter", 
-function (i) {
+function (i, bsAtoms, divideByCurrent) {
 switch (this.tokAt (i)) {
 case 7:
 var sv = (this.getToken (i)).getList ();
@@ -13538,11 +13536,11 @@ var p4 = null;
 if (sv.size () == 0 || (p4 = JS.SV.pt4Value (sv.get (0))) == null) this.invArg ();
 return JU.Quat.newP4 (p4);
 case 1073741864:
-return (this.chk ? null : JU.Quat.newP4 (JU.Escape.uP (this.vwr.getOrientationText (1073741864, null))));
+return (this.chk ? null : this.vwr.getOrientationText (1073741864, (divideByCurrent ? "best" : ""), bsAtoms));
 default:
 return JU.Quat.newP4 (this.getPoint4f (i));
 }
-}, "~N");
+}, "~N,JU.BS,~B");
 Clazz_defineMethod (c$, "checkLast", 
 function (i) {
 return this.checkLength (i + 1) - 1;
@@ -13922,7 +13920,7 @@ this.scriptManager = scriptManager;
 this.vwr = vwr;
 this.startedByCommandThread = startedByCommandThread;
 this.pt = pt;
-}, "J.api.JmolScriptManager,JV.Viewer,~B,~N");
+}, "JS.ScriptManager,JV.Viewer,~B,~N");
 Clazz_overrideMethod (c$, "run1", 
 function (mode) {
 while (true) switch (mode) {
