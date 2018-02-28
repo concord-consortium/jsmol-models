@@ -3,5 +3,5 @@ font echo 12
 color echo lightgreen
 echo "generating surface..."
 refresh
-isosurface colorscheme “rwb” resolution 6 solvent map mep
+var x = 0; for (var i in {*}) {x = x + i.partialcharge}; if (x=0) {isosurface resolution 6 solvent; color isosurface white} else {isosurface colorscheme “rwb” resolution 6 solvent map mep}
 echo ""
