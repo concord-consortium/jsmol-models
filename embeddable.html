@@ -223,6 +223,23 @@ phone.post('registerScriptingAPIFunc', 'stop');
 phone.post('registerScriptingAPIFunc', 'jsmolScript');
 phone.post('registerScriptingAPIFunc', 'set');
 
+// Callback that is used by JSmol script directly (it might look like unused function but it's referenced from spt files).
+function structureModified (a, b) {
+  var bb = '' + b
+  if (bb == -1) {
+    var updateView = 'isosurface delete; calculate partialcharge; label %P; color labels yellow;' +
+      'if (surf) {' +
+      '  script models/polarization/create-isosurface.spt;' +
+      '  if (transl) {' +
+      '    color isosurface opaque;' +
+      '  } else {' +
+      '    color isosurface translucent;' +
+      '  }' +
+      '}'
+    execJsmolScript('all', updateView)
+  }
+}
+
 </script>
 </head>
 <body>
