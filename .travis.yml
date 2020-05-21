@@ -2,11 +2,11 @@ sudo: false
 dist: trusty
 language: node_js
 node_js:
-  - "6"
+- '6'
 install: travis_retry gem install s3_website -v 3.1.0
-before_script: ./build.sh
-script: ./deploy/s3_deploy.sh
+before_script: "./build.sh"
+script: "./deploy/s3_deploy.sh"
 env:
   global:
-  - secure: DPn3RiEKNHqYQ7HLYSzBFOuEpnoXRl1gTI32mJbspQ79vr6Fz5BZZL4Gk2pi6Xv4Obl+lrYzVi9n429BgmXkJNB6O2oN4EzmKE+Shrg0V5hv6FsEaOdzmRu3TgVxvhelhYZkbaNTvpCH0fubWf3AIBB/S5FxEeEUKR/Xw4BpSto=
-  - secure: HE7H+6WxVtjumm47LjutSLuEzW1mIWfqablW2dp5JEOXVL7RMOLHOkwGTzth6z8soq85qEyDRGRj03FU3Xg7nc9jGnxISsk2UTXugAKHqH06xLk2WT0vWa33KLNtSw2w1kG2kAP+wDzkZXcl6/Lg4tg4FCW6vGI6FqmndgL7NCY=
+  - secure: YlMermtsbqihre+8Bhb+N+pZh3/twTUSLzi8EFEK7UyHtg4u4rPZxnH06AtXdvct47zZgQEKEubTdUQxixhZDNF8bhJFajqfEXhF9f65S9KZMsboMlIkZWactwQ19bb/RCgshCOZtbKOf6qT2sWM96tlRvWDeOX0G6SvTmIZWcY=
+  - secure: ft/ynFwLiZn7/bQj1uRMpV0w/gcJ/S2Rj3qBG8tMEsQ/FmEi2IuaVPgfv14DlDWLjmXrnOkFeuTjzfCt44XB5sWkdi2nWYtW1IJLNsa7ETjJQLJqWlU4zSTfBaizoyrwaDe64NnJLc0ypfIsXknC7ri6wSdr4f9TyNfdaFtDT4o=
