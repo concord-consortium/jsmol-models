@@ -1,0 +1,101 @@
+#script all-off.spt; 
+script models/dna2/all-off.spt;
+hbonds off;
+moveto /* time, axisAngle */ 1.0 { 0 0 1000 90.0} /* zoom, translation */  100.0 0.0 0.0  /* center, rotationRadius */ {43.848 43.697 23.8815} 42.406369676624315 /* navigation center, translation, depth */ {0 0 0} 0 0 0 /* cameraDepth, cameraX, cameraY */  3.0 0.0 0.0;
+
+cpk;
+display all
+
+select 14:J or 11:I
+define cgpair selected
+
+select not selected
+delay 0.5
+
+cpk 95%
+delay 0.01
+cpk 90%
+delay 0.01
+cpk 85%
+delay 0.01
+cpk 80%
+delay 0.01
+cpk 75%
+delay 0.01
+cpk 70%
+delay 0.01
+cpk 65%
+delay 0.01
+cpk 60%
+delay 0.01
+cpk 55%
+delay 0.01
+cpk 50%
+delay 0.01
+cpk 45%
+delay 0.01
+cpk 40%
+delay 0.01
+cpk 35%
+delay 0.01
+cpk 30%
+delay 0.01
+cpk 25%
+delay 0.01
+cpk 20%
+delay 0.01
+cpk 15%
+delay 0.01
+cpk 10%
+delay 0.01
+cpk 5%
+delay 0.01
+cpk off
+
+delay 0.1
+
+moveto /* time, axisAngle */ 1.5 { 364 541 758 139.32} /* zoom, translation */  300.0 0.0 0.0  /* center, rotationRadius */ {42.88004081632654 48.948448979591824 23.76204081632654} 46.87155465488881 /* navigation center, translation, depth */ {0 0 0} 0 0 0 /* cameraDepth, cameraX, cameraY */  3.0 0.0 0.0;
+
+select cgpair
+display selected   #for hbonds checkbox to turn on bonds for only this pair 
+delay 0.5
+
+
+#do not turn on hbonds here, leave that to the checkbox, or will need to change the state of the checkbox
+#hbonds on
+#hbonds 0.12
+wireframe 0.22
+
+cpk 95%
+delay 0.01
+cpk 90%
+delay 0.01
+cpk 85%
+delay 0.01
+cpk 80%
+delay 0.01
+cpk 75%
+delay 0.01
+cpk 70%
+delay 0.01
+cpk 65%
+delay 0.01
+cpk 60%
+delay 0.01
+cpk 55%
+delay 0.01
+cpk 50%
+delay 0.01
+cpk 45%
+delay 0.01
+cpk 40%
+delay 0.01
+cpk 35%
+delay 0.01
+cpk 30%
+delay 0.01
+cpk 25%
+delay 0.01
+cpk 20%
+
+display selected

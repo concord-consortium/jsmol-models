@@ -1,0 +1,100 @@
+#script all-off.spt; 
+script models/dna2/all-off.spt;
+hbonds off;
+moveto /* time, axisAngle */ 1.0 { 0 0 1000 90.0} /* zoom, translation */  100.0 0.0 0.0  /* center, rotationRadius */ {43.848 43.697 23.8815} 42.406369676624315 /* navigation center, translation, depth */ {0 0 0} 0 0 0 /* cameraDepth, cameraX, cameraY */  3.0 0.0 0.0;
+
+cpk;
+display all
+
+select 10:J or 15:I
+define atpair selected
+
+select not selected
+delay 0.5
+
+cpk 95%
+delay 0.01
+cpk 90%
+delay 0.01
+cpk 85%
+delay 0.01
+cpk 80%
+delay 0.01
+cpk 75%
+delay 0.01
+cpk 70%
+delay 0.01
+cpk 65%
+delay 0.01
+cpk 60%
+delay 0.01
+cpk 55%
+delay 0.01
+cpk 50%
+delay 0.01
+cpk 45%
+delay 0.01
+cpk 40%
+delay 0.01
+cpk 35%
+delay 0.01
+cpk 30%
+delay 0.01
+cpk 25%
+delay 0.01
+cpk 20%
+delay 0.01
+cpk 15%
+delay 0.01
+cpk 10%
+delay 0.01
+cpk 5%
+delay 0.01
+cpk off
+
+delay 0.1
+
+moveto /* time, axisAngle */ 1.0 { -700 529 -480 110.62} /* zoom, translation */  300 0.0 0.0  /* center, rotationRadius */ {42.28140625 35.16707812500001 21.8448125} 50.78463898194167 /* navigation center, translation, depth */ {0 0 0} 0 0 0 /* cameraDepth, cameraX, cameraY */  3.0 0.0 0.0;
+
+
+select atpair
+delay 0.5
+
+#do not turn on hbonds here, leave that to the checkbox, or will need to change the state of the textbox
+#hbonds on
+#hbonds 0.12
+wireframe 0.22
+
+cpk 95%
+delay 0.01
+cpk 90%
+delay 0.01
+cpk 85%
+delay 0.01
+cpk 80%
+delay 0.01
+cpk 75%
+delay 0.01
+cpk 70%
+delay 0.01
+cpk 65%
+delay 0.01
+cpk 60%
+delay 0.01
+cpk 55%
+delay 0.01
+cpk 50%
+delay 0.01
+cpk 45%
+delay 0.01
+cpk 40%
+delay 0.01
+cpk 35%
+delay 0.01
+cpk 30%
+delay 0.01
+cpk 25%
+delay 0.01
+cpk 20%
+
+display selected
