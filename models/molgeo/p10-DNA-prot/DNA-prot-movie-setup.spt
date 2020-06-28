@@ -1,0 +1,23 @@
+restrict none
+set echo OFF
+set perspectivedepth off
+set background [xf0e9cf]
+moveto 1.0 { 163 -708 687 165.4} 118.9 0.0 0.0 {6.5148897 5.8662777 21.217445} 53.2;
+select all
+wireframe off
+select protein
+color [x660099]
+select nucleic
+color [xd5ab77]
+select all
+spacefill on
+restrict not (water)
+
+select atomno=362
+label DNA
+font label 25 sans bold
+
+select atomno=1019
+label PROTEIN
+font label 25 sans bold
+set labeloffset 15 15

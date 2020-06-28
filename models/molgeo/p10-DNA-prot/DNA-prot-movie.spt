@@ -1,0 +1,77 @@
+set echo myecho 0% 50%
+echo ""
+
+set echo top left
+echo "Movie Playing..."
+font echo 18 sans bold
+color echo red
+
+delay 0.5
+moveto 1.0 { 163 -708 687 165.4} 118.9 0.0 0.0 {6.5148897 5.8662777 21.217445} 53.2;
+select protein
+color atoms opaque
+
+delay 1
+set echo myecho 100% 100%
+echo "View the|protein's grip|on DNA"
+font echo 18 sans bold
+color echo red
+
+# zoom in on interaction
+select all
+labels off
+delay 1
+moveto 3.0 { 164 -743 649 164.4} 291.2 -0.2 -7.7 {27.545963 16.883038 17.951097} 64.4;
+delay 2
+set echo myecho 0% 45%
+echo "Making DNA|transparent."
+delay 1
+select nucleic 
+color atoms translucent -1
+
+delay 2
+echo " "
+delay 0.5
+
+# view protein through DNA
+set echo myecho 0% 45%
+echo "Notice|how the protein|wraps around DNA."
+font echo 18 sans bold
+color echo red
+
+delay 0.5
+moveto 3.0 { 736 -534 415 102.9} 243.7 -0.2 -7.7 {27.545963 16.883038 17.951097} 64.4;
+
+delay 3
+set echo myecho 0% 45%
+echo "How does|the protein|hold DNA?"
+font echo 18 sans bold
+color echo red
+
+# go back
+delay 1
+moveto 3.0 { 77 -713 697 170.0} 326.8 0.0 0.0 {27.545963 16.883038 17.951097} 64.4;
+
+delay 3
+select nucleic
+color atoms opaque
+
+delay 2
+echo " "
+delay 1
+
+#select protein and not (224-232)
+#wireframe 0.3
+
+select protein and within(group, within(5.0, nucleic))
+wireframe 0.4
+color atoms translucent -1
+color bonds opaque
+
+delay 1
+set echo myecho 0% 35%
+echo "Click and drag|the structure|to view the|molecular geometry|that holds DNA."
+
+delay 3
+set echo top left
+echo "Movie done"
