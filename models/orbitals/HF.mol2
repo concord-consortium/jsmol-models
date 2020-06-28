@@ -1,0 +1,12 @@
+@<TRIPOS>MOLECULE
+                                        
+    2     1    0     0     0
+SMALL
+NO_CHARGES
+****
+
+@<TRIPOS>ATOM
+1     F1              12.4166  -7.9826  -0.1616 F         0 ABCD  -0.2496
+2     H2              11.4347  -7.9330   0.1177 H         0 ABCD   0.2496
+@<TRIPOS>BOND
+1     1     2     1
