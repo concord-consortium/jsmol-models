@@ -1,0 +1,11 @@
+#console on;
+set debugscript;
+set echo myecho 0% 100%; 
+set echo myecho DEPTH 1; 
+set echo myecho IMAGE "models/electronegativity-bonding/nonpolarComp.png";  
+set background black; 
+color atoms gray; 
+connect (atomno=1) (atomno=2) modifyorcreate; 
+moveto 0.0 { -638 -752 168 27.6} 53.9 14.3 19.8 {11.92565 -7.9578 -0.021949999} 2.2; isosurface solvent 0.1 resolution 0.6 map mep; 
+color isosurface translucent {210,210,210};
+spin on;

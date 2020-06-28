@@ -1,0 +1,16 @@
+#console on;
+set debugscript;
+set echo myecho2 0% 100%; 
+set echo myecho2 DEPTH 1; 
+set echo myecho2 IMAGE "models/electronegativity-bonding/polar2Comp.png"
+set background black; 
+select atomno=1; 
+color atoms red; 
+select atomno=2; 
+color atoms white; 
+select all; 
+connect (atomno=1) (atomno=2) modifyorcreate; 
+moveto 0.0 { -638 -752 168 27.6} 53.9 21.0 19.8 {11.92565 -7.9578 -0.021949999} 2.2; isosurface colorscheme "bwr" solvent 0.1 resolution 0.6 map mep; 
+color isosurface translucent; 
+spacefill 0.3; 
+spin on;
