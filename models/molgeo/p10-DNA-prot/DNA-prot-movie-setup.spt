@@ -1,8 +1,10 @@
 restrict none
+set antialiasdisplay true
 set echo OFF
 set perspectivedepth off
 set background [xf0e9cf]
-moveto 1.0 { 163 -708 687 165.4} 118.9 0.0 0.0 {6.5148897 5.8662777 21.217445} 53.2;
+reset;center {6.5148897 5.8662777 21.217445}; rotate z -113.53; rotate y 92.23; rotate z -87.6; zoom 83.26; set rotationRadius 53.2;
+
 select all
 wireframe off
 select protein
