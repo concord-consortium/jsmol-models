@@ -52,7 +52,7 @@ When you work on a new Lab interactive, you should test integration with new JSm
 When everything works as expected, you can push changes to the ``gh-pages`` branch of the jsmol-models repository.
 Then use the GH Pages URL in the Lab interactive:
 
-    http://concord-consortium.github.io/jsmol-models/embeddable.html
+    https://concord-consortium.github.io/jsmol-models/embeddable.html
 
 If that is working fine, then merge ``gh-pages`` into the ```production``` branch, push it,
 and then use the production URL in the Lab interactive:
