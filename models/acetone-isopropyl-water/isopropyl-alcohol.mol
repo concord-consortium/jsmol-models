@@ -254,7 +254,7 @@ function _setModelState() {
 
   isosurface ID "mySurface" select ({0:11})  molecular 1.4 color range -0.1 0.1 map mep;
   isosurface ID "mySurface" fill noMesh noDots notFrontOnly frontlit;
-  color $"mySurface""bwr" range -0.1 0.1;
+  color $"mySurface""rwb" range -0.1 0.1;
 
   frank on;
   font frank 16.0 SansSerif Plain;
